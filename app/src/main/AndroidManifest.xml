@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.creteil.com.danecreteil.app">
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".AccueilActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.creteil.com.danecreteil.app.VillesActivity"
+            android:label="@string/titre_villes_activity"
+            android:parentActivityName="com.creteil.com.danecreteil.app.AccueilActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".AccueilActivity" />
+        </activity>
+        <provider
+            android:authorities="com.creteil.com.danecreteil.app"
+            android:name=".data.DaneProvider" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDlWdTsFKgWaQaieLLZu_j_M6aLJ_3H_-w"/>
+    </application>
+
+</manifest>
