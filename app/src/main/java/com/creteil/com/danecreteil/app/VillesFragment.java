@@ -135,17 +135,17 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
 //    }
 
     private void updateVille() {
-        FetchVillesTask weatherTask = new FetchVillesTask(getActivity());
-        weatherTask.execute(choix_depart);
+        FetchVillesTask villesTask = new FetchVillesTask(getActivity());
+        villesTask.execute(choix_depart);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String sortOrder = DaneContract.VilleEntry.COLUMN_NOM + " ASC";
-        Uri weatherForLocationUri = DaneContract.VilleEntry.buildVilleParDepartement(choix_depart);
+        Uri villeParDepartementUri = DaneContract.VilleEntry.buildVilleParDepartement(choix_depart);
 
         return new CursorLoader(getActivity(),
-                weatherForLocationUri,
+                villeParDepartementUri,
                 VILLES_COLUMNS,
                 null,
                 null,

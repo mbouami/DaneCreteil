@@ -36,7 +36,6 @@ public class DaneDbHelper extends SQLiteOpenHelper {
                 VilleEntry.COLUMN_NOM + " TEXT NOT NULL, " +
                 VilleEntry.COLUMN_CODE_DEPARTEMENT + " TEXT NOT NULL, " +
                 VilleEntry.COLUMN_NOM_DEPARTEMENT + " TEXT NOT NULL, " +
-                VilleEntry.COLUMN_NOM + " TEXT NOT NULL, " +
                 VilleEntry.COLUMN_VILLE_BASE_ID + " INTEGER NOT NULL " +
                 " );";
 
@@ -45,7 +44,6 @@ public class DaneDbHelper extends SQLiteOpenHelper {
                 EtablissementEntry.COLUMN_NOM + " TEXT NOT NULL, " +
                 EtablissementEntry.COLUMN_ETABLISSEMENT_ID + " TEXT NOT NULL, " +
                 EtablissementEntry.COLUMN_VILLE_ID + " TEXT NOT NULL, " +
-                EtablissementEntry.COLUMN_VILLE_ID + " INTEGER NOT NULL, "+
                 " FOREIGN KEY (" + EtablissementEntry.COLUMN_VILLE_ID + ") REFERENCES " +
                 VilleEntry.TABLE_NAME + " (" + VilleEntry._ID + ") " +
                 " );";
