@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.creteil.com.danecreteil.app.data.DaneContract;
 import com.creteil.com.danecreteil.app.data.DaneContract.VilleEntry;
 
 import org.json.JSONArray;
@@ -18,12 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -99,8 +93,7 @@ public class FetchVillesTask extends AsyncTask<String, Void, Void> {
                 JSONObject laville = villeArray.getJSONObject(i);
                 ContentValues villesValues = new ContentValues();
                 villesValues.put(VilleEntry.COLUMN_NOM, laville.getString(OWM_NOM));
-                villesValues.put(VilleEntry.COLUMN_CODE_DEPARTEMENT, OWM_DEPART);
-                villesValues.put(VilleEntry.COLUMN_NOM_DEPARTEMENT, "");
+                villesValues.put(VilleEntry.COLUMN_DEPARTEMENT, OWM_DEPART);
                 villesValues.put(VilleEntry.COLUMN_VILLE_BASE_ID, laville.getString(OWM_ID));
                 cVVector.add(villesValues);
             }
@@ -113,7 +106,7 @@ public class FetchVillesTask extends AsyncTask<String, Void, Void> {
                 inserted = mContext.getContentResolver().bulkInsert(VilleEntry.CONTENT_URI, cvArray);
             }
 
-            Log.d(LOG_TAG, "FetchVillesTask Complete. " + inserted + " Inserted");
+            Log.d(LOG_TAG, "Lors de cette opération. " + inserted + " villes ont été insérées");
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();

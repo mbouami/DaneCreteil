@@ -9,8 +9,6 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-import static android.Manifest.permission_group.LOCATION;
-
 /**
  * Created by Mohammed on 26/11/2016.
  */
@@ -69,7 +67,7 @@ public class DaneProvider extends ContentProvider {
     //location.location_setting = ?
     private static final String sVillesParDepartementSelection =
             DaneContract.VilleEntry.TABLE_NAME+
-                    "." + DaneContract.VilleEntry.COLUMN_CODE_DEPARTEMENT + " = ? ";
+                    "." + DaneContract.VilleEntry.COLUMN_DEPARTEMENT + " = ? ";
 
     private Cursor getVillesParDepartement(Uri uri, String[] projection, String sortOrder) {
         String departement = DaneContract.VilleEntry.getDepartementFromUri(uri);

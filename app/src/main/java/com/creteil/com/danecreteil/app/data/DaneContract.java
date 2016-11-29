@@ -70,8 +70,7 @@ public class DaneContract {
 
         public static final String COLUMN_VILLE_BASE_ID = "ville_id";
         public static final String COLUMN_NOM = "nom";
-        public static final String COLUMN_CODE_DEPARTEMENT = "departement_code";
-        public static final String COLUMN_NOM_DEPARTEMENT = "departement_nom";
+        public static final String COLUMN_DEPARTEMENT = "departement";
 
         public static Uri buildVilleUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

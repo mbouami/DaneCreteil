@@ -34,8 +34,7 @@ public class DaneDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_VILLES_TABLE = "CREATE TABLE " + VilleEntry.TABLE_NAME + " (" +
                 VilleEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 VilleEntry.COLUMN_NOM + " TEXT NOT NULL, " +
-                VilleEntry.COLUMN_CODE_DEPARTEMENT + " TEXT NOT NULL, " +
-                VilleEntry.COLUMN_NOM_DEPARTEMENT + " TEXT NOT NULL, " +
+                VilleEntry.COLUMN_DEPARTEMENT + " TEXT NOT NULL, " +
                 VilleEntry.COLUMN_VILLE_BASE_ID + " INTEGER NOT NULL " +
                 " );";
 

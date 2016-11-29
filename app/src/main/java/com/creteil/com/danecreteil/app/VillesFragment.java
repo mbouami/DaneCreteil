@@ -1,36 +1,22 @@
 package com.creteil.com.danecreteil.app;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RadioGroup;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONException;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Map;
 
-import com.creteil.com.danecreteil.app.data.JSONParser;
 import com.creteil.com.danecreteil.app.data.DaneContract;
 
 /**
@@ -52,8 +38,7 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
             // So the convenience is worth it.
             DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry._ID,
             DaneContract.VilleEntry.COLUMN_NOM,
-            DaneContract.VilleEntry.COLUMN_NOM_DEPARTEMENT,
-            DaneContract.VilleEntry.COLUMN_CODE_DEPARTEMENT,
+            DaneContract.VilleEntry.COLUMN_DEPARTEMENT,
             DaneContract.VilleEntry.COLUMN_VILLE_BASE_ID
     };
 
@@ -77,8 +62,6 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mVillesAdapter = new VillesAdapter(getActivity(), null, 0);
-
-
         View rootView = inflater.inflate(R.layout.fragment_villes, container, false);
         RadioGroup liste_depart = (RadioGroup) rootView.findViewById(R.id.liste_departement);
         liste_depart.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -101,13 +84,21 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
         listView = (ListView) rootView.findViewById(R.id.liste_villes);
         listView.setAdapter(mVillesAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Map<String, String> item = (Map<String, String>) mVillesAdapter.getItem(position);
-                Toast.makeText(getActivity(), item.get("id"), Toast.LENGTH_SHORT).show();
-//                Intent intent = new Intent(getActivity(), EtabActivity.class)
-//                        .putExtra("idville", item.get("id")).putExtra("nomville",item.get("nom"));
-//                startActivity(intent);
+                // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    Toast.makeText(getActivity(), cursor.getString(COL_VILLE_ID), Toast.LENGTH_SHORT).show();
+//                    String locationSetting = Utility.getPreferredLocation(getActivity());
+//                    Intent intent = new Intent(getActivity(), DetailActivity.class)
+//                            .setData(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+//                                    locationSetting, cursor.getLong(COL_WEATHER_DATE)
+//                            ));
+//                    startActivity(intent);
+                }
             }
         });
         return rootView;
@@ -161,52 +152,4 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoaderReset(Loader<Cursor> loader) {
         mVillesAdapter.swapCursor(null);
     }
-
-//    public class FetchVillesTask extends AsyncTask<String, Void, ArrayList<Map<String, String>>> {
-//
-//        private final String LOG_TAG = FetchVillesTask.class.getSimpleName();
-//        private JSONParser listevillespardepart = new JSONParser();
-//        ProgressDialog pDialog;
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            pDialog = new ProgressDialog(getActivity());
-//            pDialog.setMessage("Chargement des données en cours. Merci de patienter...");
-//            pDialog.setIndeterminate(false);
-//            pDialog.setCancelable(false);
-//            pDialog.show();
-//        }
-//        @Override
-//        protected ArrayList<Map<String, String>> doInBackground(String... params) {
-//            if (params.length == 0) {
-//                return null;
-//            }
-//            String villesJsonStr = null;
-//            try {
-//                final String QUERY_DEPART = params[0].toString();
-//                String baseUrl = "http://www.bouami.fr/gestionetabs/web/listevilles/";
-//                URL url = new URL(baseUrl.concat(QUERY_DEPART));
-//                villesJsonStr = listevillespardepart.parse(url,"GET");
-//            } catch (IOException e) {
-//                Log.e(LOG_TAG, "Error ", e);
-//                return null;
-//            }
-//            try {
-//                return listevillespardepart.getVilleDataFromJson(villesJsonStr,params[0].toString());
-//            } catch (JSONException e) {
-//                Log.e(LOG_TAG, e.getMessage(), e);
-//                e.printStackTrace();
-//            }
-//            return null;
-//        }
-//        @Override
-//        protected void onPostExecute(ArrayList<Map<String, String>> result) {
-//            pDialog.dismiss();
-//            if (result != null) {
-//                mVillesAdapter = new SimpleAdapter(getActivity(),result, R.layout.list_item_villes, new String[] { "id", "nom" },new int[] { R.id.id, R.id.nom });
-//                listView.setAdapter(mVillesAdapter);
-//            }
-//        }
-//    }
 }

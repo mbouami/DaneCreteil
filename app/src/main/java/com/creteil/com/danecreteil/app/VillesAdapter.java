@@ -21,6 +21,7 @@ public class VillesAdapter extends CursorAdapter {
     public VillesAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
+
     public static class ViewHolder {
         public final TextView idView;
         public final TextView nomView;
@@ -30,6 +31,7 @@ public class VillesAdapter extends CursorAdapter {
             nomView = (TextView) view.findViewById(R.id.nom);
         }
     }
+
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         int viewType = getItemViewType(cursor.getPosition());
