@@ -5,13 +5,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.creteil.com.danecreteil.app.data.DaneContract;
+
 /**
  * Created by Mohammed on 27/11/2016.
  */
 
 public class VillesActivity extends AppCompatActivity {
     private final String LOG_TAG = VillesActivity.class.getSimpleName();
-    private final String VILLES_TAG = "VILLES_PAR_DEPARTEMENT";
+    private final String VILLESFRAGMENT_TAG = "VILLES_PAR_DEPARTEMENT";
+    private String mdepartement;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +22,7 @@ public class VillesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_villes);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new VillesFragment(), VILLES_TAG)
+                    .add(R.id.container, new VillesFragment(), VILLESFRAGMENT_TAG)
                     .commit();
         }
     }
@@ -44,5 +47,19 @@ public class VillesActivity extends AppCompatActivity {
 //                }
 //            }
 //        });
+//    }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        String location = DaneContract.departement_en_cours;
+//        // update the location in our second pane using the fragment manager
+//        if (location != null && !location.equals(mLocation)) {
+//            ForecastFragment ff = (ForecastFragment)getSupportFragmentManager().findFragmentByTag(FORECASTFRAGMENT_TAG);
+//            if ( null != ff ) {
+//                ff.onLocationChanged();
+//            }
+//            mLocation = location;
+//        }
 //    }
 }

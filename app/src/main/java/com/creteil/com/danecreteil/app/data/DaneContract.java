@@ -30,6 +30,7 @@ public class DaneContract {
     public static final String PATH_USERS = "users";
     public static final String PATH_VILLES = "villes";
     public static final String PATH_ETABLISSEMENTS = "etablissements";
+    public static final String PATH_PERSONNEL = "personnel";
 
     public static final class UserEntry implements BaseColumns {
 
@@ -68,7 +69,7 @@ public class DaneContract {
         // Table name
         public static final String TABLE_NAME = "villes";
 
-        public static final String COLUMN_VILLE_BASE_ID = "ville_id";
+        public static final String COLUMN_VILLE_ID = "ville_id";
         public static final String COLUMN_NOM = "nom";
         public static final String COLUMN_DEPARTEMENT = "departement";
 
@@ -87,7 +88,6 @@ public class DaneContract {
         }
     }
 
-    /* Inner class that defines the table contents of the weather table */
     public static final class EtablissementEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI =
@@ -104,17 +104,62 @@ public class DaneContract {
         public static final String COLUMN_VILLE_ID = "ville_id";
         public static final String COLUMN_ETABLISSEMENT_ID = "etablissement_id";
         public static final String COLUMN_NOM = "nom";
+        public static final String COLUMN_RNE = "rne";
+        public static final String COLUMN_TEL = "tel";
+        public static final String COLUMN_FAX = "fax";
+        public static final String COLUMN_EMAIL = "email";
+        public static final String COLUMN_CP = "cp";
+        public static final String COLUMN_ADRESSE = "adresse";
+        public static final String COLUMN_TYPE = "type";
 
-        public static Uri buildEtablissementrUri(long id) {
+        public static Uri buildEtablissementUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
+        public static Uri buildEtablissementParVille(String idville) {
+            return CONTENT_URI.buildUpon().appendPath(idville).build();
+        }
         public static String getVilleFromUri(Uri uri) {
-            return uri.getPathSegments().get(2);
+
+            return uri.getPathSegments().get(1);
         }
 
         public static String getEtablissementFromUri(Uri uri) {
             return uri.getPathSegments().get(3);
+        }
+    }
+
+    public static final class PersonnelEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_PERSONNEL).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PERSONNEL;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PERSONNEL;
+
+        public static final String TABLE_NAME = "personnel";
+
+        // Column with the foreign key into the location table.
+        public static final String COLUMN_PERSONNEL_ID = "personnel_id";
+        public static final String COLUMN_ETABLISSEMENT_ID = "etablissement_id";
+        public static final String COLUMN_NOM = "nom";
+        public static final String COLUMN_STATUT = "statut";
+
+        public static Uri buildPersonnelUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+//        public static String getVilleFromUri(Uri uri) {
+//            return uri.getPathSegments().get(1);
+//        }
+//
+//        public static String getEtablissementFromUri(Uri uri) {
+//            return uri.getPathSegments().get(2);
+//        }
+
+        public static String getPersonnelFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 }

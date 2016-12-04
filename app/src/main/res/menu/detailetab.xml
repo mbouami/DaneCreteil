@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.creteil.com.danecreteil.app.DetailActivity" >
+    <item android:id="@+id/action_share"
+        android:title="@string/action_share"
+        app:showAsAction="always"
+        android:icon="?attr/actionModeShareDrawable"
+        app:actionProviderClass="android.support.v7.widget.ShareActionProvider">
+    </item>
+    <item android:id="@+id/action_call"
+        android:title="@string/action_call"
+        app:showAsAction="always"
+        android:icon="@android:drawable/stat_sys_phone_call">
+    </item>
+    <item android:id="@+id/action_map"
+        android:title="@string/action_map"
+        app:showAsAction="always"
+        android:icon="@android:drawable/ic_menu_mapmode">
+    </item>
+    <item android:id="@+id/action_mail"
+        android:title="@string/action_mail"
+        app:showAsAction="always"
+        android:icon="@android:drawable/sym_action_email">
+    </item>
+</menu>

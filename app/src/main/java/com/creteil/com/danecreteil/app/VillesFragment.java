@@ -1,5 +1,6 @@
 package com.creteil.com.danecreteil.app;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +17,6 @@ import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import java.util.Map;
-
 import com.creteil.com.danecreteil.app.data.DaneContract;
 
 /**
@@ -24,10 +24,14 @@ import com.creteil.com.danecreteil.app.data.DaneContract;
  */
 
 public class VillesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private final String LOG_TAG = VillesFragment.class.getSimpleName();
+
     VillesAdapter mVillesAdapter;
     ListView listView = null;
     private static final int VILLES_LOADER = 0;
-    private String choix_depart =null;
+    private String choix_depart;
+
+    static String Villeencours = null;
 
     private static final String[] VILLES_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
@@ -39,18 +43,23 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
             DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry._ID,
             DaneContract.VilleEntry.COLUMN_NOM,
             DaneContract.VilleEntry.COLUMN_DEPARTEMENT,
-            DaneContract.VilleEntry.COLUMN_VILLE_BASE_ID
+            DaneContract.VilleEntry.COLUMN_VILLE_ID
     };
 
     static final int COL_VILLE_ID = 0;
     static final int COL_VILLE_NOM = 1;
-    static final int COL_VILLE_NOM_DEPARTEMENT = 2;
-    static final int COL_VILLE_CODE_DEPARTEMENT = 3;
-    static final int COL_VILLE_BASE_ID = 4;
+    static final int COL_VILLE_DEPARTEMENT = 2;
+    static final int COL_VILLE_BASE_ID = 3;
 
     public VillesFragment() {
 
     }
+
+    public String getChoix_depart() {
+        return choix_depart;
+    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +87,7 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
                         choix_depart = "94";
                         break;
                 }
-                updateVille();
+                onDepartementChanged();
             }
         });
         listView = (ListView) rootView.findViewById(R.id.liste_villes);
@@ -90,14 +99,12 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
                 // CursorAdapter returns a cursor at the correct position for getItem(), or null
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                Villeencours = cursor.getString(COL_VILLE_NOM);
                 if (cursor != null) {
-                    Toast.makeText(getActivity(), cursor.getString(COL_VILLE_ID), Toast.LENGTH_SHORT).show();
-//                    String locationSetting = Utility.getPreferredLocation(getActivity());
-//                    Intent intent = new Intent(getActivity(), DetailActivity.class)
-//                            .setData(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
-//                                    locationSetting, cursor.getLong(COL_WEATHER_DATE)
-//                            ));
-//                    startActivity(intent);
+//                    Toast.makeText(getActivity(), cursor.getString(COL_VILLE_ID)+"--"+cursor.getString(COL_VILLE_NOM)+"--"+cursor.getString(COL_VILLE_BASE_ID), Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getActivity(), EtablissementActivity.class)
+                            .setData(DaneContract.EtablissementEntry.buildEtablissementParVille(cursor.getString(COL_VILLE_ID)));
+                    startActivity(intent);
                 }
             }
         });
@@ -111,7 +118,7 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     void onDepartementChanged( ) {
-        updateVille();
+//        updateVille();
         getLoaderManager().restartLoader(VILLES_LOADER, null, this);
     }
 
@@ -127,14 +134,13 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
 
     private void updateVille() {
         FetchVillesTask villesTask = new FetchVillesTask(getActivity());
-        villesTask.execute(choix_depart);
+        villesTask.execute();
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String sortOrder = DaneContract.VilleEntry.COLUMN_NOM + " ASC";
         Uri villeParDepartementUri = DaneContract.VilleEntry.buildVilleParDepartement(choix_depart);
-
         return new CursorLoader(getActivity(),
                 villeParDepartementUri,
                 VILLES_COLUMNS,

@@ -9,4 +9,10 @@
     <string name="dep77">Seine et Marne</string>
     <string name="dep93">Seine Saint Denis</string>
     <string name="dep94">Val de Marne</string>
+    <string name="titre_etabs_activity">Etablissement par Ville</string>
+    <string name="action_share">partager</string>
+    <string name="action_call">Appeler</string>
+    <string name="action_map">Y aller</string>
+    <string name="action_mail">envoyer un mail</string>
+    <string name="titre_detail_activity">Information sur  l\'établissement</string>
 </resources>

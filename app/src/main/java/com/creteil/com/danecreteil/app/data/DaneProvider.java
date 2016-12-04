@@ -25,6 +25,8 @@ public class DaneProvider extends ContentProvider {
     static final int ETABLISSEMENTS = 300;
     static final int ETABLISSEMENTS_PAR_VILLE = 301;
 
+    static final int PERSONNEL = 400;
+
     private static final SQLiteQueryBuilder sEtablissementsParVilleQueryBuilder;
     static{
         sEtablissementsParVilleQueryBuilder = new SQLiteQueryBuilder();
@@ -45,6 +47,7 @@ public class DaneProvider extends ContentProvider {
         sVillesParDepartementQueryBuilder = new SQLiteQueryBuilder();
         sVillesParDepartementQueryBuilder.setTables(DaneContract.VilleEntry.TABLE_NAME);
     }
+
     static UriMatcher buildUriMatcher() {
         // I know what you're thinking.  Why create a UriMatcher when you can use regular
         // expressions instead?  Because you're not crazy, that's why.
@@ -61,6 +64,8 @@ public class DaneProvider extends ContentProvider {
 
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS, ETABLISSEMENTS);
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS+ "/*", ETABLISSEMENTS_PAR_VILLE);
+
+        matcher.addURI(authority, DaneContract.PATH_PERSONNEL, PERSONNEL);
         return matcher;
     }
 
@@ -90,6 +95,7 @@ public class DaneProvider extends ContentProvider {
 
 
     private Cursor getEtablissementsParVille(Uri uri, String[] projection, String sortOrder) {
+//        String ville = DaneContract.EtablissementEntry.getVilleFromUri(uri);
         String ville = DaneContract.EtablissementEntry.getVilleFromUri(uri);
         String[] selectionArgs;
         String selection;
@@ -110,6 +116,26 @@ public class DaneProvider extends ContentProvider {
     public boolean onCreate() {
         mDaneHelper = new DaneDbHelper(getContext());
         return true;
+    }
+
+    @Nullable
+    @Override
+    public String getType(Uri uri) {
+        final int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            // Student: Uncomment and fill out these two cases
+            case ETABLISSEMENTS_PAR_VILLE:
+                return DaneContract.EtablissementEntry.CONTENT_ITEM_TYPE;
+            case VILLES_PAR_DEPARTEMENT:
+                return DaneContract.VilleEntry.CONTENT_ITEM_TYPE;
+            case VILLES:
+                return DaneContract.VilleEntry.CONTENT_TYPE;
+            case ETABLISSEMENTS:
+                return DaneContract.EtablissementEntry.CONTENT_TYPE;
+            default:
+                throw new UnsupportedOperationException("uri inconnue: " + uri);
+        }
     }
 
     @Nullable
@@ -139,6 +165,18 @@ public class DaneProvider extends ContentProvider {
                 );
                 break;
             }
+            case PERSONNEL: {
+                retCursor = mDaneHelper.getReadableDatabase().query(
+                        DaneContract.PersonnelEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
             case ETABLISSEMENTS: {
                 retCursor = mDaneHelper.getReadableDatabase().query(
                         DaneContract.EtablissementEntry.TABLE_NAME,
@@ -150,6 +188,7 @@ public class DaneProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
+
             }
 
             default:
@@ -158,27 +197,6 @@ public class DaneProvider extends ContentProvider {
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
     }
-
-    @Nullable
-    @Override
-    public String getType(Uri uri) {
-        final int match = sUriMatcher.match(uri);
-
-        switch (match) {
-            // Student: Uncomment and fill out these two cases
-            case ETABLISSEMENTS_PAR_VILLE:
-                return DaneContract.EtablissementEntry.CONTENT_ITEM_TYPE;
-            case VILLES_PAR_DEPARTEMENT:
-                return DaneContract.VilleEntry.CONTENT_ITEM_TYPE;
-            case VILLES:
-                return DaneContract.VilleEntry.CONTENT_TYPE;
-            case ETABLISSEMENTS:
-                return DaneContract.EtablissementEntry.CONTENT_TYPE;
-            default:
-                throw new UnsupportedOperationException("uri inconnue: " + uri);
-        }
-    }
-
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
@@ -198,7 +216,15 @@ public class DaneProvider extends ContentProvider {
             case ETABLISSEMENTS: {
                 long _id = db.insert(DaneContract.EtablissementEntry.TABLE_NAME, null, contentValues);
                 if ( _id > 0 )
-                    returnUri = DaneContract.EtablissementEntry.buildEtablissementrUri(_id);
+                    returnUri = DaneContract.EtablissementEntry.buildEtablissementUri(_id);
+                else
+                    throw new android.database.SQLException("Erreur lors de l'ajout de l'établissement " + uri);
+                break;
+            }
+            case PERSONNEL: {
+                long _id = db.insert(DaneContract.PersonnelEntry.TABLE_NAME, null, contentValues);
+                if ( _id > 0 )
+                    returnUri = DaneContract.PersonnelEntry.buildPersonnelUri(_id);
                 else
                     throw new android.database.SQLException("Erreur lors de l'ajout de l'établissement " + uri);
                 break;
@@ -226,6 +252,10 @@ public class DaneProvider extends ContentProvider {
                 rowsDeleted = db.delete(
                         DaneContract.EtablissementEntry.TABLE_NAME, selection, selectionArgs);
                 break;
+            case PERSONNEL:
+                rowsDeleted = db.delete(
+                        DaneContract.PersonnelEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("uri inconnue: " + uri);
         }
@@ -249,6 +279,10 @@ public class DaneProvider extends ContentProvider {
                 break;
             case ETABLISSEMENTS:
                 rowsUpdated = db.update(DaneContract.EtablissementEntry.TABLE_NAME, contentValues, selection,
+                        selectionArgs);
+                break;
+            case PERSONNEL:
+                rowsUpdated = db.update(DaneContract.PersonnelEntry.TABLE_NAME, contentValues, selection,
                         selectionArgs);
                 break;
             default:
@@ -288,6 +322,23 @@ public class DaneProvider extends ContentProvider {
                 try {
                     for (ContentValues value : contentValues) {
                         long _id = db.insert(DaneContract.EtablissementEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+
+            case PERSONNEL:
+                db.beginTransaction();
+                returnCount = 0;
+                try {
+                    for (ContentValues value : contentValues) {
+                        long _id = db.insert(DaneContract.PersonnelEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
                         }
