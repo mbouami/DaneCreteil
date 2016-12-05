@@ -23,8 +23,12 @@ public class EtablissementActivity extends AppCompatActivity implements EtabsFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_etab);
         if (savedInstanceState == null) {
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(EtabsFragment.ETAB_URI,getIntent().getData());
+            EtabsFragment fragment = new EtabsFragment();
+            fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new EtabsFragment())
+                    .add(R.id.container, fragment)
                     .commit();
         }
     }

@@ -1,5 +1,7 @@
 package com.creteil.com.danecreteil.app;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.RadioGroup;
@@ -11,7 +13,7 @@ import com.creteil.com.danecreteil.app.data.DaneContract;
  * Created by Mohammed on 27/11/2016.
  */
 
-public class VillesActivity extends AppCompatActivity {
+public class VillesActivity extends AppCompatActivity implements VillesFragment.Callback {
     private final String LOG_TAG = VillesActivity.class.getSimpleName();
     private final String VILLESFRAGMENT_TAG = "VILLES_PAR_DEPARTEMENT";
     private String mdepartement;
@@ -25,6 +27,13 @@ public class VillesActivity extends AppCompatActivity {
                     .add(R.id.container, new VillesFragment(), VILLESFRAGMENT_TAG)
                     .commit();
         }
+    }
+
+    @Override
+    public void onItemSelected(Uri villeUri) {
+        Intent intent = new Intent(this, EtablissementActivity.class)
+                .setData(villeUri);
+        startActivity(intent);
     }
 //
 //    @Override

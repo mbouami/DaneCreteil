@@ -34,6 +34,9 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
     private boolean mEtabLayout;
     private static final int ETAB_LOADER = 0;
 
+    static final String ETAB_URI = "URI";
+    private Uri mUri;
+
     private static final String[] ETAB_COLUMNS = {
             EtablissementEntry.TABLE_NAME + "." + EtablissementEntry._ID,
             EtablissementEntry.TABLE_NAME + "." + EtablissementEntry.COLUMN_NOM,
@@ -59,6 +62,10 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(EtabsFragment.ETAB_URI);
+        }
         mEtabsAdapter = new EtabsAdapter(getActivity(),null,0);
         View rootView = inflater.inflate(R.layout.fragment_etab, container, false);
         mListView = (ListView) rootView.findViewById(R.id.liste_etabs);
@@ -68,16 +75,9 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-//                if (cursor != null) {
-////                    Toast.makeText(getActivity(), cursor.getString(COL_ETAB_ID)+"--"+cursor.getString(COL_ETAB_NOM)+"--"+cursor.getString(COL_ETAB_VILLE_ID), Toast.LENGTH_LONG).show();
-//////                    String locationSetting = Utility.getPreferredLocation(getActivity());
-//                    Intent intent = new Intent(getActivity(), DetailActivity.class)
-//                            .setData(DaneContract.EtablissementEntry.buildEtablissementUri(cursor.getLong(COL_ETAB_ID)));
-//                    startActivity(intent);
-//                }
                 if (cursor != null) {
                     ((Callback) getActivity())
-                            .onItemSelected(DaneContract.EtablissementEntry.buildEtablissementUri(cursor.getLong(COL_ETAB_ID)));
+                            .onItemSelected(EtablissementEntry.buildEtablissementUri(cursor.getLong(COL_ETAB_ID)));
                 }
                 mPosition = position;
             }
@@ -115,24 +115,22 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String sortOrder = EtablissementEntry.COLUMN_TYPE + " ASC";
-        Intent intent = getActivity().getIntent();
-//        Log.v(LOG_TAG, "In onCreateLoader "+DaneContract.EtablissementEntry.getVilleFromUri(intent.getData()));
-        if (intent == null) {
-            return null;
+        if ( null != mUri ) {
+            String sortOrder = EtablissementEntry.COLUMN_TYPE + " ASC";
+            Log.v(LOG_TAG, "In onCreateLoader "+mUri.toString());
+            String mEtablissement = String.format("%s %s", "Liste des établissements à ",VillesFragment.Villeencours);
+            TextView titreetabTextView = (TextView)getView().findViewById(R.id.titre_etablissement);
+            titreetabTextView.setText(mEtablissement);
+            return new CursorLoader(
+                    getActivity(),
+                    mUri,
+                    ETAB_COLUMNS,
+                    null,
+                    null,
+                    sortOrder
+            );
         }
-        String mEtablissement = String.format("%s %s", "Liste des établissements à ",VillesFragment.Villeencours);
-        TextView titreetabTextView = (TextView)getView().findViewById(R.id.titre_etablissement);
-        titreetabTextView.setText(mEtablissement);
-//        Uri etabsParVilleUri = DaneContract.EtablissementEntry.getEtablissementFromUri();
-        return new CursorLoader(
-                getActivity(),
-                intent.getData(),
-                ETAB_COLUMNS,
-                null,
-                null,
-                sortOrder
-        );
+        return null;
     }
 
     @Override

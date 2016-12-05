@@ -51,6 +51,13 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_VILLE_DEPARTEMENT = 2;
     static final int COL_VILLE_BASE_ID = 3;
 
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Uri villeUri);
+    }
+
     public VillesFragment() {
 
     }
@@ -101,10 +108,8 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 Villeencours = cursor.getString(COL_VILLE_NOM);
                 if (cursor != null) {
-//                    Toast.makeText(getActivity(), cursor.getString(COL_VILLE_ID)+"--"+cursor.getString(COL_VILLE_NOM)+"--"+cursor.getString(COL_VILLE_BASE_ID), Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(getActivity(), EtablissementActivity.class)
-                            .setData(DaneContract.EtablissementEntry.buildEtablissementParVille(cursor.getString(COL_VILLE_ID)));
-                    startActivity(intent);
+                    ((Callback) getActivity())
+                            .onItemSelected(DaneContract.EtablissementEntry.buildEtablissementParVille(cursor.getString(COL_VILLE_ID)));
                 }
             }
         });

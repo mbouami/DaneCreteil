@@ -53,7 +53,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ADRESSE,
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_CP,
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ETABLISSEMENT_ID,
+            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ETABLISSEMENT_ID
 //            DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry.COLUMN_NOM
     };
 
@@ -61,16 +61,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     // projection changes
     static final int COL_ETAB_ID = 0;
     static final int COL_ETAB_NOM = 1;
-//    static final int COL_ETAB_RNE = 2;
-//    static final int COL_ETAB_TYPE = 3;
-//    static final int COL_ETAB_TEL = 4;
-//    static final int COL_ETAB_FAX = 5;
-//    static final int COL_ETAB_EMAIL = 6;
-//    static final int COL_ETAB_ADRESSE = 7;
-//    static final int COL_ETAB_CP = 8;
-//    static final int COL_ETAB_VILLE_ID = 9;
-//    static final int COL_ETAB_ETABLISSEMENT_ID = 10;
-//    static final int COL_ETAB_VILLE = 11;
+    static final int COL_ETAB_RNE = 2;
+    static final int COL_ETAB_TYPE = 3;
+    static final int COL_ETAB_TEL = 4;
+    static final int COL_ETAB_FAX = 5;
+    static final int COL_ETAB_EMAIL = 6;
+    static final int COL_ETAB_ADRESSE = 7;
+    static final int COL_ETAB_CP = 8;
+    static final int COL_ETAB_VILLE_ID = 9;
+    static final int COL_ETAB_ETABLISSEMENT_ID = 10;
+    static final int COL_ETAB_VILLE = 11;
 
     private TextView mNomView;
     private TextView mRneView;
@@ -140,6 +140,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
         return true;
     }
+
     private Intent createShareIntent() {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
