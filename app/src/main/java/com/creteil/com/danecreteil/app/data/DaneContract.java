@@ -118,13 +118,18 @@ public class DaneContract {
         public static Uri buildEtablissementParVille(String idville) {
             return CONTENT_URI.buildUpon().appendPath(idville).build();
         }
+
+        public static Uri buildEtablissementParId(String idetab,String rubrique) {
+            return CONTENT_URI.buildUpon().appendPath(idetab).appendPath(rubrique).build();
+        }
+
         public static String getVilleFromUri(Uri uri) {
 
             return uri.getPathSegments().get(1);
         }
 
         public static String getEtablissementFromUri(Uri uri) {
-            return uri.getPathSegments().get(3);
+            return uri.getPathSegments().get(1);
         }
     }
 

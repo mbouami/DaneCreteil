@@ -77,7 +77,7 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 if (cursor != null) {
                     ((Callback) getActivity())
-                            .onItemSelected(EtablissementEntry.buildEtablissementUri(cursor.getLong(COL_ETAB_ID)));
+                            .onItemSelected(EtablissementEntry.buildEtablissementParId(cursor.getString(COL_ETAB_ID),"etab"));
                 }
                 mPosition = position;
             }

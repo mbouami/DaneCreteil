@@ -185,6 +185,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if ( null != mUri ) {
             Log.v(LOG_TAG, "In onCreateLoader "+mUri.toString());
+//            Cursor etablissementCursor = mContext.getContentResolver().query(
+//                    DaneContract.EtablissementEntry.CONTENT_URI,
+//                    new String[]{DaneContract.EtablissementEntry._ID},
+//                    DaneContract.EtablissementEntry.COLUMN_ETABLISSEMENT_ID + " = ?",
+//                    new String[]{etab_id},
+//                    null);
+//            return new CursorLoader(
+//                    getActivity(),
+//                    DaneContract.EtablissementEntry.CONTENT_URI,
+//                    ETAB_COLUMNS,
+//                    DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry._ID + " = ?",
+//                    new String[]{DaneContract.EtablissementEntry.getEtablissementFromUri(mUri)},
+////                    new String[]{String.valueOf(25)},
+//                    null
+//            );
             return new CursorLoader(
                     getActivity(),
                     mUri,
@@ -201,9 +216,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished "+mUri.toString());
 //        String nom = data.getString(COL_ETAB_NOM);
-        mNomView.setText(mUri.toString());
+        mNomView.setText(data.getString(data.getColumnIndex("nom"))+ data.getColumnName(COL_ETAB_RNE)+"---"+data.getCount());
 //        String rne = data.getString(COL_ETAB_RNE);
 //        mRneView.setText(rne);
+//        mRneView.setText(data.getString(COL_ETAB_RNE));
 //        String tel = data.getString(COL_ETAB_TEL);
 //        mTelView.setText(tel);
 //        String fax = data.getString(COL_ETAB_FAX);

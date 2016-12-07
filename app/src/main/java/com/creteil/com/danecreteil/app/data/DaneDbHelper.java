@@ -19,6 +19,10 @@ import com.creteil.com.danecreteil.app.data.DaneContract.PersonnelEntry;
 public class DaneDbHelper extends SQLiteOpenHelper {
     private final String LOG_TAG = DaneDbHelper.class.getSimpleName();
     private static final int DATABASE_VERSION = 9;
+    private static final String SQL_DELETE_USER_TABLE = "DROP TABLE IF EXISTS " + UserEntry.TABLE_NAME;
+    private static final String SQL_DELETE_VILLE_TABLE = "DROP TABLE IF EXISTS " + VilleEntry.TABLE_NAME;
+    private static final String SQL_DELETE_PERSONNEL_TABLE = "DROP TABLE IF EXISTS " + PersonnelEntry.TABLE_NAME;
+    private static final String SQL_DELETE_ETABLISSEMENT_TABLE = "DROP TABLE IF EXISTS " + EtablissementEntry.TABLE_NAME;
 
     static final String DATABASE_NAME = "danecreteil.db";
 
@@ -75,10 +79,10 @@ public class DaneDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + UserEntry.TABLE_NAME);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + VilleEntry.TABLE_NAME);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PersonnelEntry.TABLE_NAME);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + EtablissementEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL(SQL_DELETE_USER_TABLE);
+        sqLiteDatabase.execSQL(SQL_DELETE_VILLE_TABLE);
+        sqLiteDatabase.execSQL(SQL_DELETE_PERSONNEL_TABLE);
+        sqLiteDatabase.execSQL(SQL_DELETE_ETABLISSEMENT_TABLE);
         onCreate(sqLiteDatabase);
     }
 }

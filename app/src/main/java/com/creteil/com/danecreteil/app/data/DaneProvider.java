@@ -24,6 +24,7 @@ public class DaneProvider extends ContentProvider {
 
     static final int ETABLISSEMENTS = 300;
     static final int ETABLISSEMENTS_PAR_VILLE = 301;
+    static final int ETABLISSEMENTS_ID = 302;
 
     static final int PERSONNEL = 400;
 
@@ -48,6 +49,12 @@ public class DaneProvider extends ContentProvider {
         sVillesParDepartementQueryBuilder.setTables(DaneContract.VilleEntry.TABLE_NAME);
     }
 
+    private static final SQLiteQueryBuilder sEtablissementParIdQueryBuilder;
+    static{
+        sEtablissementParIdQueryBuilder = new SQLiteQueryBuilder();
+        sEtablissementParIdQueryBuilder.setTables(DaneContract.EtablissementEntry.TABLE_NAME);
+    }
+
     static UriMatcher buildUriMatcher() {
         // I know what you're thinking.  Why create a UriMatcher when you can use regular
         // expressions instead?  Because you're not crazy, that's why.
@@ -64,6 +71,7 @@ public class DaneProvider extends ContentProvider {
 
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS, ETABLISSEMENTS);
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS+ "/*", ETABLISSEMENTS_PAR_VILLE);
+        matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS+ "/*/etab", ETABLISSEMENTS_ID);
 
         matcher.addURI(authority, DaneContract.PATH_PERSONNEL, PERSONNEL);
         return matcher;
@@ -73,6 +81,10 @@ public class DaneProvider extends ContentProvider {
     private static final String sVillesParDepartementSelection =
             DaneContract.VilleEntry.TABLE_NAME+
                     "." + DaneContract.VilleEntry.COLUMN_DEPARTEMENT + " = ? ";
+
+    private static final String sEtablissementParIdSelection =
+            DaneContract.EtablissementEntry.TABLE_NAME+
+                    "." + DaneContract.EtablissementEntry._ID + " = ? ";
 
     private Cursor getVillesParDepartement(Uri uri, String[] projection, String sortOrder) {
         String departement = DaneContract.VilleEntry.getDepartementFromUri(uri);
@@ -111,6 +123,21 @@ public class DaneProvider extends ContentProvider {
         );
     }
 
+    private Cursor getEtablissementsParId(Uri uri, String[] projection, String sortOrder) {
+        String idetab = DaneContract.EtablissementEntry.getEtablissementFromUri(uri);
+        String[] selectionArgs;
+        String selection;
+        selectionArgs = new String[]{idetab};
+        selection = sEtablissementParIdSelection;
+        return sEtablissementParIdQueryBuilder.query(mDaneHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
 
     @Override
     public boolean onCreate() {
@@ -125,14 +152,16 @@ public class DaneProvider extends ContentProvider {
 
         switch (match) {
             // Student: Uncomment and fill out these two cases
-            case ETABLISSEMENTS_PAR_VILLE:
-                return DaneContract.EtablissementEntry.CONTENT_ITEM_TYPE;
             case VILLES_PAR_DEPARTEMENT:
                 return DaneContract.VilleEntry.CONTENT_ITEM_TYPE;
             case VILLES:
                 return DaneContract.VilleEntry.CONTENT_TYPE;
             case ETABLISSEMENTS:
                 return DaneContract.EtablissementEntry.CONTENT_TYPE;
+            case ETABLISSEMENTS_PAR_VILLE:
+                return DaneContract.EtablissementEntry.CONTENT_ITEM_TYPE;
+            case ETABLISSEMENTS_ID:
+                return DaneContract.EtablissementEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("uri inconnue: " + uri);
         }
@@ -151,6 +180,10 @@ public class DaneProvider extends ContentProvider {
             }
             case ETABLISSEMENTS_PAR_VILLE: {
                 retCursor = getEtablissementsParVille(uri, projection, sortOrder);
+                break;
+            }
+            case ETABLISSEMENTS_ID: {
+                retCursor = getEtablissementsParId(uri, projection, sortOrder);
                 break;
             }
             case VILLES: {
