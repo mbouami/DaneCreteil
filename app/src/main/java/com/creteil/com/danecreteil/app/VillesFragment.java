@@ -34,15 +34,9 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     static String Villeencours = null;
 
     private static final String[] VILLES_COLUMNS = {
-            // In this case the id needs to be fully qualified with a table name, since
-            // the content provider joins the location & weather tables in the background
-            // (both have an _id column)
-            // On the one hand, that's annoying.  On the other, you can search the weather table
-            // using the location set by the user, which is only in the Location table.
-            // So the convenience is worth it.
             DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry._ID,
-            DaneContract.VilleEntry.COLUMN_NOM,
-            DaneContract.VilleEntry.COLUMN_DEPARTEMENT,
+            DaneContract.VilleEntry.COLUMN_VILLE_NOM,
+            DaneContract.VilleEntry.COLUMN_VILLE_DEPARTEMENT,
             DaneContract.VilleEntry.COLUMN_VILLE_ID
     };
 
@@ -144,7 +138,7 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String sortOrder = DaneContract.VilleEntry.COLUMN_NOM + " ASC";
+        String sortOrder = DaneContract.VilleEntry.COLUMN_VILLE_NOM + " ASC";
         Uri villeParDepartementUri = DaneContract.VilleEntry.buildVilleParDepartement(choix_depart);
         return new CursorLoader(getActivity(),
                 villeParDepartementUri,

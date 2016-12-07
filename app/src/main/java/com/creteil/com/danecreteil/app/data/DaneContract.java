@@ -70,8 +70,8 @@ public class DaneContract {
         public static final String TABLE_NAME = "villes";
 
         public static final String COLUMN_VILLE_ID = "ville_id";
-        public static final String COLUMN_NOM = "nom";
-        public static final String COLUMN_DEPARTEMENT = "departement";
+        public static final String COLUMN_VILLE_NOM = "nom";
+        public static final String COLUMN_VILLE_DEPARTEMENT = "departement";
 
         public static Uri buildVilleUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -159,10 +159,12 @@ public class DaneContract {
 //            return uri.getPathSegments().get(1);
 //        }
 //
-//        public static String getEtablissementFromUri(Uri uri) {
-//            return uri.getPathSegments().get(2);
-//        }
-
+        public static String getEtablissementFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+        public static Uri buildPersonnelParIdEtab(String idetab,String rubrique) {
+            return CONTENT_URI.buildUpon().appendPath(idetab).appendPath(rubrique).build();
+        }
         public static String getPersonnelFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }

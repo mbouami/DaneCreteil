@@ -27,6 +27,8 @@ public class DaneProvider extends ContentProvider {
     static final int ETABLISSEMENTS_ID = 302;
 
     static final int PERSONNEL = 400;
+    static final int PERSONNEL_PAR_ETAB = 401;
+    static final int PERSONNEL_PAR_ID = 402;
 
     private static final SQLiteQueryBuilder sEtablissementsParVilleQueryBuilder;
     static{
@@ -37,6 +39,34 @@ public class DaneProvider extends ContentProvider {
         //weather INNER JOIN location ON weather.location_id = location._id
         sEtablissementsParVilleQueryBuilder.setTables(
                 DaneContract.EtablissementEntry.TABLE_NAME + " INNER JOIN " +
+                        DaneContract.VilleEntry.TABLE_NAME +
+                        " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
+                        "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID +
+                        " = " + DaneContract.VilleEntry.TABLE_NAME +
+                        "." + DaneContract.VilleEntry._ID);
+    }
+
+    private static final SQLiteQueryBuilder sPersonnelParEtablissamentQueryBuilder;
+    static{
+        sPersonnelParEtablissamentQueryBuilder = new SQLiteQueryBuilder();
+
+
+        //This is an inner join which looks like
+        //weather INNER JOIN location ON weather.location_id = location._id
+//        sPersonnelParEtablissamentQueryBuilder.setTables(
+//                DaneContract.PersonnelEntry.TABLE_NAME + " INNER JOIN " +
+//                        DaneContract.EtablissementEntry.TABLE_NAME +
+//                        " ON " + DaneContract.PersonnelEntry.TABLE_NAME +
+//                        "." + DaneContract.PersonnelEntry.COLUMN_ETABLISSEMENT_ID +
+//                        " = " + DaneContract.EtablissementEntry.TABLE_NAME +
+//                        "." + DaneContract.EtablissementEntry._ID);
+        sPersonnelParEtablissamentQueryBuilder.setTables(
+                DaneContract.PersonnelEntry.TABLE_NAME + " INNER JOIN " +
+                        DaneContract.EtablissementEntry.TABLE_NAME +
+                        " ON " + DaneContract.PersonnelEntry.TABLE_NAME +
+                        "." + DaneContract.PersonnelEntry.COLUMN_ETABLISSEMENT_ID +
+                        " = " + DaneContract.EtablissementEntry.TABLE_NAME +
+                        "." + DaneContract.EtablissementEntry._ID + " INNER JOIN " +
                         DaneContract.VilleEntry.TABLE_NAME +
                         " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
                         "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID +
@@ -74,17 +104,23 @@ public class DaneProvider extends ContentProvider {
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS+ "/*/etab", ETABLISSEMENTS_ID);
 
         matcher.addURI(authority, DaneContract.PATH_PERSONNEL, PERSONNEL);
+        matcher.addURI(authority, DaneContract.PATH_PERSONNEL+ "/*", PERSONNEL_PAR_ID);
+        matcher.addURI(authority, DaneContract.PATH_PERSONNEL+ "/*/etab", PERSONNEL_PAR_ETAB);
         return matcher;
     }
 
     //location.location_setting = ?
     private static final String sVillesParDepartementSelection =
             DaneContract.VilleEntry.TABLE_NAME+
-                    "." + DaneContract.VilleEntry.COLUMN_DEPARTEMENT + " = ? ";
+                    "." + DaneContract.VilleEntry.COLUMN_VILLE_DEPARTEMENT + " = ? ";
 
     private static final String sEtablissementParIdSelection =
             DaneContract.EtablissementEntry.TABLE_NAME+
                     "." + DaneContract.EtablissementEntry._ID + " = ? ";
+
+    private static final String sPersonnelParEtabSelection =
+            DaneContract.PersonnelEntry.TABLE_NAME+
+                    "." + DaneContract.PersonnelEntry.COLUMN_ETABLISSEMENT_ID + " = ? ";
 
     private Cursor getVillesParDepartement(Uri uri, String[] projection, String sortOrder) {
         String departement = DaneContract.VilleEntry.getDepartementFromUri(uri);
@@ -129,7 +165,23 @@ public class DaneProvider extends ContentProvider {
         String selection;
         selectionArgs = new String[]{idetab};
         selection = sEtablissementParIdSelection;
-        return sEtablissementParIdQueryBuilder.query(mDaneHelper.getReadableDatabase(),
+        return sEtablissementsParVilleQueryBuilder.query(mDaneHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getPersonnelParEtab(Uri uri, String[] projection, String sortOrder) {
+        String idetab = DaneContract.PersonnelEntry.getEtablissementFromUri(uri);
+        String[] selectionArgs;
+        String selection;
+        selectionArgs = new String[]{idetab};
+        selection = sPersonnelParEtabSelection;
+        return sPersonnelParEtablissamentQueryBuilder.query(mDaneHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -162,6 +214,12 @@ public class DaneProvider extends ContentProvider {
                 return DaneContract.EtablissementEntry.CONTENT_ITEM_TYPE;
             case ETABLISSEMENTS_ID:
                 return DaneContract.EtablissementEntry.CONTENT_ITEM_TYPE;
+            case PERSONNEL:
+                return DaneContract.PersonnelEntry.CONTENT_TYPE;
+            case PERSONNEL_PAR_ID:
+                return DaneContract.PersonnelEntry.CONTENT_ITEM_TYPE;
+            case PERSONNEL_PAR_ETAB:
+                return DaneContract.PersonnelEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("uri inconnue: " + uri);
         }
@@ -184,6 +242,10 @@ public class DaneProvider extends ContentProvider {
             }
             case ETABLISSEMENTS_ID: {
                 retCursor = getEtablissementsParId(uri, projection, sortOrder);
+                break;
+            }
+            case PERSONNEL_PAR_ETAB: {
+                retCursor = getPersonnelParEtab(uri, projection, sortOrder);
                 break;
             }
             case VILLES: {

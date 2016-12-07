@@ -100,8 +100,8 @@ public class JSONParser {
             villeId = villeCursor.getLong(villeIdIndex);
         } else {
             ContentValues villeValues = new ContentValues();
-            villeValues.put(DaneContract.VilleEntry.COLUMN_NOM, nom);
-            villeValues.put(DaneContract.VilleEntry.COLUMN_DEPARTEMENT, departement);
+            villeValues.put(DaneContract.VilleEntry.COLUMN_VILLE_NOM, nom);
+            villeValues.put(DaneContract.VilleEntry.COLUMN_VILLE_DEPARTEMENT, departement);
             villeValues.put(DaneContract.VilleEntry.COLUMN_VILLE_ID, Ville_base_Id);
             Uri insertedUri = mContext.getContentResolver().insert(
                     DaneContract.VilleEntry.CONTENT_URI,
