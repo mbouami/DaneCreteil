@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
 import com.creteil.com.danecreteil.app.data.DaneContract.VilleEntry;
+import com.creteil.com.danecreteil.app.data.DaneDbHelper;
 import com.creteil.com.danecreteil.app.data.JSONParser;
 
 import org.json.JSONArray;
@@ -64,15 +65,16 @@ public class FetchVillesTask extends AsyncTask<String, Void, Void> {
 
     @Override
     protected Void doInBackground(String... params) {
-
-        // If there's no zip code, there's nothing to look up.  Verify size of params.
+        final String VILLES_BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
+        JSONParser parser = new JSONParser(VILLES_BASE_URL,"GET",mContext);
+        if (params[0]=="update") {
+            parser.initialiserBase();
+        }
 //        if (params.length == 0) {
 //            return null;
 //        }
 //        String departementQuery = params[0];
 //        final String VILLES_BASE_URL ="http://www.bouami.fr/gestionetabs/web/listevilles/";
-        final String VILLES_BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
-        JSONParser parser = new JSONParser(VILLES_BASE_URL,"GET",mContext);
         try {
 //            parser.getVillesDataFromJson(mContext,departementQuery);
             parser.getVillesDataFromJson();

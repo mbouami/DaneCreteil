@@ -181,6 +181,12 @@ public class JSONParser {
         return personnelId;
     }
 
+    public void initialiserBase(){
+        int effacertablePersonnel = mContext.getContentResolver().delete(DaneContract.PersonnelEntry.CONTENT_URI,null,null);
+        int effacertableEtablissement = mContext.getContentResolver().delete(DaneContract.EtablissementEntry.CONTENT_URI,null,null);
+        int effacertableVille = mContext.getContentResolver().delete(DaneContract.VilleEntry.CONTENT_URI,null,null);
+    }
+
     public void getVillesDataFromJson()
             throws JSONException {
 

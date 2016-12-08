@@ -15,4 +15,5 @@
     <string name="action_map">Y aller</string>
     <string name="action_mail">envoyer un mail</string>
     <string name="titre_detail_activity">Information sur  l\'établissement</string>
+    <string name="action_rafraichir">Rafraîchir</string>
 </resources>

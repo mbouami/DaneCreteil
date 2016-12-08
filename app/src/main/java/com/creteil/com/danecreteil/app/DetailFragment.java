@@ -40,25 +40,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private ShareActionProvider mShareActionProvider;
     private static final String ETABCAST_SHARE_HASHTAG = " #EtabsDaneCreteil";
+    private String mNomEtabcast;
     private String mEtabSharecast;
     private String mTelEtabcast;
     private String mMailEtabcast;
     private String mAdresseEtabcast;
-//
-//    private static final String[] ETAB_COLUMNS = {
-//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry._ID,
-//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_NOM,
-//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_RNE,
-//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TYPE,
-//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TEL,
-//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_FAX,
-//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_EMAIL,
-//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ADRESSE,
-//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_CP,
-//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID,
-//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ETABLISSEMENT_ID,
-//            DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry.COLUMN_VILLE_NOM
-//    };
 
     private static final String[] PERSONNEL_COLUMNS = {
             DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry._ID,
@@ -88,18 +74,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_ETAB_ADRESSE = 10;
     static final int COL_ETAB_CP = 11;
     static final int COL_VILLE = 12;
-//    static final int COL_ETAB_ID = 0;
-//    static final int COL_ETAB_NOM = 1;
-//    static final int COL_ETAB_RNE = 2;
-//    static final int COL_ETAB_TYPE = 3;
-//    static final int COL_ETAB_TEL = 4;
-//    static final int COL_ETAB_FAX = 5;
-//    static final int COL_ETAB_EMAIL = 6;
-//    static final int COL_ETAB_ADRESSE = 7;
-//    static final int COL_ETAB_CP = 8;
-//    static final int COL_ETAB_VILLE_ID = 9;
-//    static final int COL_ETAB_ETABLISSEMENT_ID = 10;
-//    static final int COL_VILLE = 11;
 
     private TextView mNomView;
     private TextView mRneView;
@@ -176,7 +150,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mEtabSharecast + ETABCAST_SHARE_HASHTAG);
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Carte visite : "+mNomEtabcast);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mEtabSharecast);
         return shareIntent;
     }
 
@@ -262,7 +237,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mEmailView.setText("Mail : "+mail);
         String adresse = data.getString(COL_ETAB_ADRESSE)+ " "+data.getString(COL_ETAB_CP)+" "+data.getString(COL_VILLE);
         mAdresseView.setText("Adresse : "+adresse);
-        mEtabSharecast = String.format("%s", "test");
+        mNomEtabcast = nom;
+        mEtabSharecast = String.format("%s\n%s\n%s\n%s\n%s\n%s", nom,"RNE : "+rne,"Tél : "+tel,"Fax : "+fax,"Mail : "+mail,"Adresse : "+adresse);
         mMailEtabcast = String.format("%s", mail);
         mTelEtabcast = String.format("%s", tel);
         mAdresseEtabcast = String.format("%s", adresse);
