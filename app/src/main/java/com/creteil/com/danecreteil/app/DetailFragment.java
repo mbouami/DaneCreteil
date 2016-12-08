@@ -20,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
@@ -34,6 +35,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static final int DETAIL_LOADER = 0;
     static final String DETAIL_URI = "URI";
     private Uri mUri;
+    PersonnelAdapter mPersonnelAdapter;
+    private ListView mListView;
 
     private ShareActionProvider mShareActionProvider;
     private static final String ETABCAST_SHARE_HASHTAG = " #EtabsDaneCreteil";
@@ -41,9 +44,27 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private String mTelEtabcast;
     private String mMailEtabcast;
     private String mAdresseEtabcast;
+//
+//    private static final String[] ETAB_COLUMNS = {
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry._ID,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_NOM,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_RNE,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TYPE,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TEL,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_FAX,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_EMAIL,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ADRESSE,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_CP,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ETABLISSEMENT_ID,
+//            DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry.COLUMN_VILLE_NOM
+//    };
 
-    private static final String[] ETAB_COLUMNS = {
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry._ID,
+    private static final String[] PERSONNEL_COLUMNS = {
+            DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry._ID,
+            DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry.COLUMN_NOM,
+            DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry.COLUMN_STATUT,
+            DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry.COLUMN_ETABLISSEMENT_ID,
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_NOM,
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_RNE,
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TYPE,
@@ -52,25 +73,33 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_EMAIL,
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ADRESSE,
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_CP,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ETABLISSEMENT_ID,
             DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry.COLUMN_VILLE_NOM
     };
-
-    // these constants correspond to the projection defined above, and must change if the
-    // projection changes
-    static final int COL_ETAB_ID = 0;
-    static final int COL_ETAB_NOM = 1;
-    static final int COL_ETAB_RNE = 2;
-    static final int COL_ETAB_TYPE = 3;
-    static final int COL_ETAB_TEL = 4;
-    static final int COL_ETAB_FAX = 5;
-    static final int COL_ETAB_EMAIL = 6;
-    static final int COL_ETAB_ADRESSE = 7;
-    static final int COL_ETAB_CP = 8;
-    static final int COL_ETAB_VILLE_ID = 9;
-    static final int COL_ETAB_ETABLISSEMENT_ID = 10;
-    static final int COL_VILLE = 11;
+    static final int COL_PERSONNEL_ID = 0;
+    static final int COL_PERSONNEL_NOM = 1;
+    static final int COL_PERSONNEL_STATUT = 2;
+    static final int COL_ETAB_ID = 3;
+    static final int COL_ETAB_NOM = 4;
+    static final int COL_ETAB_RNE = 5;
+    static final int COL_ETAB_TYPE = 6;
+    static final int COL_ETAB_TEL = 7;
+    static final int COL_ETAB_FAX = 8;
+    static final int COL_ETAB_EMAIL = 9;
+    static final int COL_ETAB_ADRESSE = 10;
+    static final int COL_ETAB_CP = 11;
+    static final int COL_VILLE = 12;
+//    static final int COL_ETAB_ID = 0;
+//    static final int COL_ETAB_NOM = 1;
+//    static final int COL_ETAB_RNE = 2;
+//    static final int COL_ETAB_TYPE = 3;
+//    static final int COL_ETAB_TEL = 4;
+//    static final int COL_ETAB_FAX = 5;
+//    static final int COL_ETAB_EMAIL = 6;
+//    static final int COL_ETAB_ADRESSE = 7;
+//    static final int COL_ETAB_CP = 8;
+//    static final int COL_ETAB_VILLE_ID = 9;
+//    static final int COL_ETAB_ETABLISSEMENT_ID = 10;
+//    static final int COL_VILLE = 11;
 
     private TextView mNomView;
     private TextView mRneView;
@@ -87,7 +116,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {;
+                             Bundle savedInstanceState) {
+        mPersonnelAdapter = new PersonnelAdapter(getActivity(), null, 0);
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
@@ -99,6 +129,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mFaxView = (TextView) rootView.findViewById(R.id.detail_fax_textview);
         mEmailView = (TextView) rootView.findViewById(R.id.detail_email_textview);
         mAdresseView = (TextView) rootView.findViewById(R.id.detail_adresse_textview);
+        mListView = (ListView) rootView.findViewById(R.id.liste_personnel);
+        mListView.setAdapter(mPersonnelAdapter);
         return rootView;
     }
 
@@ -152,10 +184,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Intent shareIntent = new Intent(Intent.ACTION_DIAL);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setData(Uri.parse("tel:"+mTelEtabcast));
-        if (ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            return null;
-        }
+//        if (ActivityCompat.checkSelfPermission(getActivity(),
+//                Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+//            return null;
+//        }
         return shareIntent;
     }
 
@@ -164,7 +196,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, "");
-        shareIntent.putExtra(Intent.EXTRA_EMAIL, mMailEtabcast);
+        shareIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { mMailEtabcast });
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Demande de rendez-vous");
         return shareIntent;
     }
@@ -191,7 +223,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     void onEtablissementChanged( String idEtablissement ) {
         if (null != mUri) {
-            Uri updatedUri = DaneContract.EtablissementEntry.buildEtablissementParId(idEtablissement,"etab");
+//            Uri updatedUri = DaneContract.EtablissementEntry.buildEtablissementParId(idEtablissement,"etab");
+            Uri updatedUri = DaneContract.PersonnelEntry.buildPersonnelParIdEtab(idEtablissement,"etab");
             mUri = updatedUri;
             getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
         }
@@ -204,7 +237,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             return new CursorLoader(
                     getActivity(),
                     mUri,
-                    ETAB_COLUMNS,
+                    PERSONNEL_COLUMNS,
                     null,
                     null,
                     null
@@ -216,7 +249,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
-//            Log.v(LOG_TAG, "In onLoadFinished "+mUri.toString()+"----"+data.getString(COL_VILLE)+"---"+data.getString(COL_ETAB_VILLE_ID));
+           Log.v(LOG_TAG, "In onLoadFinished "+mUri.toString()+"----"+data.getString(COL_PERSONNEL_STATUT)+"---"+data.getString(COL_PERSONNEL_NOM));
         String nom = data.getString(COL_ETAB_TYPE) +" "+data.getString(COL_ETAB_NOM);
         mNomView.setText(nom);
         String rne = data.getString(COL_ETAB_RNE);
@@ -233,6 +266,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mMailEtabcast = String.format("%s", mail);
         mTelEtabcast = String.format("%s", tel);
         mAdresseEtabcast = String.format("%s", adresse);
+        mPersonnelAdapter.swapCursor(data);
 //        if (mShareActionProvider != null) {
 //            mShareActionProvider.setShareIntent(createShareIntent());
 ////            mShareActionProvider.setShareIntent(createPhoneIntent());
@@ -243,6 +277,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        mPersonnelAdapter.swapCursor(null);
     }
 }
