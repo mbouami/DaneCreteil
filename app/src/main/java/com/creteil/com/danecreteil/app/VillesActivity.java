@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -30,7 +33,27 @@ public class VillesActivity extends AppCompatActivity implements VillesFragment.
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the main; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.villeactivity, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_departement) {
+            startActivity(new Intent(this, ParametresActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onItemSelected(Uri villeUri) {
+        Log.d(LOG_TAG, "onItemSelected : "+villeUri+"----"+DaneContract.EtablissementEntry.getNomEtablissementFromUri(villeUri));
         Intent intent = new Intent(this, EtablissementActivity.class)
                 .setData(villeUri);
         startActivity(intent);

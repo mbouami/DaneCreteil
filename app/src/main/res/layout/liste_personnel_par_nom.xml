@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.09"
+    tools:context="com.creteil.com.danecreteil.app.PersonnelParNomActivity">
+    <AutoCompleteTextView
+        android:id="@+id/rechercher_personnel_par_nom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:layout_below="@+id/imageView"
+        android:layout_alignLeft="@+id/imageView"
+        android:layout_alignStart="@+id/imageView"
+        android:layout_marginTop="10dp"
+        android:hint="@string/label_recherche_personnel_par_nom">
+        <requestFocus />
+    </AutoCompleteTextView>
+
+    <FrameLayout
+        android:id="@+id/detail_personnel_par_nom"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        tools:layout="@android:layout/list_content" />
+</LinearLayout>

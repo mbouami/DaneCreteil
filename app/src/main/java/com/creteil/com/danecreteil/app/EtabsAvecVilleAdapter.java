@@ -16,54 +16,65 @@ import android.widget.TextView;
 import com.creteil.com.danecreteil.app.data.DaneContract;
 
 /**
- * Created by Mohammed on 08/12/2016.
+ * Created by Mohammed on 03/12/2016.
  */
 
-public class PersonnelAdapter extends CursorAdapter implements Filterable {
-    private static final int VIEW_TYPE_COUNT = 2;
-    private static final int VIEW_TYPE_PERSONNEL_EN_COURS = 0;
-    private static final int VIEW_TYPE_PERSONNEL_LES_AUTRES = 1;
-    private ContentResolver mContent;
+public class EtabsAvecVilleAdapter extends CursorAdapter implements Filterable {
 
-    public PersonnelAdapter(Context context, Cursor c, int flags) {
+    private static final int VIEW_TYPE_COUNT = 2;
+    private static final int VIEW_TYPE_ETABS_EN_COURS = 0;
+    private static final int VIEW_TYPE_ETABS_LES_AUTRES = 1;
+    private boolean mEtabLayout;
+    private ContentResolver mContent;
+    private static final String LOG_TAG = EtabsAvecVilleAdapter.class.getSimpleName();
+
+    public EtabsAvecVilleAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
         mContent = context.getContentResolver();
+    }
+
+    public void setUseEtabLayout(boolean EtabLayout) {
+        mEtabLayout = EtabLayout;
     }
 
     public static class ViewHolder {
         public final TextView nomView;
 
         public ViewHolder(View view) {
-            nomView = (TextView) view.findViewById(R.id.list_item_personnel_textview);
+            nomView = (TextView) view.findViewById(R.id.list_item_etabs_textview);
         }
     }
 
     private String convertCursorRowToUXFormat(Cursor cursor) {
-        return cursor.getString(ListePersonnelparNomFragment.COL_PERSONNEL_STATUT)
-                +" : "
-                +cursor.getString(ListePersonnelparNomFragment.COL_PERSONNEL_NOM);
+        return cursor.getString(ListeEtabParNomFragment.COL_ETAB_TYPE)+
+                " "+
+                cursor.getString(ListeEtabParNomFragment.COL_ETAB_NOM);
+//                +" ("+cursor.getString(ListeEtabParNomFragment.COL_VILLE)+")";
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         int viewType = getItemViewType(cursor.getPosition());
         int layoutId = -1;
-        layoutId = R.layout.list_item_personnel;
+        layoutId = R.layout.list_item_etabs;
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
+
         return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
+//        String nomville = cursor.getString(VillesFragment.COL_VILLE_NOM);
+//        viewHolder.nomView.setText(nomville);
         viewHolder.nomView.setText(convertCursorRowToUXFormat(cursor));
     }
 
     @Override
     public int getItemViewType(int position) {
-        return position == 0 ? VIEW_TYPE_PERSONNEL_EN_COURS : VIEW_TYPE_PERSONNEL_LES_AUTRES;
+        return position == 0 ? VIEW_TYPE_ETABS_EN_COURS : VIEW_TYPE_ETABS_LES_AUTRES;
     }
 
     @Override
@@ -74,7 +85,7 @@ public class PersonnelAdapter extends CursorAdapter implements Filterable {
     @Override
     public String convertToString(Cursor cursor) {
         //returns string inserted into textview after item from drop-down list is selected.
-        return cursor.getString(ListePersonnelparNomFragment.COL_PERSONNEL_STATUT)+" "+cursor.getString(ListePersonnelparNomFragment.COL_PERSONNEL_NOM);
+        return cursor.getString(ListeEtabParNomFragment.COL_ETAB_TYPE)+" "+cursor.getString(ListeEtabParNomFragment.COL_ETAB_NOM);
 //                +" ("+cursor.getString(ListeEtabParNomFragment.COL_VILLE)+")";
     }
 
@@ -85,35 +96,28 @@ public class PersonnelAdapter extends CursorAdapter implements Filterable {
             return filter.runQuery(constraint);
         }
         Uri uri = DaneContract.EtablissementEntry.CONTENT_URI.buildUpon().appendPath(constraint.toString()).appendPath("rechercher").build();
+        Log.v(LOG_TAG, "In onCreateLoader "+uri.toString()+"---"+DaneContract.EtablissementEntry.getNomEtablissementFromUri(uri));
         String nometab = DaneContract.EtablissementEntry.getNomEtablissementFromUri(uri);
         String[] selectionArgs;
         String selection;
         selectionArgs = new String[]{"%" + nometab +"%"};
+//        selection = DaneContract.EtablissementEntry.TABLE_NAME+"." + DaneContract.EtablissementEntry.COLUMN_NOM + " like ? ";
         return mContent.query(uri,
-                PERSONNEL_COLUMNS,
-                sPersonnelParNomSelection,
+                ETAB_PROJECTION,
+                sEtablissementParNomSelection,
                 selectionArgs,
                 null,
                 null
         );
     }
-    public static final String[] PERSONNEL_COLUMNS = {
-            DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry._ID,
-            DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry.COLUMN_NOM,
-            DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry.COLUMN_STATUT,
-            DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry.COLUMN_ETABLISSEMENT_ID,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_NOM,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_RNE,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TYPE,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TEL,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_FAX,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_EMAIL,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ADRESSE,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_CP,
-            DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry.COLUMN_VILLE_NOM
+
+    public static final String[] ETAB_PROJECTION = new String[] {
+            DaneContract.EtablissementEntry.TABLE_NAME +"."+DaneContract.EtablissementEntry._ID,
+            DaneContract.EtablissementEntry.TABLE_NAME +"."+DaneContract.EtablissementEntry.COLUMN_NOM,
+            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TYPE
     };
 
-    private static final String sPersonnelParNomSelection =
-            DaneContract.PersonnelEntry.TABLE_NAME+
-                    "." + DaneContract.PersonnelEntry.COLUMN_NOM + " like ? '";
+    private static final String sEtablissementParNomSelection =
+            DaneContract.EtablissementEntry.TABLE_NAME+
+                    "." + DaneContract.EtablissementEntry.COLUMN_NOM + " like ? '";
 }

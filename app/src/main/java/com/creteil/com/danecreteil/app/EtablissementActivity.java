@@ -16,7 +16,6 @@ public class EtablissementActivity extends AppCompatActivity implements EtabsFra
     private static final String ETABFRAGMENT_TAG = "DFTAG";
 
     private boolean mTwoPane;
-    private String mLocation;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

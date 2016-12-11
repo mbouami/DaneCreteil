@@ -209,13 +209,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if ( null != mUri ) {
 //            Log.v(LOG_TAG, "In onCreateLoader "+mUri.toString());
+            String sortOrder = DaneContract.PersonnelEntry.COLUMN_STATUT + " DESC";
             return new CursorLoader(
                     getActivity(),
                     mUri,
                     PERSONNEL_COLUMNS,
                     null,
                     null,
-                    null
+                    sortOrder
             );
         }
         return null;
@@ -224,7 +225,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
-           Log.v(LOG_TAG, "In onLoadFinished "+mUri.toString()+"----"+data.getString(COL_PERSONNEL_STATUT)+"---"+data.getString(COL_PERSONNEL_NOM));
+//           Log.v(LOG_TAG, "In onLoadFinished "+mUri.toString()+"----"+data.getString(COL_PERSONNEL_STATUT)+"---"+data.getString(COL_PERSONNEL_NOM));
         String nom = data.getString(COL_ETAB_TYPE) +" "+data.getString(COL_ETAB_NOM);
         mNomView.setText(nom);
         String rne = data.getString(COL_ETAB_RNE);

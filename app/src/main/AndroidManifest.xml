@@ -34,6 +34,14 @@
                 android:value=".AccueilActivity" />
         </activity>
         <activity
+            android:name="com.creteil.com.danecreteil.app.ParametresActivity"
+            android:label="@string/title_parametres_activity"
+            android:parentActivityName="com.creteil.com.danecreteil.app.VillesActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".VillesActivity" />
+        </activity>
+        <activity
             android:name="com.creteil.com.danecreteil.app.EtablissementActivity"
             android:label="@string/titre_etabs_activity"
             android:parentActivityName="com.creteil.com.danecreteil.app.VillesActivity" >
@@ -48,6 +56,22 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".EtablissementActivity" />
+        </activity>
+        <activity
+            android:name="com.creteil.com.danecreteil.app.EtablissementsparNomActivity"
+            android:label="@string/titre_etabs_activity"
+            android:parentActivityName="com.creteil.com.danecreteil.app.AccueilActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".AccueilActivity" />
+        </activity>
+        <activity
+            android:name="com.creteil.com.danecreteil.app.PersonnelParNomActivity"
+            android:label="@string/titre_etabs_activity"
+            android:parentActivityName="com.creteil.com.danecreteil.app.AccueilActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".AccueilActivity" />
         </activity>
         <provider
             android:authorities="com.creteil.com.danecreteil.app"

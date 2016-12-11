@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_depart_options">
+        <item>@string/pref_depart_label_77</item>
+        <item>@string/pref_depart_label_93</item>
+        <item>@string/pref_depart_label_94</item>
+    </string-array>
+
+    <string-array name="pref_depart_values">
+        <item>@string/pref_depart_77</item>
+        <item>@string/pref_depart_93</item>
+        <item>@string/pref_depart_94</item>
+    </string-array>
+</resources>

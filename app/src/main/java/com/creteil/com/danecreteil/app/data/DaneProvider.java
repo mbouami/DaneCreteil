@@ -25,6 +25,7 @@ public class DaneProvider extends ContentProvider {
     static final int ETABLISSEMENTS = 300;
     static final int ETABLISSEMENTS_PAR_VILLE = 301;
     static final int ETABLISSEMENTS_ID = 302;
+    static final int ETABLISSEMENTS_CONTENANT_NOM = 303;
 
     static final int PERSONNEL = 400;
     static final int PERSONNEL_PAR_ETAB = 401;
@@ -85,6 +86,12 @@ public class DaneProvider extends ContentProvider {
         sEtablissementParIdQueryBuilder.setTables(DaneContract.EtablissementEntry.TABLE_NAME);
     }
 
+    private static final SQLiteQueryBuilder sEtablissementQueryBuilder;
+    static{
+        sEtablissementQueryBuilder = new SQLiteQueryBuilder();
+        sEtablissementQueryBuilder.setTables(DaneContract.EtablissementEntry.TABLE_NAME);
+    }
+
     static UriMatcher buildUriMatcher() {
         // I know what you're thinking.  Why create a UriMatcher when you can use regular
         // expressions instead?  Because you're not crazy, that's why.
@@ -102,6 +109,7 @@ public class DaneProvider extends ContentProvider {
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS, ETABLISSEMENTS);
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS+ "/*", ETABLISSEMENTS_PAR_VILLE);
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS+ "/*/etab", ETABLISSEMENTS_ID);
+        matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS+ "/*/rechercher", ETABLISSEMENTS_CONTENANT_NOM);
 
         matcher.addURI(authority, DaneContract.PATH_PERSONNEL, PERSONNEL);
         matcher.addURI(authority, DaneContract.PATH_PERSONNEL+ "/*", PERSONNEL_PAR_ID);
@@ -117,6 +125,10 @@ public class DaneProvider extends ContentProvider {
     private static final String sEtablissementParIdSelection =
             DaneContract.EtablissementEntry.TABLE_NAME+
                     "." + DaneContract.EtablissementEntry._ID + " = ? ";
+
+    private static final String sEtablissementParNomSelection =
+            DaneContract.EtablissementEntry.TABLE_NAME+
+                    "." + DaneContract.EtablissementEntry.COLUMN_NOM + " like ? ";
 
     private static final String sPersonnelParEtabSelection =
             DaneContract.PersonnelEntry.TABLE_NAME+
@@ -175,6 +187,22 @@ public class DaneProvider extends ContentProvider {
         );
     }
 
+    private Cursor getEtablissementsContenantleNom(Uri uri, String[] projection, String sortOrder) {
+        String nometab = DaneContract.EtablissementEntry.getNomEtablissementFromUri(uri);
+        String[] selectionArgs;
+        String selection;
+        selectionArgs = new String[]{"%" + nometab +"%"};
+        selection = sEtablissementParNomSelection;
+        return sEtablissementQueryBuilder.query(mDaneHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
     private Cursor getPersonnelParEtab(Uri uri, String[] projection, String sortOrder) {
         String idetab = DaneContract.PersonnelEntry.getEtablissementFromUri(uri);
         String[] selectionArgs;
@@ -214,6 +242,8 @@ public class DaneProvider extends ContentProvider {
                 return DaneContract.EtablissementEntry.CONTENT_ITEM_TYPE;
             case ETABLISSEMENTS_ID:
                 return DaneContract.EtablissementEntry.CONTENT_ITEM_TYPE;
+            case ETABLISSEMENTS_CONTENANT_NOM:
+                return DaneContract.EtablissementEntry.CONTENT_ITEM_TYPE;
             case PERSONNEL:
                 return DaneContract.PersonnelEntry.CONTENT_TYPE;
             case PERSONNEL_PAR_ID:
@@ -242,6 +272,10 @@ public class DaneProvider extends ContentProvider {
             }
             case ETABLISSEMENTS_ID: {
                 retCursor = getEtablissementsParId(uri, projection, sortOrder);
+                break;
+            }
+            case ETABLISSEMENTS_CONTENANT_NOM: {
+                retCursor = getEtablissementsContenantleNom(uri, projection, sortOrder);
                 break;
             }
             case PERSONNEL_PAR_ETAB: {

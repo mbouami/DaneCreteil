@@ -118,17 +118,25 @@ public class DaneContract {
         public static Uri buildEtablissementParVille(String idville) {
             return CONTENT_URI.buildUpon().appendPath(idville).build();
         }
-
+        public static Uri buildEtablissements() {
+            return CONTENT_URI.buildUpon().build();
+        }
         public static Uri buildEtablissementParId(String idetab,String rubrique) {
             return CONTENT_URI.buildUpon().appendPath(idetab).appendPath(rubrique).build();
         }
 
+        public static Uri buildEtablissementContenatLeNom(String nometab,String rubrique) {
+            return CONTENT_URI.buildUpon().appendPath(nometab).appendPath(rubrique).build();
+        }
         public static String getVilleFromUri(Uri uri) {
 
             return uri.getPathSegments().get(1);
         }
 
         public static String getEtablissementFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+        public static String getNomEtablissementFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
     }
@@ -154,7 +162,9 @@ public class DaneContract {
         public static Uri buildPersonnelUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
+        public static Uri buildPersonnel() {
+            return CONTENT_URI.buildUpon().build();
+        }
 //        public static String getVilleFromUri(Uri uri) {
 //            return uri.getPathSegments().get(1);
 //        }

@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.creteil.com.danecreteil.app.data.DaneContract;
+
 public class AccueilActivity extends AppCompatActivity {
     private final String LOG_TAG =AccueilActivity.class.getSimpleName();
 
@@ -36,13 +38,19 @@ public class AccueilActivity extends AppCompatActivity {
         recherche_etab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(), "recherche_etab", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(view.getContext(), "recherche_etab", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(view.getContext(), EtablissementsparNomActivity.class)
+                        .setData(DaneContract.EtablissementEntry.buildEtablissements());
+                startActivity(intent);
             }
         });
         recherche_personnel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(), "recherche_personnel", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(view.getContext(), "recherche_personnel", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(view.getContext(), PersonnelParNomActivity.class)
+                        .setData(DaneContract.PersonnelEntry.buildPersonnel());
+                startActivity(intent);
             }
         });
         recherche_etablissement_par_animateur.setOnClickListener(new View.OnClickListener() {

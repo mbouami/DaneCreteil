@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     ListView listView = null;
     private static final int VILLES_LOADER = 0;
     private String choix_depart;
+    RadioGroup liste_depart;
 
     static String Villeencours = null;
 
@@ -93,7 +95,8 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
                              Bundle savedInstanceState) {
         mVillesAdapter = new VillesAdapter(getActivity(), null, 0);
         View rootView = inflater.inflate(R.layout.fragment_villes, container, false);
-        RadioGroup liste_depart = (RadioGroup) rootView.findViewById(R.id.liste_departement);
+        SelectDepart(rootView);
+        liste_depart = (RadioGroup) rootView.findViewById(R.id.liste_departement);
         liste_depart.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
@@ -124,6 +127,8 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
                 if (cursor != null) {
                     ((Callback) getActivity())
                             .onItemSelected(DaneContract.EtablissementEntry.buildEtablissementParVille(cursor.getString(COL_VILLE_ID)));
+//                            .onItemSelected(DaneContract.EtablissementEntry.buildEtablissements());
+//                            .onItemSelected(DaneContract.EtablissementEntry.buildEtablissementContenatLeNom("MOUSS","rechercher"));
                 }
             }
         });
@@ -140,7 +145,32 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
 //        updateVille();
         getLoaderManager().restartLoader(VILLES_LOADER, null, this);
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        SelectDepart(getView());
+    }
 
+    private void SelectDepart(View view) {
+        switch (Utility.getPreferredDepart(getActivity())) {
+            case "77" :
+                RadioButton selection77 = (RadioButton) view.findViewById(R.id.dep77);
+                selection77.setChecked(true);
+                choix_depart = "77";
+                break;
+            case "93" :
+                RadioButton selection93 = (RadioButton) view.findViewById(R.id.dep93);
+                selection93.setChecked(true);
+                choix_depart = "93";
+                break;
+            case "94" :
+                RadioButton selection94 = (RadioButton) view.findViewById(R.id.dep94);
+                selection94.setChecked(true);
+                choix_depart = "94";
+                break;
+        }
+        onDepartementChanged();
+    }
 //    @Override
 //    public void onStart() {
 //        super.onStart();
