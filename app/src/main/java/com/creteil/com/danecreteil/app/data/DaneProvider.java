@@ -30,6 +30,7 @@ public class DaneProvider extends ContentProvider {
     static final int PERSONNEL = 400;
     static final int PERSONNEL_PAR_ETAB = 401;
     static final int PERSONNEL_PAR_ID = 402;
+    static final int PERSONNEL_CONTENANT_NOM = 403;
 
     private static final SQLiteQueryBuilder sEtablissementsParVilleQueryBuilder;
     static{
@@ -92,6 +93,23 @@ public class DaneProvider extends ContentProvider {
         sEtablissementQueryBuilder.setTables(DaneContract.EtablissementEntry.TABLE_NAME);
     }
 
+    private static final SQLiteQueryBuilder sPersonnelQueryBuilder;
+    static{
+        sPersonnelQueryBuilder = new SQLiteQueryBuilder();
+        sPersonnelQueryBuilder.setTables(
+                DaneContract.PersonnelEntry.TABLE_NAME + " INNER JOIN " +
+                        DaneContract.EtablissementEntry.TABLE_NAME +
+                        " ON " + DaneContract.PersonnelEntry.TABLE_NAME +
+                        "." + DaneContract.PersonnelEntry.COLUMN_ETABLISSEMENT_ID +
+                        " = " + DaneContract.EtablissementEntry.TABLE_NAME +
+                        "." + DaneContract.EtablissementEntry._ID + " INNER JOIN " +
+                        DaneContract.VilleEntry.TABLE_NAME +
+                        " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
+                        "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID +
+                        " = " + DaneContract.VilleEntry.TABLE_NAME +
+                        "." + DaneContract.VilleEntry._ID);
+    };
+
     static UriMatcher buildUriMatcher() {
         // I know what you're thinking.  Why create a UriMatcher when you can use regular
         // expressions instead?  Because you're not crazy, that's why.
@@ -114,6 +132,7 @@ public class DaneProvider extends ContentProvider {
         matcher.addURI(authority, DaneContract.PATH_PERSONNEL, PERSONNEL);
         matcher.addURI(authority, DaneContract.PATH_PERSONNEL+ "/*", PERSONNEL_PAR_ID);
         matcher.addURI(authority, DaneContract.PATH_PERSONNEL+ "/*/etab", PERSONNEL_PAR_ETAB);
+        matcher.addURI(authority, DaneContract.PATH_PERSONNEL+ "/*/rechercher", PERSONNEL_CONTENANT_NOM);
         return matcher;
     }
 
@@ -129,6 +148,10 @@ public class DaneProvider extends ContentProvider {
     private static final String sEtablissementParNomSelection =
             DaneContract.EtablissementEntry.TABLE_NAME+
                     "." + DaneContract.EtablissementEntry.COLUMN_NOM + " like ? ";
+
+    private static final String sPersonnelParNomSelection =
+            DaneContract.PersonnelEntry.TABLE_NAME+
+                    "." + DaneContract.PersonnelEntry.COLUMN_NOM + " like ? ";
 
     private static final String sPersonnelParEtabSelection =
             DaneContract.PersonnelEntry.TABLE_NAME+
@@ -203,6 +226,22 @@ public class DaneProvider extends ContentProvider {
         );
     }
 
+    private Cursor getPersonnelContenantleNom(Uri uri, String[] projection, String sortOrder) {
+        String nompersonnel = DaneContract.PersonnelEntry.getPersonnelFromUri(uri);
+        String[] selectionArgs;
+        String selection;
+        selectionArgs = new String[]{"%" + nompersonnel +"%"};
+        selection = sPersonnelParNomSelection;
+        return sPersonnelQueryBuilder.query(mDaneHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
     private Cursor getPersonnelParEtab(Uri uri, String[] projection, String sortOrder) {
         String idetab = DaneContract.PersonnelEntry.getEtablissementFromUri(uri);
         String[] selectionArgs;
@@ -250,6 +289,8 @@ public class DaneProvider extends ContentProvider {
                 return DaneContract.PersonnelEntry.CONTENT_ITEM_TYPE;
             case PERSONNEL_PAR_ETAB:
                 return DaneContract.PersonnelEntry.CONTENT_ITEM_TYPE;
+            case PERSONNEL_CONTENANT_NOM:
+                return DaneContract.PersonnelEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("uri inconnue: " + uri);
         }
@@ -280,6 +321,10 @@ public class DaneProvider extends ContentProvider {
             }
             case PERSONNEL_PAR_ETAB: {
                 retCursor = getPersonnelParEtab(uri, projection, sortOrder);
+                break;
+            }
+            case PERSONNEL_CONTENANT_NOM: {
+                retCursor = getPersonnelContenantleNom(uri, projection, sortOrder);
                 break;
             }
             case VILLES: {

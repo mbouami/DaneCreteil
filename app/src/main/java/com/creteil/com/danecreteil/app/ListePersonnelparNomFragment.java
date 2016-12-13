@@ -34,29 +34,29 @@ public class ListePersonnelparNomFragment extends Fragment implements LoaderMana
             DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry.COLUMN_NOM,
             DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry.COLUMN_STATUT,
             DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry.COLUMN_ETABLISSEMENT_ID,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_NOM,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_RNE,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TYPE,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TEL,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_FAX,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_EMAIL,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ADRESSE,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_CP,
-            DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry.COLUMN_VILLE_NOM
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_NOM,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_RNE,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TYPE,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TEL,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_FAX,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_EMAIL,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ADRESSE,
+//            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_CP,
+//            DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry.COLUMN_VILLE_NOM
     };
     static final int COL_PERSONNEL_ID = 0;
     static final int COL_PERSONNEL_NOM = 1;
     static final int COL_PERSONNEL_STATUT = 2;
     static final int COL_ETAB_ID = 3;
-    static final int COL_ETAB_NOM = 4;
-    static final int COL_ETAB_RNE = 5;
-    static final int COL_ETAB_TYPE = 6;
-    static final int COL_ETAB_TEL = 7;
-    static final int COL_ETAB_FAX = 8;
-    static final int COL_ETAB_EMAIL = 9;
-    static final int COL_ETAB_ADRESSE = 10;
-    static final int COL_ETAB_CP = 11;
-    static final int COL_VILLE = 12;
+//    static final int COL_ETAB_NOM = 4;
+//    static final int COL_ETAB_RNE = 5;
+//    static final int COL_ETAB_TYPE = 6;
+//    static final int COL_ETAB_TEL = 7;
+//    static final int COL_ETAB_FAX = 8;
+//    static final int COL_ETAB_EMAIL = 9;
+//    static final int COL_ETAB_ADRESSE = 10;
+//    static final int COL_ETAB_CP = 11;
+//    static final int COL_VILLE = 12;
 
     public ListePersonnelparNomFragment() {
 
