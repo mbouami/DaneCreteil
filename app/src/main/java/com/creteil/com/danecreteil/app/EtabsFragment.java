@@ -50,13 +50,11 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
     static final int COL_ETAB_TYPE = 2;
 
     public interface Callback {
-        /**
-         * DetailFragmentCallback for when an item has been selected.
-         */
         public void onItemSelected(Uri etabUri);
     }
 
     public EtabsFragment() {
+
     }
 
     @Nullable
@@ -77,7 +75,6 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 if (cursor != null) {
                     ((Callback) getActivity())
-//                            .onItemSelected(EtablissementEntry.buildEtablissementParId(cursor.getString(COL_ETAB_ID),"etab"));
                             .onItemSelected(DaneContract.PersonnelEntry.buildPersonnelParIdEtab(cursor.getString(COL_ETAB_ID),"etab"));
                 }
                 mPosition = position;
@@ -118,7 +115,7 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if ( null != mUri ) {
             String sortOrder = EtablissementEntry.COLUMN_TYPE + " ASC";
-            Log.v(LOG_TAG, "In onCreateLoader "+mUri.toString());
+//            Log.v(LOG_TAG, "In onCreateLoader "+mUri.toString());
             String mEtablissement = String.format("%s %s", "Liste des établissements à ",VillesFragment.Villeencours);
             TextView titreetabTextView = (TextView)getView().findViewById(R.id.titre_etablissement);
             titreetabTextView.setText(mEtablissement);
@@ -149,5 +146,11 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mEtabsAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(LOG_TAG, "onPause : ");
     }
 }

@@ -49,6 +49,7 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_VILLE_DEPARTEMENT = 2;
     static final int COL_VILLE_BASE_ID = 3;
 
+
     public interface Callback {
         /**
          * DetailFragmentCallback for when an item has been selected.
@@ -82,12 +83,13 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_refresh) {
-            updateDatabase();
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                updateDatabase();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -127,8 +129,6 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
                 if (cursor != null) {
                     ((Callback) getActivity())
                             .onItemSelected(DaneContract.EtablissementEntry.buildEtablissementParVille(cursor.getString(COL_VILLE_ID)));
-//                            .onItemSelected(DaneContract.EtablissementEntry.buildEtablissements());
-//                            .onItemSelected(DaneContract.EtablissementEntry.buildEtablissementContenatLeNom("MOUSS","rechercher"));
                 }
             }
         });
@@ -148,6 +148,7 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(LOG_TAG, "onResume : ");
         SelectDepart(getView());
     }
 

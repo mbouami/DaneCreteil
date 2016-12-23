@@ -1,5 +1,6 @@
 <resources xmlns:xliff="http://schemas.android.com/tools">
     <string name="app_name">DaneCreteil</string>
+    <string name="accueil">Accueil</string>
     <string name="message_accueil">Bienvenue sur l\'application de gestion des animateurs de la DANE de Créteil</string>
     <string name="annuaire_etabs">Etablissements par Département</string>
     <string name="recherche_personnel">Rechercher un personnel administratif</string>
@@ -15,7 +16,7 @@
     <string name="action_map">Y aller</string>
     <string name="action_mail">envoyer un mail</string>
     <string name="titre_detail_activity">Information sur  l\'établissement</string>
-    <string name="action_rafraichir">Rafraîchir</string>
+    <string name="action_rafraichir">Synchroniser</string>
 
     <string name="pref_depart_label">Département</string>
     <string name="pref_depart_key" translatable="false">depart</string>

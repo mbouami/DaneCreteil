@@ -129,21 +129,22 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_call) {
-            startActivity(createPhoneIntent());
+        switch (item.getItemId()) {
+            case R.id.action_call:
+                startActivity(createPhoneIntent());
+                return true;
+            case R.id.action_share:
+                startActivity(createShareIntent());
+                return true;
+            case R.id.action_mail:
+                startActivity(createMailIntent());
+                return true;
+            case R.id.action_map:
+                startActivity(createMapIntent());
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        if (id == R.id.action_share) {
-            startActivity(createShareIntent());
-        }
-        if (id == R.id.action_mail) {
-            startActivity(createMailIntent());
-//            startActivity(Intent.createChooser(createMailIntent(), mMailEtabcast));
-        }
-        if (id == R.id.action_map) {
-            startActivity(createMapIntent());
-        }
-        return true;
     }
 
     private Intent createShareIntent() {

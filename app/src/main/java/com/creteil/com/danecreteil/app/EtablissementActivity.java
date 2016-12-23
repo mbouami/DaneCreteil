@@ -15,8 +15,6 @@ public class EtablissementActivity extends AppCompatActivity implements EtabsFra
     private final String LOG_TAG = EtablissementActivity.class.getSimpleName();
     private static final String ETABFRAGMENT_TAG = "DFTAG";
 
-    private boolean mTwoPane;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,20 +33,8 @@ public class EtablissementActivity extends AppCompatActivity implements EtabsFra
     @Override
     public void onItemSelected(Uri contentUri) {
 //        Log.d(LOG_TAG, "onItemSelected : "+contentUri.toString());
-        if (mTwoPane) {
-            Bundle args = new Bundle();
-            args.putParcelable(DetailFragment.DETAIL_URI, contentUri);
-
-            DetailFragment fragment = new DetailFragment();
-            fragment.setArguments(args);
-
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.etab_detail, fragment, ETABFRAGMENT_TAG)
-                    .commit();
-        } else {
             Intent intent = new Intent(this, DetailActivity.class)
                     .setData(contentUri);
             startActivity(intent);
-        }
     }
 }

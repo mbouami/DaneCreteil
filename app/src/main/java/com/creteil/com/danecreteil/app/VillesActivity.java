@@ -20,11 +20,14 @@ public class VillesActivity extends AppCompatActivity implements VillesFragment.
     private final String LOG_TAG = VillesActivity.class.getSimpleName();
     private final String VILLESFRAGMENT_TAG = "VILLES_PAR_DEPARTEMENT";
     private String mdepartement;
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_villes);
+        mdepartement = Utility.getPreferredDepart(this);
+        Log.d(LOG_TAG, "onCreate : "+mdepartement);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new VillesFragment(), VILLESFRAGMENT_TAG)
@@ -41,24 +44,24 @@ public class VillesActivity extends AppCompatActivity implements VillesFragment.
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.action_departement:
+                startActivity(new Intent(this, ParametresActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_departement) {
-            startActivity(new Intent(this, ParametresActivity.class));
-            return true;
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onItemSelected(Uri villeUri) {
-        Log.d(LOG_TAG, "onItemSelected : "+villeUri+"----"+DaneContract.EtablissementEntry.getNomEtablissementFromUri(villeUri));
-        Intent intent = new Intent(this, EtablissementActivity.class)
-                .setData(villeUri);
-        startActivity(intent);
+//        Log.d(LOG_TAG, "onItemSelected : "+villeUri+"----"+DaneContract.EtablissementEntry.getNomEtablissementFromUri(villeUri));
+            Intent intent = new Intent(this, EtablissementActivity.class)
+                    .setData(villeUri);
+            startActivity(intent);
     }
-//
+
 //    @Override
 //    protected void onResume() {
 //        super.onResume();
@@ -84,14 +87,16 @@ public class VillesActivity extends AppCompatActivity implements VillesFragment.
 //    @Override
 //    protected void onResume() {
 //        super.onResume();
-//        String location = DaneContract.departement_en_cours;
-//        // update the location in our second pane using the fragment manager
-//        if (location != null && !location.equals(mLocation)) {
-//            ForecastFragment ff = (ForecastFragment)getSupportFragmentManager().findFragmentByTag(FORECASTFRAGMENT_TAG);
-//            if ( null != ff ) {
-//                ff.onLocationChanged();
-//            }
-//            mLocation = location;
+//        String departement = Utility.getPreferredDepart(this);
+//        Log.d(LOG_TAG, "onResume : "+departement+"----"+mdepartement);
+////        // update the location in our second pane using the fragment manager
+//        if (departement != null && !departement.equals(mdepartement)) {
+////            VillesFragment ff = (VillesFragment)getSupportFragmentManager().findFragmentByTag(VILLESFRAGMENT_TAG);
+////            if ( null != ff ) {
+////                ff.onDepartementChanged();
+////            }
+//            mdepartement = departement;
 //        }
 //    }
+
 }

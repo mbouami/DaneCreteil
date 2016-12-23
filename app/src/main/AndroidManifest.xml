@@ -27,7 +27,7 @@
         </activity>
         <activity
             android:name="com.creteil.com.danecreteil.app.VillesActivity"
-            android:label="@string/titre_villes_activity"
+            android:label="@string/accueil"
             android:parentActivityName="com.creteil.com.danecreteil.app.AccueilActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -35,31 +35,31 @@
         </activity>
         <activity
             android:name="com.creteil.com.danecreteil.app.ParametresActivity"
-            android:label="@string/title_parametres_activity"
-            android:parentActivityName="com.creteil.com.danecreteil.app.VillesActivity" >
+            android:label="@string/accueil"
+            android:parentActivityName="com.creteil.com.danecreteil.app.AccueilActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".VillesActivity" />
+                android:value=".AccueilActivity" />
         </activity>
         <activity
             android:name="com.creteil.com.danecreteil.app.EtablissementActivity"
-            android:label="@string/titre_etabs_activity"
-            android:parentActivityName="com.creteil.com.danecreteil.app.VillesActivity" >
+            android:label="@string/accueil"
+            android:parentActivityName="com.creteil.com.danecreteil.app.AccueilActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".VillesActivity" />
+                android:value=".AccueilActivity" />
         </activity>
         <activity
             android:name="com.creteil.com.danecreteil.app.DetailActivity"
-            android:label="@string/titre_detail_activity"
-            android:parentActivityName="com.creteil.com.danecreteil.app.EtablissementActivity" >
+            android:label="@string/accueil"
+            android:parentActivityName="com.creteil.com.danecreteil.app.AccueilActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".EtablissementActivity" />
+                android:value=".AccueilActivity" />
         </activity>
         <activity
             android:name="com.creteil.com.danecreteil.app.EtablissementsparNomActivity"
-            android:label="@string/titre_etabs_activity"
+            android:label="@string/accueil"
             android:parentActivityName="com.creteil.com.danecreteil.app.AccueilActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -67,7 +67,7 @@
         </activity>
         <activity
             android:name="com.creteil.com.danecreteil.app.PersonnelParNomActivity"
-            android:label="@string/titre_etabs_activity"
+            android:label="@string/accueil"
             android:parentActivityName="com.creteil.com.danecreteil.app.AccueilActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
