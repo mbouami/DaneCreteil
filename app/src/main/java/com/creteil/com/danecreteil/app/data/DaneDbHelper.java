@@ -3,11 +3,8 @@ package com.creteil.com.danecreteil.app.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.creteil.com.danecreteil.app.VillesFragment;
-import com.creteil.com.danecreteil.app.data.DaneContract.UserEntry;
+import com.creteil.com.danecreteil.app.data.DaneContract.AnimateurEntry;
 import com.creteil.com.danecreteil.app.data.DaneContract.VilleEntry;
 import com.creteil.com.danecreteil.app.data.DaneContract.EtablissementEntry;
 import com.creteil.com.danecreteil.app.data.DaneContract.PersonnelEntry;
@@ -18,8 +15,8 @@ import com.creteil.com.danecreteil.app.data.DaneContract.PersonnelEntry;
 
 public class DaneDbHelper extends SQLiteOpenHelper {
     private final String LOG_TAG = DaneDbHelper.class.getSimpleName();
-    private static final int DATABASE_VERSION = 9;
-    private static final String SQL_DELETE_USER_TABLE = "DROP TABLE IF EXISTS " + UserEntry.TABLE_NAME;
+    private static final int DATABASE_VERSION = 11;
+    private static final String SQL_DELETE_ANIMATEUR_TABLE = "DROP TABLE IF EXISTS " + AnimateurEntry.TABLE_NAME;
     private static final String SQL_DELETE_VILLE_TABLE = "DROP TABLE IF EXISTS " + VilleEntry.TABLE_NAME;
     private static final String SQL_DELETE_PERSONNEL_TABLE = "DROP TABLE IF EXISTS " + PersonnelEntry.TABLE_NAME;
     private static final String SQL_DELETE_ETABLISSEMENT_TABLE = "DROP TABLE IF EXISTS " + EtablissementEntry.TABLE_NAME;
@@ -32,11 +29,12 @@ public class DaneDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        final String SQL_CREATE_USERS_TABLE = "CREATE TABLE " + UserEntry.TABLE_NAME + " (" +
-                UserEntry._ID + " INTEGER PRIMARY KEY," +
-                UserEntry.COLUMN_LOGIN + " TEXT UNIQUE NOT NULL, " +
-                UserEntry.COLUMN_MDP + " TEXT NOT NULL, " +
-                UserEntry.COLUMN_KEY + " TEXT NOT NULL " +
+        final String SQL_CREATE_ANIMATEUR_TABLE = "CREATE TABLE " + AnimateurEntry.TABLE_NAME + " (" +
+                AnimateurEntry._ID + " INTEGER PRIMARY KEY," +
+                AnimateurEntry.COLUMN_NOM + " TEXT NOT NULL, " +
+                AnimateurEntry.COLUMN_TEL + " TEXT NOT NULL, " +
+                AnimateurEntry.COLUMN_EMAIL + " TEXT NOT NULL, " +
+                AnimateurEntry.COLUMN_ANIMATEUR_ID + " INTEGER NOT NULL " +
                 " );";
 
         final String SQL_CREATE_VILLES_TABLE = "CREATE TABLE " + VilleEntry.TABLE_NAME + " (" +
@@ -51,6 +49,7 @@ public class DaneDbHelper extends SQLiteOpenHelper {
                 EtablissementEntry.COLUMN_NOM + " TEXT NOT NULL, " +
                 EtablissementEntry.COLUMN_ETABLISSEMENT_ID + " INTEGER NOT NULL, " +
                 EtablissementEntry.COLUMN_VILLE_ID + " INTEGER NOT NULL, " +
+                EtablissementEntry.COLUMN_ANIMATEUR_ID + " INTEGER, " +
                 EtablissementEntry.COLUMN_TEL + " TEXT, " +
                 EtablissementEntry.COLUMN_FAX + " TEXT, " +
                 EtablissementEntry.COLUMN_EMAIL + " TEXT, " +
@@ -60,6 +59,8 @@ public class DaneDbHelper extends SQLiteOpenHelper {
                 EtablissementEntry.COLUMN_TYPE + " TEXT, " +
                 " FOREIGN KEY (" + EtablissementEntry.COLUMN_VILLE_ID + ") REFERENCES " +
                 VilleEntry.TABLE_NAME + " (" + VilleEntry._ID + ") " +
+                " FOREIGN KEY (" + EtablissementEntry.COLUMN_ANIMATEUR_ID + ") REFERENCES " +
+                AnimateurEntry.TABLE_NAME + " (" + AnimateurEntry._ID + ") " +
                 " );";
 
         final String SQL_CREATE_PERSONNEL_TABLE = "CREATE TABLE " + PersonnelEntry.TABLE_NAME + " (" +
@@ -71,7 +72,7 @@ public class DaneDbHelper extends SQLiteOpenHelper {
                 " FOREIGN KEY (" + PersonnelEntry.COLUMN_ETABLISSEMENT_ID + ") REFERENCES " +
                 EtablissementEntry.TABLE_NAME + " (" + EtablissementEntry._ID + ") " +
                 " );";
-        sqLiteDatabase.execSQL(SQL_CREATE_USERS_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_ANIMATEUR_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_VILLES_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_ETABLISSEMENTS_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_PERSONNEL_TABLE);
@@ -79,7 +80,7 @@ public class DaneDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        sqLiteDatabase.execSQL(SQL_DELETE_USER_TABLE);
+        sqLiteDatabase.execSQL(SQL_DELETE_ANIMATEUR_TABLE);
         sqLiteDatabase.execSQL(SQL_DELETE_VILLE_TABLE);
         sqLiteDatabase.execSQL(SQL_DELETE_PERSONNEL_TABLE);
         sqLiteDatabase.execSQL(SQL_DELETE_ETABLISSEMENT_TABLE);

@@ -27,31 +27,32 @@ public class DaneContract {
     // looking at weather data. content://com.example.android.sunshine.app/givemeroot/ will fail,
     // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
     // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
-    public static final String PATH_USERS = "users";
+    public static final String PATH_ANIMATEURS = "users";
     public static final String PATH_VILLES = "villes";
     public static final String PATH_ETABLISSEMENTS = "etablissements";
     public static final String PATH_PERSONNEL = "personnel";
 
-    public static final class UserEntry implements BaseColumns {
+    public static final class AnimateurEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_USERS).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_ANIMATEURS).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USERS;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ANIMATEURS;
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USERS;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ANIMATEURS;
 
         // Table name
-        public static final String TABLE_NAME = "users";
+        public static final String TABLE_NAME = "animateurs";
 
-        public static final String COLUMN_ID = "user_id";
-        public static final String COLUMN_LOGIN = "login";
-        public static final String COLUMN_MDP = "mdp";
-        public static final String COLUMN_KEY = "cle";
+        public static final String COLUMN_ID = "animateur_id";
+        public static final String COLUMN_NOM = "nom";
+        public static final String COLUMN_TEL = "tel";
+        public static final String COLUMN_EMAIL = "email";
+        public static final String COLUMN_ANIMATEUR_ID = "animateur_id";
 
 
-        public static Uri buildVilleUri(long id) {
+        public static Uri buildAnimateurUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
@@ -102,6 +103,7 @@ public class DaneContract {
 
         // Column with the foreign key into the location table.
         public static final String COLUMN_VILLE_ID = "ville_id";
+        public static final String COLUMN_ANIMATEUR_ID = "animateur_id";
         public static final String COLUMN_ETABLISSEMENT_ID = "etablissement_id";
         public static final String COLUMN_NOM = "nom";
         public static final String COLUMN_RNE = "rne";

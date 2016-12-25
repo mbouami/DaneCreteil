@@ -59,7 +59,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_EMAIL,
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ADRESSE,
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_CP,
-            DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry.COLUMN_VILLE_NOM
+            DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry.COLUMN_VILLE_NOM,
+            DaneContract.AnimateurEntry.TABLE_NAME + "." + DaneContract.AnimateurEntry.COLUMN_NOM
     };
     static final int COL_PERSONNEL_ID = 0;
     static final int COL_PERSONNEL_NOM = 1;
@@ -74,6 +75,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_ETAB_ADRESSE = 10;
     static final int COL_ETAB_CP = 11;
     static final int COL_VILLE = 12;
+    static final int COL_ANIMATEUR = 13;
 
     private TextView mNomView;
     private TextView mRneView;
@@ -81,6 +83,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mFaxView;
     private TextView mEmailView;
     private TextView mAdresseView;
+    private TextView mAnimateurView;
 
 
 
@@ -103,6 +106,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mFaxView = (TextView) rootView.findViewById(R.id.detail_fax_textview);
         mEmailView = (TextView) rootView.findViewById(R.id.detail_email_textview);
         mAdresseView = (TextView) rootView.findViewById(R.id.detail_adresse_textview);
+        mAnimateurView = (TextView) rootView.findViewById(R.id.detail_animateur_textview);
         mListView = (ListView) rootView.findViewById(R.id.liste_personnel);
         mListView.setAdapter(mPersonnelAdapter);
         return rootView;
@@ -239,8 +243,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mEmailView.setText("Mail : "+mail);
         String adresse = data.getString(COL_ETAB_ADRESSE)+ " "+data.getString(COL_ETAB_CP)+" "+data.getString(COL_VILLE);
         mAdresseView.setText("Adresse : "+adresse);
+        String animateur = data.getString(COL_ANIMATEUR);
+        mAnimateurView.setText("Animateur : "+animateur);
         mNomEtabcast = nom;
-        mEtabSharecast = String.format("%s\n%s\n%s\n%s\n%s\n%s", nom,"RNE : "+rne,"Tél : "+tel,"Fax : "+fax,"Mail : "+mail,"Adresse : "+adresse);
+        mEtabSharecast = String.format("%s\n%s\n%s\n%s\n%s\n%s\n%s", nom,"RNE : "+rne,"Tél : "+tel,"Fax : "+fax,"Mail : "+mail,"Adresse : "+adresse,"Animateur : "+animateur);
         mMailEtabcast = String.format("%s", mail);
         mTelEtabcast = String.format("%s", tel);
         mAdresseEtabcast = String.format("%s", adresse);

@@ -22,10 +22,14 @@ public class DaneProvider extends ContentProvider {
     static final int VILLES = 100;
     static final int VILLES_PAR_DEPARTEMENT = 101;
 
+    static final int ANIMATEURS = 200;
+    static final int ANIMATEURS_ID = 201;
+
     static final int ETABLISSEMENTS = 300;
     static final int ETABLISSEMENTS_PAR_VILLE = 301;
     static final int ETABLISSEMENTS_ID = 302;
     static final int ETABLISSEMENTS_CONTENANT_NOM = 303;
+    static final int ETABLISSEMENTS_PAR_ANIMATEUR = 304;
 
     static final int PERSONNEL = 400;
     static final int PERSONNEL_PAR_ETAB = 401;
@@ -73,7 +77,13 @@ public class DaneProvider extends ContentProvider {
                         " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
                         "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID +
                         " = " + DaneContract.VilleEntry.TABLE_NAME +
-                        "." + DaneContract.VilleEntry._ID);
+                        "." + DaneContract.VilleEntry._ID  + " INNER JOIN " +
+                        DaneContract.AnimateurEntry.TABLE_NAME +
+                        " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
+                        "." + DaneContract.EtablissementEntry.COLUMN_ANIMATEUR_ID +
+                        " = " + DaneContract.AnimateurEntry.TABLE_NAME +
+                        "." + DaneContract.AnimateurEntry._ID
+                );
     }
    private static final SQLiteQueryBuilder sVillesParDepartementQueryBuilder;
    static{
@@ -107,7 +117,13 @@ public class DaneProvider extends ContentProvider {
                         " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
                         "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID +
                         " = " + DaneContract.VilleEntry.TABLE_NAME +
-                        "." + DaneContract.VilleEntry._ID);
+                        "." + DaneContract.VilleEntry._ID  + " INNER JOIN " +
+                        DaneContract.AnimateurEntry.TABLE_NAME +
+                        " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
+                        "." + DaneContract.EtablissementEntry.COLUMN_ANIMATEUR_ID +
+                        " = " + DaneContract.AnimateurEntry.TABLE_NAME +
+                        "." + DaneContract.AnimateurEntry._ID
+                );
     };
 
     static UriMatcher buildUriMatcher() {
@@ -123,7 +139,8 @@ public class DaneProvider extends ContentProvider {
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, DaneContract.PATH_VILLES, VILLES);
         matcher.addURI(authority, DaneContract.PATH_VILLES+ "/*", VILLES_PAR_DEPARTEMENT);
-
+        matcher.addURI(authority, DaneContract.PATH_ANIMATEURS, ANIMATEURS);
+        matcher.addURI(authority, DaneContract.PATH_ANIMATEURS+ "/*", ANIMATEURS_ID);
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS, ETABLISSEMENTS);
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS+ "/*", ETABLISSEMENTS_PAR_VILLE);
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS+ "/*/etab", ETABLISSEMENTS_ID);
@@ -275,6 +292,10 @@ public class DaneProvider extends ContentProvider {
                 return DaneContract.VilleEntry.CONTENT_ITEM_TYPE;
             case VILLES:
                 return DaneContract.VilleEntry.CONTENT_TYPE;
+            case ANIMATEURS:
+                return DaneContract.AnimateurEntry.CONTENT_TYPE;
+            case ANIMATEURS_ID:
+                return DaneContract.AnimateurEntry.CONTENT_ITEM_TYPE;
             case ETABLISSEMENTS:
                 return DaneContract.EtablissementEntry.CONTENT_TYPE;
             case ETABLISSEMENTS_PAR_VILLE:
@@ -351,6 +372,20 @@ public class DaneProvider extends ContentProvider {
                 );
                 break;
             }
+
+            case ANIMATEURS: {
+                retCursor = mDaneHelper.getReadableDatabase().query(
+                        DaneContract.AnimateurEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+
+            }
             case ETABLISSEMENTS: {
                 retCursor = mDaneHelper.getReadableDatabase().query(
                         DaneContract.EtablissementEntry.TABLE_NAME,
@@ -403,6 +438,14 @@ public class DaneProvider extends ContentProvider {
                     throw new android.database.SQLException("Erreur lors de l'ajout de l'établissement " + uri);
                 break;
             }
+            case ANIMATEURS: {
+                long _id = db.insert(DaneContract.AnimateurEntry.TABLE_NAME, null, contentValues);
+                if ( _id > 0 )
+                    returnUri = DaneContract.AnimateurEntry.buildAnimateurUri(_id);
+                else
+                    throw new android.database.SQLException("Erreur lors de l'ajout de l'établissement " + uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("uri inconnue: " + uri);
         }
@@ -429,6 +472,10 @@ public class DaneProvider extends ContentProvider {
             case PERSONNEL:
                 rowsDeleted = db.delete(
                         DaneContract.PersonnelEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case ANIMATEURS:
+                rowsDeleted = db.delete(
+                        DaneContract.AnimateurEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("uri inconnue: " + uri);

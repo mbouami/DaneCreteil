@@ -112,7 +112,36 @@ public class JSONParser {
         villeCursor.close();
         return villeId;
     }
-    long addEtablissement(long VilleId,String etab_id,String nom,String rne,String tel,
+
+    long addAnimateur(String nom,String tel,String email,String Animateur_base_Id) {
+
+        long animateurId;
+        Cursor animateurCursor = mContext.getContentResolver().query(
+                DaneContract.AnimateurEntry.CONTENT_URI,
+                new String[]{DaneContract.AnimateurEntry._ID},
+                DaneContract.AnimateurEntry.COLUMN_ANIMATEUR_ID + " = ?",
+                new String[]{Animateur_base_Id},
+                null);
+        if (animateurCursor.moveToFirst()) {
+            int animateurIdIndex = animateurCursor.getColumnIndex(DaneContract.AnimateurEntry._ID);
+            animateurId = animateurCursor.getLong(animateurIdIndex);
+        } else {
+            ContentValues animateurValues = new ContentValues();
+            animateurValues.put(DaneContract.AnimateurEntry.COLUMN_NOM, nom);
+            animateurValues.put(DaneContract.AnimateurEntry.COLUMN_TEL, tel);
+            animateurValues.put(DaneContract.AnimateurEntry.COLUMN_EMAIL, email);
+            animateurValues.put(DaneContract.AnimateurEntry.COLUMN_ANIMATEUR_ID, Animateur_base_Id);
+            Uri insertedUri = mContext.getContentResolver().insert(
+                    DaneContract.AnimateurEntry.CONTENT_URI,
+                    animateurValues
+            );
+            animateurId = ContentUris.parseId(insertedUri);
+        }
+        animateurCursor.close();
+        return animateurId;
+    }
+
+    long addEtablissement(long VilleId,long AnimateurId,String etab_id,String nom,String rne,String tel,
                           String fax, String email,String adresse, String cp, String type) {
         long etablissementId;
         // First, check if the location with this city name exists in the db
@@ -134,6 +163,7 @@ public class JSONParser {
             etablissementValues.put(DaneContract.EtablissementEntry.COLUMN_CP, cp);
             etablissementValues.put(DaneContract.EtablissementEntry.COLUMN_ADRESSE, adresse);
             etablissementValues.put(DaneContract.EtablissementEntry.COLUMN_VILLE_ID, VilleId);
+            etablissementValues.put(DaneContract.EtablissementEntry.COLUMN_ANIMATEUR_ID, (AnimateurId==0)?null:AnimateurId);
             etablissementValues.put(DaneContract.EtablissementEntry.COLUMN_EMAIL, email);
             etablissementValues.put(DaneContract.EtablissementEntry.COLUMN_TYPE, type);
             etablissementValues.put(DaneContract.EtablissementEntry.COLUMN_ETABLISSEMENT_ID, etab_id);
@@ -185,6 +215,7 @@ public class JSONParser {
         int effacertablePersonnel = mContext.getContentResolver().delete(DaneContract.PersonnelEntry.CONTENT_URI,null,null);
         int effacertableEtablissement = mContext.getContentResolver().delete(DaneContract.EtablissementEntry.CONTENT_URI,null,null);
         int effacertableVille = mContext.getContentResolver().delete(DaneContract.VilleEntry.CONTENT_URI,null,null);
+        int effacertableAnimateur = mContext.getContentResolver().delete(DaneContract.AnimateurEntry.CONTENT_URI,null,null);
     }
 
     public void getVillesDataFromJson()
@@ -198,6 +229,7 @@ public class JSONParser {
         final String OWM_VILLE_ID = "id";
         final String OWM_ETABLISSEMENT_ID = "id";
         final String OWM_PERSONNEL_ID = "id";
+        final String OWM_ANIMATEUR_ID = "id";
         final String OWM_ETABS = "etabs";
         final String OWM_RNE = "rne";
         final String OWM_TEL = "tel";
@@ -206,6 +238,7 @@ public class JSONParser {
         final String OWM_ADRESSE = "adresse";
         final String OWM_TYPE = "type";
         final String OWM_PERSONNEL = "personnel";
+        final String OWM_ANIMATEUR = "animateur";
         final String OWM_STATUT = "statut";
         try {
             JSONObject villeJson = new JSONObject(resultat);
@@ -238,16 +271,23 @@ public class JSONParser {
 //                        etabValues.put(DaneContract.EtablissementEntry.COLUMN_CP,etab.getString(OWM_CP));
 //                        etabValues.put(DaneContract.EtablissementEntry.COLUMN_EMAIL,etab.getString(OWM_EMAIL));
 //                        etabVector.add(etabValues);
-                        long insertedEtab = addEtablissement(insertedVille,etab.getString(OWM_ETABLISSEMENT_ID),etab.getString(OWM_NOM),etab.getString(OWM_RNE),
+                        JSONArray animateurArray = etab.getJSONArray(OWM_ANIMATEUR);
+                        long insertedanimateur = 0;
+                        if (animateurArray.length()>0) {
+                            JSONObject animateur = animateurArray.getJSONObject(0);
+                            insertedanimateur = addAnimateur(animateur.getString(OWM_NOM),animateur.getString(OWM_TEL),animateur.getString(OWM_EMAIL),
+                                    animateur.getString(OWM_ANIMATEUR_ID));
+                        }
+                        long insertedEtab = addEtablissement(insertedVille,insertedanimateur,etab.getString(OWM_ETABLISSEMENT_ID),etab.getString(OWM_NOM),etab.getString(OWM_RNE),
                                 etab.getString(OWM_TEL),etab.getString(OWM_FAX),etab.getString(OWM_EMAIL),
                                 etab.getString(OWM_ADRESSE),etab.getString(OWM_CP),etab.getString(OWM_TYPE));
-                        Log.d(LOG_TAG, "Lors de cette opération. " + etab.getString(OWM_NOM) + " = id de letablissement inséré");
+                        Log.d(LOG_TAG, "Lors de cette opération, l'établissement " + etab.getString(OWM_NOM) + "----"+insertedanimateur + " a été inséré");
                         JSONArray personnelArray = etab.getJSONArray(OWM_PERSONNEL);
                         for(int k = 0; k < personnelArray.length(); k++) {
                             JSONObject personnel = personnelArray.getJSONObject(k);
                             long insertedPersonnel = addPersonnel(insertedEtab,personnel.getString(OWM_PERSONNEL_ID),
                                     personnel.getString(OWM_NOM),personnel.getString(OWM_STATUT));
-                            Log.d(LOG_TAG, "Lors de cette opération. " + personnel.getString(OWM_NOM) + " = id du personnel inséré");
+//                            Log.d(LOG_TAG, "Lors de cette opération. " + personnel.getString(OWM_NOM) + " = id du personnel inséré");
 
                         }
 
