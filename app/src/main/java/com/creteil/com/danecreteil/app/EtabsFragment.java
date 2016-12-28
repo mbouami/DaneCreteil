@@ -148,9 +148,9 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
         mEtabsAdapter.swapCursor(null);
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d(LOG_TAG, "onPause : ");
-    }
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        Log.d(LOG_TAG, "onPause : ");
+//    }
 }

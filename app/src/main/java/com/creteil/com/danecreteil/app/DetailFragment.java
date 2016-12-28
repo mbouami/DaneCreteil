@@ -243,7 +243,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mEmailView.setText("Mail : "+mail);
         String adresse = data.getString(COL_ETAB_ADRESSE)+ " "+data.getString(COL_ETAB_CP)+" "+data.getString(COL_VILLE);
         mAdresseView.setText("Adresse : "+adresse);
-        String animateur = data.getString(COL_ANIMATEUR);
+        String animateur = (data.getString(COL_ANIMATEUR)==null)?" ":data.getString(COL_ANIMATEUR);
         mAnimateurView.setText("Animateur : "+animateur);
         mNomEtabcast = nom;
         mEtabSharecast = String.format("%s\n%s\n%s\n%s\n%s\n%s\n%s", nom,"RNE : "+rne,"Tél : "+tel,"Fax : "+fax,"Mail : "+mail,"Adresse : "+adresse,"Animateur : "+animateur);

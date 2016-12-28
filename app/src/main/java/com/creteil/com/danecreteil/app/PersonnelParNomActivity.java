@@ -17,7 +17,7 @@ public class PersonnelParNomActivity extends AppCompatActivity implements ListeP
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_etab);
-        Log.d(LOG_TAG, "onCreate : ");
+//        Log.d(LOG_TAG, "onCreate : ");
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
             arguments.putParcelable(ListePersonnelparNomFragment.PERSONNEL_URI,getIntent().getData());

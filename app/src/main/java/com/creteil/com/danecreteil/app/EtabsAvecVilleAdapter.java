@@ -96,7 +96,7 @@ public class EtabsAvecVilleAdapter extends CursorAdapter implements Filterable {
             return filter.runQuery(constraint);
         }
         Uri uri = DaneContract.EtablissementEntry.CONTENT_URI.buildUpon().appendPath(constraint.toString()).appendPath("rechercher").build();
-        Log.v(LOG_TAG, "In onCreateLoader "+uri.toString()+"---"+DaneContract.EtablissementEntry.getNomEtablissementFromUri(uri));
+//        Log.v(LOG_TAG, "In onCreateLoader "+uri.toString()+"---"+DaneContract.EtablissementEntry.getNomEtablissementFromUri(uri));
         String nometab = DaneContract.EtablissementEntry.getNomEtablissementFromUri(uri);
         String[] selectionArgs;
         String selection;

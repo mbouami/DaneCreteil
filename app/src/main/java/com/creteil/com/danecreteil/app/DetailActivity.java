@@ -48,9 +48,9 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "onResume : ");
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        Log.d(LOG_TAG, "onResume : ");
+//    }
 }

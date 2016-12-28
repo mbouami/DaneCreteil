@@ -20,7 +20,7 @@ public class EtablissementsparNomActivity extends AppCompatActivity implements L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_etab);
-        Log.d(LOG_TAG, "onCreate : ");
+//        Log.d(LOG_TAG, "onCreate : ");
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
             arguments.putParcelable(ListeEtabParNomFragment.ETAB_URI,getIntent().getData());

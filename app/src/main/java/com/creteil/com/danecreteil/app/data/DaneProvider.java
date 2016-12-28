@@ -67,17 +67,17 @@ public class DaneProvider extends ContentProvider {
 //                        " = " + DaneContract.EtablissementEntry.TABLE_NAME +
 //                        "." + DaneContract.EtablissementEntry._ID);
         sPersonnelParEtablissamentQueryBuilder.setTables(
-                DaneContract.PersonnelEntry.TABLE_NAME + " INNER JOIN " +
+                DaneContract.PersonnelEntry.TABLE_NAME + " LEFT JOIN " +
                         DaneContract.EtablissementEntry.TABLE_NAME +
                         " ON " + DaneContract.PersonnelEntry.TABLE_NAME +
                         "." + DaneContract.PersonnelEntry.COLUMN_ETABLISSEMENT_ID +
                         " = " + DaneContract.EtablissementEntry.TABLE_NAME +
-                        "." + DaneContract.EtablissementEntry._ID + " INNER JOIN " +
+                        "." + DaneContract.EtablissementEntry._ID + " LEFT JOIN " +
                         DaneContract.VilleEntry.TABLE_NAME +
                         " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
                         "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID +
                         " = " + DaneContract.VilleEntry.TABLE_NAME +
-                        "." + DaneContract.VilleEntry._ID  + " INNER JOIN " +
+                        "." + DaneContract.VilleEntry._ID  + " LEFT JOIN " +
                         DaneContract.AnimateurEntry.TABLE_NAME +
                         " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
                         "." + DaneContract.EtablissementEntry.COLUMN_ANIMATEUR_ID +
@@ -107,17 +107,17 @@ public class DaneProvider extends ContentProvider {
     static{
         sPersonnelQueryBuilder = new SQLiteQueryBuilder();
         sPersonnelQueryBuilder.setTables(
-                DaneContract.PersonnelEntry.TABLE_NAME + " INNER JOIN " +
+                DaneContract.PersonnelEntry.TABLE_NAME + " LEFT JOIN " +
                         DaneContract.EtablissementEntry.TABLE_NAME +
                         " ON " + DaneContract.PersonnelEntry.TABLE_NAME +
                         "." + DaneContract.PersonnelEntry.COLUMN_ETABLISSEMENT_ID +
                         " = " + DaneContract.EtablissementEntry.TABLE_NAME +
-                        "." + DaneContract.EtablissementEntry._ID + " INNER JOIN " +
+                        "." + DaneContract.EtablissementEntry._ID + " LEFT JOIN " +
                         DaneContract.VilleEntry.TABLE_NAME +
                         " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
                         "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID +
                         " = " + DaneContract.VilleEntry.TABLE_NAME +
-                        "." + DaneContract.VilleEntry._ID  + " INNER JOIN " +
+                        "." + DaneContract.VilleEntry._ID  + " LEFT JOIN " +
                         DaneContract.AnimateurEntry.TABLE_NAME +
                         " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
                         "." + DaneContract.EtablissementEntry.COLUMN_ANIMATEUR_ID +

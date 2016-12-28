@@ -148,7 +148,7 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(LOG_TAG, "onResume : ");
+//        Log.d(LOG_TAG, "onResume : ");
         SelectDepart(getView());
     }
 

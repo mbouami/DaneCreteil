@@ -27,7 +27,7 @@ public class VillesActivity extends AppCompatActivity implements VillesFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_villes);
         mdepartement = Utility.getPreferredDepart(this);
-        Log.d(LOG_TAG, "onCreate : "+mdepartement);
+//        Log.d(LOG_TAG, "onCreate : "+mdepartement);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new VillesFragment(), VILLESFRAGMENT_TAG)
