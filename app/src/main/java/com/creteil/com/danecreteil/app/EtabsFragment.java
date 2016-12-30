@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
 import com.creteil.com.danecreteil.app.data.DaneContract.EtablissementEntry;
+import com.creteil.com.danecreteil.app.data.DaneContract.VilleEntry;
+import com.creteil.com.danecreteil.app.data.DaneContract.AnimateurEntry;
 
 /**
  * Created by Mohammed on 02/12/2016.
@@ -40,7 +42,7 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
     private static final String[] ETAB_COLUMNS = {
             EtablissementEntry.TABLE_NAME + "." + EtablissementEntry._ID,
             EtablissementEntry.TABLE_NAME + "." + EtablissementEntry.COLUMN_NOM,
-            EtablissementEntry.TABLE_NAME + "." + EtablissementEntry.COLUMN_TYPE,
+            EtablissementEntry.TABLE_NAME + "." + EtablissementEntry.COLUMN_TYPE
     };
 
     // these constants correspond to the projection defined above, and must change if the
@@ -115,18 +117,6 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if ( null != mUri ) {
             String sortOrder = EtablissementEntry.COLUMN_TYPE + " ASC";
-            Log.v(LOG_TAG, "In onCreateLoader "+mUri.getPathSegments().get(0));
-            String mEtablissement = "";
-            switch (mUri.getPathSegments().get(0)) {
-                case "etablissements" :
-                    mEtablissement = String.format("%s %s", "Liste des établissements à ",VillesFragment.Villeencours);
-                    break;
-                case "animateurs" :
-                    mEtablissement = String.format("%s %s", "Liste des établissements ayant pour référent ",ListeAnimParNomFragment.Animateurencours);
-                    break;
-            }
-            TextView titreetabTextView = (TextView)getView().findViewById(R.id.titre_etablissement);
-            titreetabTextView.setText(mEtablissement);
             return new CursorLoader(
                     getActivity(),
                     mUri,
@@ -144,7 +134,19 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
 //        Log.v(LOG_TAG, "In onLoadFinished");
 //        if (!data.moveToFirst()) { return; }
 //        mEtabsAdapter.swapCursor(data);
-
+        if (data.moveToFirst()) {
+            String mEtablissement = "";
+            switch (mUri.getPathSegments().get(0)) {
+                case "etablissements" :
+                    mEtablissement = String.format("%s %s", "Liste des établissements à ",VillesFragment.Villeencours);
+                    break;
+                case "animateurs" :
+                    mEtablissement = String.format("%s %s", "Liste des établissements ayant pour référent ",ListeAnimParNomFragment.Animateurencours);
+                    break;
+            }
+            TextView titreetabTextView = (TextView)getView().findViewById(R.id.titre_etablissement);
+            titreetabTextView.setText(mEtablissement);
+        }
         mEtabsAdapter.swapCursor(data);
         if (mPosition != ListView.INVALID_POSITION) {
             mListView.smoothScrollToPosition(mPosition);

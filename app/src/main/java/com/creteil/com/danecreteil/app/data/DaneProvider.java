@@ -45,12 +45,20 @@ public class DaneProvider extends ContentProvider {
         //This is an inner join which looks like
         //weather INNER JOIN location ON weather.location_id = location._id
         sEtablissementsParVilleQueryBuilder.setTables(
-                DaneContract.EtablissementEntry.TABLE_NAME + " INNER JOIN " +
+                DaneContract.EtablissementEntry.TABLE_NAME + " LEFT JOIN " +
                         DaneContract.VilleEntry.TABLE_NAME +
                         " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
                         "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID +
                         " = " + DaneContract.VilleEntry.TABLE_NAME +
-                        "." + DaneContract.VilleEntry._ID);
+                        "." + DaneContract.VilleEntry._ID +
+                        " = " + DaneContract.VilleEntry.TABLE_NAME +
+                        "." + DaneContract.VilleEntry._ID  + " LEFT JOIN " +
+                        DaneContract.AnimateurEntry.TABLE_NAME +
+                        " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
+                        "." + DaneContract.EtablissementEntry.COLUMN_ANIMATEUR_ID +
+                        " = " + DaneContract.AnimateurEntry.TABLE_NAME +
+                        "." + DaneContract.AnimateurEntry._ID
+        );
     }
 
     private static final SQLiteQueryBuilder sPersonnelParEtablissamentQueryBuilder;
