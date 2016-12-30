@@ -115,8 +115,16 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if ( null != mUri ) {
             String sortOrder = EtablissementEntry.COLUMN_TYPE + " ASC";
-//            Log.v(LOG_TAG, "In onCreateLoader "+mUri.toString());
-            String mEtablissement = String.format("%s %s", "Liste des établissements à ",VillesFragment.Villeencours);
+            Log.v(LOG_TAG, "In onCreateLoader "+mUri.getPathSegments().get(0));
+            String mEtablissement = "";
+            switch (mUri.getPathSegments().get(0)) {
+                case "etablissements" :
+                    mEtablissement = String.format("%s %s", "Liste des établissements à ",VillesFragment.Villeencours);
+                    break;
+                case "animateurs" :
+                    mEtablissement = String.format("%s %s", "Liste des établissements ayant pour référent ",ListeAnimParNomFragment.Animateurencours);
+                    break;
+            }
             TextView titreetabTextView = (TextView)getView().findViewById(R.id.titre_etablissement);
             titreetabTextView.setText(mEtablissement);
             return new CursorLoader(

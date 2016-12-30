@@ -41,4 +41,5 @@
     <string name="message_etabs">Nom de l\'établissement</string>
     <string name="label_recherche_etab_par_nom">Nom de l\'établissement à rechercher</string>
     <string name="label_recherche_personnel_par_nom">Nom du personnel administratif</string>
+    <string name="label_recherche_anim_par_nom">Nom de l\'animateur</string>
 </resources>

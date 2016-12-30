@@ -56,7 +56,9 @@ public class AccueilActivity extends AppCompatActivity {
         recherche_etablissement_par_animateur.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(), "recherche_etablissement_par_animateur", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(view.getContext(), AnimateurParNomActivity.class)
+                        .setData(DaneContract.AnimateurEntry.buildAnimateurs());
+                startActivity(intent);
             }
         });
 

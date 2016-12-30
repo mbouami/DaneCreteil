@@ -27,7 +27,7 @@ public class DaneContract {
     // looking at weather data. content://com.example.android.sunshine.app/givemeroot/ will fail,
     // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
     // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
-    public static final String PATH_ANIMATEURS = "users";
+    public static final String PATH_ANIMATEURS = "animateurs";
     public static final String PATH_VILLES = "villes";
     public static final String PATH_ETABLISSEMENTS = "etablissements";
     public static final String PATH_PERSONNEL = "personnel";
@@ -54,6 +54,22 @@ public class DaneContract {
 
         public static Uri buildAnimateurUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildAnimateurs() {
+            return CONTENT_URI.buildUpon().build();
+        }
+
+        public static Uri buildEtabParIdAnimateur(String idanim,String rubrique) {
+            return CONTENT_URI.buildUpon().appendPath(idanim).appendPath(rubrique).build();
+        }
+
+        public static String getNomAnimateurFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
+        public static String getIdAnimateurFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 
@@ -120,9 +136,11 @@ public class DaneContract {
         public static Uri buildEtablissementParVille(String idville) {
             return CONTENT_URI.buildUpon().appendPath(idville).build();
         }
+
         public static Uri buildEtablissements() {
             return CONTENT_URI.buildUpon().build();
         }
+
         public static Uri buildEtablissementParId(String idetab,String rubrique) {
             return CONTENT_URI.buildUpon().appendPath(idetab).appendPath(rubrique).build();
         }

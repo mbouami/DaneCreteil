@@ -24,6 +24,7 @@ public class DaneProvider extends ContentProvider {
 
     static final int ANIMATEURS = 200;
     static final int ANIMATEURS_ID = 201;
+    static final int ANIMATEURS_CONTENANT_NOM = 202;
 
     static final int ETABLISSEMENTS = 300;
     static final int ETABLISSEMENTS_PAR_VILLE = 301;
@@ -97,6 +98,12 @@ public class DaneProvider extends ContentProvider {
         sEtablissementParIdQueryBuilder.setTables(DaneContract.EtablissementEntry.TABLE_NAME);
     }
 
+    private static final SQLiteQueryBuilder sAnimateurQueryBuilder;
+    static{
+        sAnimateurQueryBuilder = new SQLiteQueryBuilder();
+        sAnimateurQueryBuilder.setTables(DaneContract.AnimateurEntry.TABLE_NAME);
+    }
+
     private static final SQLiteQueryBuilder sEtablissementQueryBuilder;
     static{
         sEtablissementQueryBuilder = new SQLiteQueryBuilder();
@@ -141,6 +148,9 @@ public class DaneProvider extends ContentProvider {
         matcher.addURI(authority, DaneContract.PATH_VILLES+ "/*", VILLES_PAR_DEPARTEMENT);
         matcher.addURI(authority, DaneContract.PATH_ANIMATEURS, ANIMATEURS);
         matcher.addURI(authority, DaneContract.PATH_ANIMATEURS+ "/*", ANIMATEURS_ID);
+        matcher.addURI(authority, DaneContract.PATH_ANIMATEURS+ "/*/rechercher", ANIMATEURS_CONTENANT_NOM);
+        matcher.addURI(authority, DaneContract.PATH_ANIMATEURS+ "/*/etab", ETABLISSEMENTS_PAR_ANIMATEUR);
+
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS, ETABLISSEMENTS);
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS+ "/*", ETABLISSEMENTS_PAR_VILLE);
         matcher.addURI(authority, DaneContract.PATH_ETABLISSEMENTS+ "/*/etab", ETABLISSEMENTS_ID);
@@ -162,9 +172,17 @@ public class DaneProvider extends ContentProvider {
             DaneContract.EtablissementEntry.TABLE_NAME+
                     "." + DaneContract.EtablissementEntry._ID + " = ? ";
 
+    private static final String sEtablissementParIdAnimateurSelection =
+            DaneContract.EtablissementEntry.TABLE_NAME+
+                    "." + DaneContract.EtablissementEntry.COLUMN_ANIMATEUR_ID+ " = ? ";
+
     private static final String sEtablissementParNomSelection =
             DaneContract.EtablissementEntry.TABLE_NAME+
                     "." + DaneContract.EtablissementEntry.COLUMN_NOM + " like ? ";
+
+    private static final String sAnimateursParNomSelection =
+            DaneContract.AnimateurEntry.TABLE_NAME+
+                    "." + DaneContract.AnimateurEntry.COLUMN_NOM + " like ? ";
 
     private static final String sPersonnelParNomSelection =
             DaneContract.PersonnelEntry.TABLE_NAME+
@@ -227,6 +245,22 @@ public class DaneProvider extends ContentProvider {
         );
     }
 
+    private Cursor getEtablissementsParAnimateur(Uri uri, String[] projection, String sortOrder) {
+        String idanim = DaneContract.AnimateurEntry.getIdAnimateurFromUri(uri);
+        String[] selectionArgs;
+        String selection;
+        selectionArgs = new String[]{idanim};
+        selection = sEtablissementParIdAnimateurSelection;
+        return sEtablissementQueryBuilder.query(mDaneHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
     private Cursor getEtablissementsContenantleNom(Uri uri, String[] projection, String sortOrder) {
         String nometab = DaneContract.EtablissementEntry.getNomEtablissementFromUri(uri);
         String[] selectionArgs;
@@ -234,6 +268,22 @@ public class DaneProvider extends ContentProvider {
         selectionArgs = new String[]{"%" + nometab +"%"};
         selection = sEtablissementParNomSelection;
         return sEtablissementQueryBuilder.query(mDaneHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getAnimateursContenantleNom(Uri uri, String[] projection, String sortOrder) {
+        String nomanim = DaneContract.AnimateurEntry.getNomAnimateurFromUri(uri);
+        String[] selectionArgs;
+        String selection;
+        selectionArgs = new String[]{"%" + nomanim +"%"};
+        selection = sAnimateursParNomSelection;
+        return sAnimateurQueryBuilder.query(mDaneHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -296,6 +346,10 @@ public class DaneProvider extends ContentProvider {
                 return DaneContract.AnimateurEntry.CONTENT_TYPE;
             case ANIMATEURS_ID:
                 return DaneContract.AnimateurEntry.CONTENT_ITEM_TYPE;
+            case ANIMATEURS_CONTENANT_NOM:
+                return DaneContract.AnimateurEntry.CONTENT_ITEM_TYPE;
+            case ETABLISSEMENTS_PAR_ANIMATEUR:
+                return DaneContract.AnimateurEntry.CONTENT_ITEM_TYPE;
             case ETABLISSEMENTS:
                 return DaneContract.EtablissementEntry.CONTENT_TYPE;
             case ETABLISSEMENTS_PAR_VILLE:
@@ -346,6 +400,15 @@ public class DaneProvider extends ContentProvider {
             }
             case PERSONNEL_CONTENANT_NOM: {
                 retCursor = getPersonnelContenantleNom(uri, projection, sortOrder);
+                break;
+            }
+
+            case ANIMATEURS_CONTENANT_NOM: {
+                retCursor = getAnimateursContenantleNom(uri, projection, sortOrder);
+                break;
+            }
+            case ETABLISSEMENTS_PAR_ANIMATEUR: {
+                retCursor = getEtablissementsParAnimateur(uri, projection, sortOrder);
                 break;
             }
             case VILLES: {

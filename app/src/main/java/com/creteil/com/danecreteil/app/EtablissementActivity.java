@@ -32,7 +32,6 @@ public class EtablissementActivity extends AppCompatActivity implements EtabsFra
 
     @Override
     public void onItemSelected(Uri contentUri) {
-//        Log.d(LOG_TAG, "onItemSelected : "+contentUri.toString());
             Intent intent = new Intent(this, DetailActivity.class)
                     .setData(contentUri);
             startActivity(intent);
