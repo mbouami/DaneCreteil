@@ -1,6 +1,5 @@
 package com.creteil.com.danecreteil.app;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,9 +17,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
+import com.creteil.com.danecreteil.app.data.JSONParser;
+
 /**
  * Created by Mohammed on 27/11/2016.
  */
@@ -36,6 +35,7 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     RadioGroup liste_depart;
 
     static String Villeencours = null;
+    private String BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
 
     private static final String[] VILLES_COLUMNS = {
             DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry._ID,
@@ -70,7 +70,6 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
     }
 
     @Override
@@ -151,6 +150,7 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
 //        Log.d(LOG_TAG, "onResume : ");
         SelectDepart(getView());
     }
+
 
     private void SelectDepart(View view) {
         switch (Utility.getPreferredDepart(getActivity())) {

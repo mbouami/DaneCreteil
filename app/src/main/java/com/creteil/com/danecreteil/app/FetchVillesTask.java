@@ -41,6 +41,7 @@ public class FetchVillesTask extends AsyncTask<String, Void, Void> {
 
     private final Context mContext;
     private boolean DEBUG = true;
+    private String BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
     ProgressDialog pDialog;
 
     public FetchVillesTask(Context context) {
@@ -65,21 +66,21 @@ public class FetchVillesTask extends AsyncTask<String, Void, Void> {
 
     @Override
     protected Void doInBackground(String... params) {
-        final String VILLES_BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
-        JSONParser parser = new JSONParser(VILLES_BASE_URL,"GET",mContext);
-        if (params[0]=="update") {
-            parser.initialiserBase();
-        }
-//        if (params.length == 0) {
-//            return null;
-//        }
-//        String departementQuery = params[0];
-//        final String VILLES_BASE_URL ="http://www.bouami.fr/gestionetabs/web/listevilles/";
-        try {
-//            parser.getVillesDataFromJson(mContext,departementQuery);
-            parser.getVillesDataFromJson();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        JSONParser parser = new JSONParser(BASE_URL,"GET",mContext);
+        switch (params[0]) {
+            case "update":
+                parser.initialiserBase();
+                try {
+                    parser.getVillesDataFromJson();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "Initialiser":
+                parser.verifierDatabase();
+                break;
+//            default:
+//                return super.onOptionsItemSelected(item);
         }
         return null;
     }

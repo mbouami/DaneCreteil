@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.FetchVillesTask;
 
@@ -86,6 +87,7 @@ public class JSONParser {
         }
     }
 
+
     long addVille(String nom,String departement,String Ville_base_Id) {
 
         long villeId;
@@ -139,6 +141,30 @@ public class JSONParser {
         }
         animateurCursor.close();
         return animateurId;
+    }
+
+    public Integer getNombreEtablissement() {
+        Cursor NombreetablissementCursor = mContext.getContentResolver().query(
+                DaneContract.EtablissementEntry.CONTENT_URI,
+                new String[]{DaneContract.EtablissementEntry._ID},
+                null,
+                null,
+                null);
+        return NombreetablissementCursor.getCount();
+    }
+
+    public void verifierDatabase() {
+        Integer nbreetabs = this.getNombreEtablissement();
+        if (nbreetabs > 0) {
+            Log.d(LOG_TAG, "updateDatabase : " + nbreetabs);
+        } else {
+            this.initialiserBase();
+            try {
+                this.getVillesDataFromJson();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     long addEtablissement(long VilleId,long AnimateurId,String etab_id,String nom,String rne,String tel,

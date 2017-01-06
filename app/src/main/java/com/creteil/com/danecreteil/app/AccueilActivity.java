@@ -4,24 +4,39 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
+import com.creteil.com.danecreteil.app.data.JSONParser;
 
 public class AccueilActivity extends AppCompatActivity {
     private final String LOG_TAG =AccueilActivity.class.getSimpleName();
+    private String BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_accueil);
+        FetchVillesTask villesTask = new FetchVillesTask(this);
+        villesTask.execute("Initialiser");
     }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+//        Log.d(LOG_TAG, "onPostResume : ");
+//        Toast.makeText(this, "onPostResume : ", Toast.LENGTH_LONG).show();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-
+//        Log.d(LOG_TAG, "onResume : ");
         Button annuaire_etabs = (Button) this.findViewById(R.id.annuaire_etabs);
         Button recherche_etab = (Button) this.findViewById(R.id.recherche_etab);
         Button recherche_personnel = (Button) this.findViewById(R.id.recherche_personnel);
