@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.creteil.com.danecreteil.app">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -11,6 +12,13 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <!-- Permissions required by the sync adapter -->
+    <uses-permission
+        android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission
+        android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission
+        android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
 
     <application
         android:allowBackup="true"
@@ -85,8 +93,30 @@
             android:authorities="com.creteil.com.danecreteil.app"
             android:name=".data.DaneProvider"
             android:enabled="true"
+            android:syncable="true"
             android:exported="true">
         </provider>
+        <!-- SyncAdapter's dummy authentication service -->
+        <!--<service android:name=".service.DaneAuthenticatorService">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.accounts.AccountAuthenticator" />-->
+            <!--</intent-filter>-->
+            <!--<meta-data-->
+                <!--android:name="android.accounts.AccountAuthenticator"-->
+                <!--android:resource="@xml/authenticator" />-->
+        <!--</service>-->
+        <!--&lt;!&ndash; The SyncAdapter service &ndash;&gt;-->
+        <!--<service-->
+            <!--android:name=".service.DaneService"-->
+            <!--android:exported="false"-->
+            <!--&gt;-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.content.SyncAdapter" />-->
+            <!--</intent-filter>-->
+            <!--<meta-data-->
+                <!--android:name="android.content.SyncAdapter"-->
+                <!--android:resource="@xml/syncadapter" />-->
+        <!--</service>-->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDlWdTsFKgWaQaieLLZu_j_M6aLJ_3H_-w">

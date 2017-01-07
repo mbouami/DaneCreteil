@@ -1,5 +1,6 @@
 package com.creteil.com.danecreteil.app;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,7 +20,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
-import com.creteil.com.danecreteil.app.data.JSONParser;
+import com.creteil.com.danecreteil.app.service.DaneService;
+import com.creteil.com.danecreteil.app.service.DaneServiceAdapter;
 
 /**
  * Created by Mohammed on 27/11/2016.
@@ -140,10 +142,6 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
         super.onActivityCreated(savedInstanceState);
     }
 
-    void onDepartementChanged( ) {
-//        updateVille();
-        getLoaderManager().restartLoader(VILLES_LOADER, null, this);
-    }
     @Override
     public void onResume() {
         super.onResume();
@@ -178,6 +176,11 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
 //        updateVille();
 //    }
 
+    void onDepartementChanged( ) {
+//        updateVille();
+        getLoaderManager().restartLoader(VILLES_LOADER, null, this);
+    }
+
     private void updateVille() {
         FetchVillesTask villesTask = new FetchVillesTask(getActivity());
         villesTask.execute();
@@ -186,6 +189,10 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     private void updateDatabase() {
         FetchVillesTask villesTask = new FetchVillesTask(getActivity());
         villesTask.execute("update");
+//        DaneServiceAdapter.syncImmediately(getActivity());
+//        Intent mServiceIntent = new Intent(getActivity(), DaneService.class);
+////        mServiceIntent.putExtra("EXTRA_COMPTEUR", "test");
+//        getActivity().startService(mServiceIntent);
     }
 
     @Override

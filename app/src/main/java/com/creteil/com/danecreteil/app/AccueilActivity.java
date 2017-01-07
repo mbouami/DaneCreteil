@@ -2,6 +2,7 @@ package com.creteil.com.danecreteil.app;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,17 +14,37 @@ import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
 import com.creteil.com.danecreteil.app.data.JSONParser;
+import com.creteil.com.danecreteil.app.service.DaneService;
+import com.creteil.com.danecreteil.app.service.DaneServiceAdapter;
 
 public class AccueilActivity extends AppCompatActivity {
     private final String LOG_TAG =AccueilActivity.class.getSimpleName();
     private String BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
+    public final static String ETAT_BASE = "etat.base.de.donnees";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_accueil);
-        FetchVillesTask villesTask = new FetchVillesTask(this);
-        villesTask.execute("Initialiser");
+//        FetchVillesTask villesTask = new FetchVillesTask(this);
+//        villesTask.execute("Initialiser");
+//        DaneServiceAdapter.syncImmediately(this);
+//        Intent mServiceIntent = new Intent(AccueilActivity.this, DaneService.class);
+//        mServiceIntent.putExtra(ETAT_BASE, "Initialiser");
+//        startService(mServiceIntent);
+        Cursor NombreetablissementCursor = getBaseContext().getContentResolver().query(
+                DaneContract.EtablissementEntry.CONTENT_URI,
+                new String[]{DaneContract.EtablissementEntry._ID},
+                null,
+                null,
+                null);
+        if (NombreetablissementCursor.getCount() > 0) {
+            Log.d(LOG_TAG, "updateDatabase : " + NombreetablissementCursor.getCount());
+        } else {
+//            DaneServiceAdapter.syncImmediately(this);
+            FetchVillesTask villesTask = new FetchVillesTask(AccueilActivity.this);
+            villesTask.execute("update");
+        }
     }
 
     @Override

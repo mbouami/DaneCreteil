@@ -42,4 +42,7 @@
     <string name="label_recherche_etab_par_nom">Nom de l\'établissement à rechercher</string>
     <string name="label_recherche_personnel_par_nom">Nom du personnel administratif</string>
     <string name="label_recherche_anim_par_nom">Nom de l\'animateur</string>
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">bouami.fr</string>
+    <string name="content_authority">com.creteil.com.danecreteil.app</string>
 </resources>
