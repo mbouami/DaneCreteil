@@ -38,9 +38,9 @@ public class AccueilActivity extends AppCompatActivity {
                 null,
                 null,
                 null);
-        if (NombreetablissementCursor.getCount() > 0) {
-            Log.d(LOG_TAG, "updateDatabase : " + NombreetablissementCursor.getCount());
-        } else {
+        if (!(NombreetablissementCursor.getCount() > 0)) {
+//            Log.d(LOG_TAG, "updateDatabase : " + NombreetablissementCursor.getCount());
+//        } else {
 //            DaneServiceAdapter.syncImmediately(this);
             FetchVillesTask villesTask = new FetchVillesTask(AccueilActivity.this);
             villesTask.execute("update");
