@@ -1,6 +1,8 @@
 package com.creteil.com.danecreteil.app;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
@@ -38,12 +40,30 @@ public class AccueilActivity extends AppCompatActivity {
                 null,
                 null,
                 null);
-        if (!(NombreetablissementCursor.getCount() > 0)) {
-//            Log.d(LOG_TAG, "updateDatabase : " + NombreetablissementCursor.getCount());
+//        if (!(NombreetablissementCursor.getCount() > 0)) {
+////            Log.d(LOG_TAG, "updateDatabase : " + NombreetablissementCursor.getCount());
+////        } else {
+////            DaneServiceAdapter.syncImmediately(this);
+//            FetchVillesTask villesTask = new FetchVillesTask(AccueilActivity.this);
+//            villesTask.execute("update");
 //        } else {
-//            DaneServiceAdapter.syncImmediately(this);
-            FetchVillesTask villesTask = new FetchVillesTask(AccueilActivity.this);
-            villesTask.execute("update");
+//            Intent mServiceIntent = new Intent(this, DaneService.class);
+//            mServiceIntent.putExtra(ETAT_BASE, "Initialiser");
+//            startService(mServiceIntent);
+////            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, mServiceIntent, 0);
+////            Notification notification = new Notification.Builder(this)
+////                    .setContentTitle(getText(R.string.action_departement))
+////                    .setContentText(getText(R.string.message_version))
+//////                    .setSmallIcon(R.drawable.icon)
+////                    .setContentIntent(pendingIntent)
+////                    .setTicker(getText(R.string.action_mail))
+////                    .build();
+////            startForeground(13568, notification);
+//        }
+        if (!(NombreetablissementCursor.getCount() > 0)) {
+            DaneServiceAdapter.syncImmediately(this);
+        } else {
+            Toast.makeText(this, "base complète ", Toast.LENGTH_LONG).show();
         }
     }
 

@@ -97,26 +97,26 @@
             android:exported="true">
         </provider>
         <!-- SyncAdapter's dummy authentication service -->
-        <!--<service android:name=".service.DaneAuthenticatorService">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.accounts.AccountAuthenticator" />-->
-            <!--</intent-filter>-->
-            <!--<meta-data-->
-                <!--android:name="android.accounts.AccountAuthenticator"-->
-                <!--android:resource="@xml/authenticator" />-->
-        <!--</service>-->
+        <service android:name=".service.DaneAuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
         <!--&lt;!&ndash; The SyncAdapter service &ndash;&gt;-->
-        <!--<service-->
-            <!--android:name=".service.DaneService"-->
-            <!--android:exported="false"-->
-            <!--&gt;-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.content.SyncAdapter" />-->
-            <!--</intent-filter>-->
-            <!--<meta-data-->
-                <!--android:name="android.content.SyncAdapter"-->
-                <!--android:resource="@xml/syncadapter" />-->
-        <!--</service>-->
+        <service
+            android:name=".service.DaneService"
+            android:exported="false"
+            >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDlWdTsFKgWaQaieLLZu_j_M6aLJ_3H_-w">

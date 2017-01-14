@@ -15,7 +15,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.creteil.com.danecreteil.app.AccueilActivity;
 import com.creteil.com.danecreteil.app.R;
 import com.creteil.com.danecreteil.app.data.DaneContract;
 
@@ -39,12 +41,14 @@ import java.util.Vector;
 public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = DaneServiceAdapter.class.getSimpleName();
     private String BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
+    ContentResolver mContentResolver;
     public static final int SYNC_INTERVAL = 60 * 180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
 
     public DaneServiceAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
+        mContentResolver = context.getContentResolver();
     }
 
     @Override
@@ -157,15 +161,14 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
     }
 
     public void initialiserBase(){
-        Context mContext = getContext();
-        int effacertablePersonnel = mContext.getContentResolver().delete(DaneContract.PersonnelEntry.CONTENT_URI,null,null);
-        int effacertableEtablissement = mContext.getContentResolver().delete(DaneContract.EtablissementEntry.CONTENT_URI,null,null);
-        int effacertableVille = mContext.getContentResolver().delete(DaneContract.VilleEntry.CONTENT_URI,null,null);
-        int effacertableAnimateur = mContext.getContentResolver().delete(DaneContract.AnimateurEntry.CONTENT_URI,null,null);
+        int effacertablePersonnel = mContentResolver.delete(DaneContract.PersonnelEntry.CONTENT_URI,null,null);
+        int effacertableEtablissement = mContentResolver.delete(DaneContract.EtablissementEntry.CONTENT_URI,null,null);
+        int effacertableVille = mContentResolver.delete(DaneContract.VilleEntry.CONTENT_URI,null,null);
+        int effacertableAnimateur = mContentResolver.delete(DaneContract.AnimateurEntry.CONTENT_URI,null,null);
     }
 
     public Integer getNombreEtablissement() {
-        Cursor NombreetablissementCursor = getContext().getContentResolver().query(
+        Cursor NombreetablissementCursor = mContentResolver.query(
                 DaneContract.EtablissementEntry.CONTENT_URI,
                 new String[]{DaneContract.EtablissementEntry._ID},
                 null,
@@ -252,7 +255,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
                           String fax, String email,String adresse, String cp, String type) {
         long etablissementId;
         // First, check if the location with this city name exists in the db
-        Cursor etablissementCursor = getContext().getContentResolver().query(
+        Cursor etablissementCursor = mContentResolver.query(
                 DaneContract.EtablissementEntry.CONTENT_URI,
                 new String[]{DaneContract.EtablissementEntry._ID},
                 DaneContract.EtablissementEntry.COLUMN_ETABLISSEMENT_ID + " = ?",
@@ -275,7 +278,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
             etablissementValues.put(DaneContract.EtablissementEntry.COLUMN_TYPE, type);
             etablissementValues.put(DaneContract.EtablissementEntry.COLUMN_ETABLISSEMENT_ID, etab_id);
             // Finally, insert location data into the database.
-            Uri insertedUri = getContext().getContentResolver().insert(
+            Uri insertedUri = mContentResolver.insert(
                     DaneContract.EtablissementEntry.CONTENT_URI,
                     etablissementValues
             );
@@ -290,7 +293,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
     long addPersonnel(long EtablissementId,String personnel_id,String nom,String statut) {
         long personnelId;
         // First, check if the location with this city name exists in the db
-        Cursor personnelCursor = getContext().getContentResolver().query(
+        Cursor personnelCursor = mContentResolver.query(
                 DaneContract.PersonnelEntry.CONTENT_URI,
                 new String[]{DaneContract.PersonnelEntry._ID},
                 DaneContract.PersonnelEntry.COLUMN_PERSONNEL_ID + " = ?",
@@ -306,7 +309,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
             personnelValues.put(DaneContract.PersonnelEntry.COLUMN_ETABLISSEMENT_ID, EtablissementId);
             personnelValues.put(DaneContract.PersonnelEntry.COLUMN_PERSONNEL_ID, personnel_id);
             // Finally, insert location data into the database.
-            Uri insertedUri = getContext().getContentResolver().insert(
+            Uri insertedUri = mContentResolver.insert(
                     DaneContract.PersonnelEntry.CONTENT_URI,
                     personnelValues
             );
@@ -321,7 +324,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
     long addVille(String nom,String departement,String Ville_base_Id) {
 
         long villeId;
-        Cursor villeCursor = getContext().getContentResolver().query(
+        Cursor villeCursor = mContentResolver.query(
                 DaneContract.VilleEntry.CONTENT_URI,
                 new String[]{DaneContract.VilleEntry._ID},
                 DaneContract.VilleEntry.COLUMN_VILLE_ID + " = ?",
@@ -335,7 +338,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
             villeValues.put(DaneContract.VilleEntry.COLUMN_VILLE_NOM, nom);
             villeValues.put(DaneContract.VilleEntry.COLUMN_VILLE_DEPARTEMENT, departement);
             villeValues.put(DaneContract.VilleEntry.COLUMN_VILLE_ID, Ville_base_Id);
-            Uri insertedUri = getContext().getContentResolver().insert(
+            Uri insertedUri = mContentResolver.insert(
                     DaneContract.VilleEntry.CONTENT_URI,
                     villeValues
             );
@@ -348,7 +351,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
     long addAnimateur(String nom,String tel,String email,String Animateur_base_Id) {
 
         long animateurId;
-        Cursor animateurCursor = getContext().getContentResolver().query(
+        Cursor animateurCursor = mContentResolver.query(
                 DaneContract.AnimateurEntry.CONTENT_URI,
                 new String[]{DaneContract.AnimateurEntry._ID},
                 DaneContract.AnimateurEntry.COLUMN_ANIMATEUR_ID + " = ?",
@@ -363,7 +366,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
             animateurValues.put(DaneContract.AnimateurEntry.COLUMN_TEL, tel);
             animateurValues.put(DaneContract.AnimateurEntry.COLUMN_EMAIL, email);
             animateurValues.put(DaneContract.AnimateurEntry.COLUMN_ANIMATEUR_ID, Animateur_base_Id);
-            Uri insertedUri = getContext().getContentResolver().insert(
+            Uri insertedUri = mContentResolver.insert(
                     DaneContract.AnimateurEntry.CONTENT_URI,
                     animateurValues
             );
