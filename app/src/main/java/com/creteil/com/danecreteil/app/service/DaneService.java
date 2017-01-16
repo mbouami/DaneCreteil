@@ -52,25 +52,8 @@ public class DaneService extends IntentService  {
         }
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "service starting "+intent.getStringExtra(AccueilActivity.ETAT_BASE)+"---"+flags+"----"+startId, Toast.LENGTH_LONG).show();
-//        synchronized (sSyncAdapterLock) {
-//            Toast.makeText(this, "onStartCommand ", Toast.LENGTH_LONG).show();
-//            if (sDaneServiceAdapter == null) {
-//                Toast.makeText(this, "sDaneServiceAdapter ", Toast.LENGTH_LONG).show();
-//                sDaneServiceAdapter = new DaneServiceAdapter(getApplicationContext(), true);
-//            }
-//        }
+    public void AfficherNotofication(Intent intent) {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-//        Notification notification = new Notification.Builder(this)
-//                .setContentTitle("Truiton Music Player")
-//                .setTicker("Truiton Music Player")
-//                .setContentText("My Music")
-//                .setSmallIcon(android.R.drawable.ic_popup_sync)
-//                .setContentIntent(pendingIntent)
-//                .setTicker(getText(R.string.action_mail))
-//                .build();
         Bitmap icon = BitmapFactory.decodeResource(getResources(),
                 android.R.drawable.ic_dialog_dialer);
         Notification notification = new Notification.Builder(this)
@@ -83,6 +66,15 @@ public class DaneService extends IntentService  {
                 .setContentIntent(pendingIntent)
                 .setTicker(getText(R.string.action_mail))
                 .build();
+        startForeground(13568, notification);
+//        Notification notification = new Notification.Builder(this)
+//                .setContentTitle("Truiton Music Player")
+//                .setTicker("Truiton Music Player")
+//                .setContentText("My Music")
+//                .setSmallIcon(android.R.drawable.ic_popup_sync)
+//                .setContentIntent(pendingIntent)
+//                .setTicker(getText(R.string.action_mail))
+//                .build();
 
 //        Notification notification = new Notification.Builder(this)
 //                .setContentTitle(getText(R.string.action_departement))
@@ -99,7 +91,19 @@ public class DaneService extends IntentService  {
 //                        pendingIntent)
 //                .addAction(android.R.drawable.ic_media_next, "Next",
 //                        pendingIntent).build();
-        startForeground(13568, notification);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Toast.makeText(this, "service starting "+intent.getStringExtra(AccueilActivity.ETAT_BASE)+"---"+flags+"----"+startId, Toast.LENGTH_LONG).show();
+//        synchronized (sSyncAdapterLock) {
+//            Toast.makeText(this, "onStartCommand ", Toast.LENGTH_LONG).show();
+//            if (sDaneServiceAdapter == null) {
+//                Toast.makeText(this, "sDaneServiceAdapter ", Toast.LENGTH_LONG).show();
+//                sDaneServiceAdapter = new DaneServiceAdapter(getApplicationContext(), true);
+//            }
+//        }
+        AfficherNotofication(intent);
         return super.onStartCommand(intent, flags, startId);
 //        return START_STICKY;
     }

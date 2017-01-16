@@ -187,9 +187,9 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     private void updateDatabase() {
-        FetchVillesTask villesTask = new FetchVillesTask(getActivity());
-        villesTask.execute("update");
-//        DaneServiceAdapter.syncImmediately(getActivity());
+//        FetchVillesTask villesTask = new FetchVillesTask(getActivity());
+//        villesTask.execute("update");
+        DaneServiceAdapter.syncImmediately(getActivity());
 //        Intent mServiceIntent = new Intent(getActivity(), DaneService.class);
 ////        mServiceIntent.putExtra("EXTRA_COMPTEUR", "test");
 //        getActivity().startService(mServiceIntent);

@@ -103,14 +103,6 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
         }
-//        Integer nbreetabs = this.getNombreEtablissement();
-//        if (nbreetabs > 0) {
-//            Log.d(LOG_TAG, "updateDatabase : " + nbreetabs);
-//            return;
-//        }
-//        if (!verifierDatabaseChargee()) {
-//            this.ChargerDonneesBase();
-//        }
         return;
     }
     private void ChargerDonneesBase(){
