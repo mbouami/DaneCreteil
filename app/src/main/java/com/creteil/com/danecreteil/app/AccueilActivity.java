@@ -39,9 +39,6 @@ public class AccueilActivity extends AppCompatActivity {
                 null,
                 null);
         if (!(NombreetablissementCursor.getCount() > 0)) {
-//            Log.d(LOG_TAG, "updateDatabase : " + NombreetablissementCursor.getCount());
-//        } else {
-//            DaneServiceAdapter.syncImmediately(this);
             FetchVillesTask villesTask = new FetchVillesTask(AccueilActivity.this);
             villesTask.execute("update");
         }
@@ -50,8 +47,6 @@ public class AccueilActivity extends AppCompatActivity {
     @Override
     protected void onPostResume() {
         super.onPostResume();
-//        Log.d(LOG_TAG, "onPostResume : ");
-//        Toast.makeText(this, "onPostResume : ", Toast.LENGTH_LONG).show();
     }
 
     @Override

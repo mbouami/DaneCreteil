@@ -15,7 +15,7 @@ import com.creteil.com.danecreteil.app.data.DaneContract.PersonnelEntry;
 
 public class DaneDbHelper extends SQLiteOpenHelper {
     private final String LOG_TAG = DaneDbHelper.class.getSimpleName();
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 15;
     private static final String SQL_DELETE_ANIMATEUR_TABLE = "DROP TABLE IF EXISTS " + AnimateurEntry.TABLE_NAME;
     private static final String SQL_DELETE_VILLE_TABLE = "DROP TABLE IF EXISTS " + VilleEntry.TABLE_NAME;
     private static final String SQL_DELETE_PERSONNEL_TABLE = "DROP TABLE IF EXISTS " + PersonnelEntry.TABLE_NAME;

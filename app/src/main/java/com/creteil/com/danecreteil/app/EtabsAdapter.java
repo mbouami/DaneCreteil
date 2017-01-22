@@ -46,7 +46,17 @@ public class EtabsAdapter extends CursorAdapter implements Filterable {
     }
 
     private String convertCursorRowToUXFormat(Cursor cursor) {
-        return cursor.getString(EtabsFragment.COL_ETAB_TYPE)+" "+cursor.getString(EtabsFragment.COL_ETAB_NOM);
+//        return cursor.getString(cursor.getColumnIndex("type"))
+//                +" "+cursor.getString(cursor.getColumnIndex("nom"));
+        String nomville = null;
+        Cursor curs = getVilleById(cursor.getString(cursor.getColumnIndex("ville_id")));
+        if (curs.moveToFirst()){
+            nomville = curs.getString(curs.getColumnIndex("nom"));
+        }
+        return cursor.getString(cursor.getColumnIndex("type"))+" "+
+                cursor.getString(cursor.getColumnIndex("nom"))
+                +" ("+nomville+")"
+                ;
     }
 
     @Override
@@ -82,7 +92,8 @@ public class EtabsAdapter extends CursorAdapter implements Filterable {
     @Override
     public String convertToString(Cursor cursor) {
         //returns string inserted into textview after item from drop-down list is selected.
-        return cursor.getString(EtabsFragment.COL_ETAB_TYPE)+" "+cursor.getString(EtabsFragment.COL_ETAB_NOM)+" ("+"----"+")";
+        return cursor.getString(cursor.getColumnIndex("type"))
+                +" "+cursor.getString(cursor.getColumnIndex("nom"));
     }
 
     @Override
@@ -92,15 +103,27 @@ public class EtabsAdapter extends CursorAdapter implements Filterable {
             return filter.runQuery(constraint);
         }
         Uri uri = DaneContract.EtablissementEntry.CONTENT_URI.buildUpon().appendPath(constraint.toString()).appendPath("rechercher").build();
-        Log.v(LOG_TAG, "In onCreateLoader "+uri.toString()+"---"+DaneContract.EtablissementEntry.getNomEtablissementFromUri(uri));
+//        Log.v(LOG_TAG, "In onCreateLoader "+uri.toString()+"---"+DaneContract.EtablissementEntry.getNomEtablissementFromUri(uri));
         String nometab = DaneContract.EtablissementEntry.getNomEtablissementFromUri(uri);
         String[] selectionArgs;
         String selection;
         selectionArgs = new String[]{"%" + nometab +"%"};
-        selection = DaneContract.EtablissementEntry.TABLE_NAME+"." + DaneContract.EtablissementEntry.COLUMN_NOM + " like ? ";
+//        selection = DaneContract.EtablissementEntry.TABLE_NAME+"." + DaneContract.EtablissementEntry.COLUMN_NOM + " like ? ";
         return mContent.query(uri,
                 ETAB_PROJECTION,
-                selection,
+                sEtablissementParNomSelection,
+                selectionArgs,
+                null,
+                null
+        );
+    }
+
+    public Cursor getVilleById(String Idville) {
+        Uri uri = DaneContract.VilleEntry.buildVille();
+        String[] selectionArgs = new String[]{Idville};
+        return mContent.query(uri,
+                Ville_PROJECTION,
+                sVilleParIdSelection,
                 selectionArgs,
                 null,
                 null
@@ -110,10 +133,21 @@ public class EtabsAdapter extends CursorAdapter implements Filterable {
     public static final String[] ETAB_PROJECTION = new String[] {
             DaneContract.EtablissementEntry.TABLE_NAME +"."+DaneContract.EtablissementEntry._ID,
             DaneContract.EtablissementEntry.TABLE_NAME +"."+DaneContract.EtablissementEntry.COLUMN_NOM,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TYPE
+            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TYPE,
+            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_RNE,
+            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID
     };
 
     private static final String sEtablissementParNomSelection =
             DaneContract.EtablissementEntry.TABLE_NAME+
-                    "." + DaneContract.EtablissementEntry.COLUMN_NOM + " LIKE '% ? %'";
+                    "." + DaneContract.EtablissementEntry.COLUMN_NOM + " like ? ";
+
+    public static final String[] Ville_PROJECTION = new String[] {
+            DaneContract.VilleEntry.TABLE_NAME +"."+DaneContract.VilleEntry._ID,
+            DaneContract.VilleEntry.TABLE_NAME +"."+DaneContract.VilleEntry.COLUMN_VILLE_NOM
+    };
+
+    private static final String sVilleParIdSelection =
+            DaneContract.VilleEntry.TABLE_NAME+
+                    "." + DaneContract.VilleEntry._ID + " = ? ";
 }
