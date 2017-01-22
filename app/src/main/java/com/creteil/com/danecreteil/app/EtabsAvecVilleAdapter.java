@@ -46,10 +46,15 @@ public class EtabsAvecVilleAdapter extends CursorAdapter implements Filterable {
     }
 
     private String convertCursorRowToUXFormat(Cursor cursor) {
-        return cursor.getString(ListeEtabParNomFragment.COL_ETAB_TYPE)+
-                " "+
-                cursor.getString(ListeEtabParNomFragment.COL_ETAB_NOM);
-//                +" ("+cursor.getString(ListeEtabParNomFragment.COL_VILLE)+")";
+        String nomville = null;
+        Cursor curs = getVilleById(cursor.getString(cursor.getColumnIndex("ville_id")));
+        if (curs.moveToFirst()){
+            nomville = curs.getString(curs.getColumnIndex("nom"));
+        }
+        return cursor.getString(cursor.getColumnIndex("type"))+" "+
+                cursor.getString(cursor.getColumnIndex("nom"))
+                +" ("+nomville+")"
+                ;
     }
 
     @Override
@@ -85,8 +90,21 @@ public class EtabsAvecVilleAdapter extends CursorAdapter implements Filterable {
     @Override
     public String convertToString(Cursor cursor) {
         //returns string inserted into textview after item from drop-down list is selected.
-        return cursor.getString(ListeEtabParNomFragment.COL_ETAB_TYPE)+" "+cursor.getString(ListeEtabParNomFragment.COL_ETAB_NOM);
+        return cursor.getString(cursor.getColumnIndex("type"))
+                +" "+cursor.getString(cursor.getColumnIndex("nom"));
 //                +" ("+cursor.getString(ListeEtabParNomFragment.COL_VILLE)+")";
+    }
+
+    public Cursor getVilleById(String Idville) {
+        Uri uri = DaneContract.VilleEntry.buildVille();
+        String[] selectionArgs = new String[]{Idville};
+        return mContent.query(uri,
+                Ville_PROJECTION,
+                sVilleParIdSelection,
+                selectionArgs,
+                null,
+                null
+        );
     }
 
     @Override
@@ -114,10 +132,21 @@ public class EtabsAvecVilleAdapter extends CursorAdapter implements Filterable {
     public static final String[] ETAB_PROJECTION = new String[] {
             DaneContract.EtablissementEntry.TABLE_NAME +"."+DaneContract.EtablissementEntry._ID,
             DaneContract.EtablissementEntry.TABLE_NAME +"."+DaneContract.EtablissementEntry.COLUMN_NOM,
-            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TYPE
+            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TYPE,
+            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_RNE,
+            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID
     };
 
     private static final String sEtablissementParNomSelection =
             DaneContract.EtablissementEntry.TABLE_NAME+
-                    "." + DaneContract.EtablissementEntry.COLUMN_NOM + " like ? '";
+                    "." + DaneContract.EtablissementEntry.COLUMN_NOM + " like ? ";
+
+    public static final String[] Ville_PROJECTION = new String[] {
+            DaneContract.VilleEntry.TABLE_NAME +"."+DaneContract.VilleEntry._ID,
+            DaneContract.VilleEntry.TABLE_NAME +"."+DaneContract.VilleEntry.COLUMN_VILLE_NOM
+    };
+
+    private static final String sVilleParIdSelection =
+            DaneContract.VilleEntry.TABLE_NAME+
+                    "." + DaneContract.VilleEntry._ID + " = ? ";
 }

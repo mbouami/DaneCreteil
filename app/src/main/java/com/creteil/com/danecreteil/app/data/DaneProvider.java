@@ -50,8 +50,6 @@ public class DaneProvider extends ContentProvider {
                         " ON " + DaneContract.EtablissementEntry.TABLE_NAME +
                         "." + DaneContract.EtablissementEntry.COLUMN_VILLE_ID +
                         " = " + DaneContract.VilleEntry.TABLE_NAME +
-                        "." + DaneContract.VilleEntry._ID +
-                        " = " + DaneContract.VilleEntry.TABLE_NAME +
                         "." + DaneContract.VilleEntry._ID  + " LEFT JOIN " +
                         DaneContract.AnimateurEntry.TABLE_NAME +
                         " ON " + DaneContract.EtablissementEntry.TABLE_NAME +

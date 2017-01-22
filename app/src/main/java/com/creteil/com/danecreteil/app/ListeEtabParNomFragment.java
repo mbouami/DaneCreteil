@@ -37,6 +37,7 @@ public class ListeEtabParNomFragment extends Fragment implements LoaderManager.L
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry._ID,
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_NOM,
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_TYPE,
+            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_RNE,
 //            DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry.COLUMN_VILLE_NOM
     };
 
@@ -45,7 +46,8 @@ public class ListeEtabParNomFragment extends Fragment implements LoaderManager.L
     static final int COL_ETAB_ID = 0;
     static final int COL_ETAB_NOM = 1;
     static final int COL_ETAB_TYPE = 2;
-//    static final int COL_VILLE = 3;
+    static final int COL_RNE = 3;
+    static final int COL_VILLE = 4;
 
     public ListeEtabParNomFragment() {
 
