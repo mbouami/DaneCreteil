@@ -63,41 +63,4 @@ public class VillesActivity extends AppCompatActivity implements VillesFragment.
             startActivity(intent);
     }
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        RadioGroup liste_depart = (RadioGroup) this.findViewById(R.id.liste_departement);
-//        liste_depart.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-//                switch (checkedId) {
-//                    case R.id.dep77:
-//                        Toast.makeText(getBaseContext(), "dep77", Toast.LENGTH_SHORT).show();
-//                        break;
-//                    case R.id.dep93:
-//                        Toast.makeText(getBaseContext(), "dep93", Toast.LENGTH_SHORT).show();
-//                        break;
-//                    case R.id.dep94:
-//                        Toast.makeText(getBaseContext(), "dep94", Toast.LENGTH_SHORT).show();
-//                        break;
-//                }
-//            }
-//        });
-//    }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        String departement = Utility.getPreferredDepart(this);
-//        Log.d(LOG_TAG, "onResume : "+departement+"----"+mdepartement);
-////        // update the location in our second pane using the fragment manager
-//        if (departement != null && !departement.equals(mdepartement)) {
-////            VillesFragment ff = (VillesFragment)getSupportFragmentManager().findFragmentByTag(VILLESFRAGMENT_TAG);
-////            if ( null != ff ) {
-////                ff.onDepartementChanged();
-////            }
-//            mdepartement = departement;
-//        }
-//    }
-
 }
