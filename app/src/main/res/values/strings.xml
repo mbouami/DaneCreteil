@@ -7,6 +7,7 @@
     <string name="recherche_personnel">Rechercher un personnel administratif</string>
     <string name="recherche_etab">Rechercher un établissement par nom</string>
     <string name="recherche_etablissement_par_animateur">Etablissements par animateur </string>
+    <string name="liste_animateurs">Liste des animateurs </string>
     <string name="titre_villes_activity">Villes Par Département</string>
     <string name="dep77">Seine et Marne</string>
     <string name="dep93">Seine Saint Denis</string>

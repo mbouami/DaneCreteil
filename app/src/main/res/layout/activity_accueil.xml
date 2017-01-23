@@ -54,6 +54,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/recherche_etablissement_par_animateur" />
+
+        <Button
+            android:text="@string/liste_animateurs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/liste_animateurs" />
     </LinearLayout>
     <TextView
         android:layout_width="match_parent"
