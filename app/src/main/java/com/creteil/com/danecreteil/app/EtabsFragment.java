@@ -42,7 +42,8 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
     private static final String[] ETAB_COLUMNS = {
             EtablissementEntry.TABLE_NAME + "." + EtablissementEntry._ID,
             EtablissementEntry.TABLE_NAME + "." + EtablissementEntry.COLUMN_NOM,
-            EtablissementEntry.TABLE_NAME + "." + EtablissementEntry.COLUMN_TYPE
+            EtablissementEntry.TABLE_NAME + "." + EtablissementEntry.COLUMN_TYPE,
+            EtablissementEntry.TABLE_NAME + "." + EtablissementEntry.COLUMN_VILLE_ID,
     };
 
     // these constants correspond to the projection defined above, and must change if the
