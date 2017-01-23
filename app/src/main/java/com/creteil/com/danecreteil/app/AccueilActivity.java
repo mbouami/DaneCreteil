@@ -26,12 +26,6 @@ public class AccueilActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_accueil);
-//        FetchVillesTask villesTask = new FetchVillesTask(this);
-//        villesTask.execute("Initialiser");
-//        DaneServiceAdapter.syncImmediately(this);
-//        Intent mServiceIntent = new Intent(AccueilActivity.this, DaneService.class);
-//        mServiceIntent.putExtra(ETAT_BASE, "Initialiser");
-//        startService(mServiceIntent);
         Cursor NombreetablissementCursor = getBaseContext().getContentResolver().query(
                 DaneContract.EtablissementEntry.CONTENT_URI,
                 new String[]{DaneContract.EtablissementEntry._ID},
@@ -57,6 +51,7 @@ public class AccueilActivity extends AppCompatActivity {
         Button recherche_etab = (Button) this.findViewById(R.id.recherche_etab);
         Button recherche_personnel = (Button) this.findViewById(R.id.recherche_personnel);
         Button recherche_etablissement_par_animateur = (Button) this.findViewById(R.id.recherche_etablissement_par_animateur);
+        Button liste_animateurs = (Button) this.findViewById(R.id.liste_animateurs);
         annuaire_etabs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,6 +85,16 @@ public class AccueilActivity extends AppCompatActivity {
                 Intent intent = new Intent(view.getContext(), AnimateurParNomActivity.class)
                         .setData(DaneContract.AnimateurEntry.buildAnimateurs());
                 startActivity(intent);
+            }
+        });
+
+        liste_animateurs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(view.getContext(), "liste des Animateurs", Toast.LENGTH_SHORT).show();
+//                Intent intent = new Intent(view.getContext(), AnimateurParNomActivity.class)
+//                        .setData(DaneContract.AnimateurEntry.buildAnimateurs());
+//                startActivity(intent);
             }
         });
 

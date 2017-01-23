@@ -35,6 +35,7 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
     private static final String SELECTED_KEY = "selected_position";
     private boolean mEtabLayout;
     private static final int ETAB_LOADER = 0;
+    private boolean mAvecVille = false;
 
     static final String ETAB_URI = "URI";
     private Uri mUri;
@@ -66,8 +67,9 @@ public class EtabsFragment extends Fragment implements LoaderManager.LoaderCallb
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(EtabsFragment.ETAB_URI);
+            mAvecVille = arguments.getBoolean("avecville");
         }
-        mEtabsAdapter = new EtabsAdapter(getActivity(),null,0);
+        mEtabsAdapter = new EtabsAdapter(getActivity(),null,0,mAvecVille);
         View rootView = inflater.inflate(R.layout.fragment_etab, container, false);
         mListView = (ListView) rootView.findViewById(R.id.liste_etabs);
         mListView.setAdapter(mEtabsAdapter);
