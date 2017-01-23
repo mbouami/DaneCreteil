@@ -21,7 +21,9 @@ public class EtablissementActivity extends AppCompatActivity implements EtabsFra
         setContentView(R.layout.activity_etab);
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
+            Boolean avecville = getIntent().getBooleanExtra("avecville",false);
             arguments.putParcelable(EtabsFragment.ETAB_URI,getIntent().getData());
+            arguments.putBoolean("avecville",avecville);
             EtabsFragment fragment = new EtabsFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()

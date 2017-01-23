@@ -26,12 +26,6 @@ public class AccueilActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_accueil);
-//        FetchVillesTask villesTask = new FetchVillesTask(this);
-//        villesTask.execute("Initialiser");
-//        DaneServiceAdapter.syncImmediately(this);
-//        Intent mServiceIntent = new Intent(AccueilActivity.this, DaneService.class);
-//        mServiceIntent.putExtra(ETAT_BASE, "Initialiser");
-//        startService(mServiceIntent);
         Cursor NombreetablissementCursor = getBaseContext().getContentResolver().query(
                 DaneContract.EtablissementEntry.CONTENT_URI,
                 new String[]{DaneContract.EtablissementEntry._ID},

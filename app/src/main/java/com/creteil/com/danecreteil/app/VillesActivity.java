@@ -59,6 +59,7 @@ public class VillesActivity extends AppCompatActivity implements VillesFragment.
 //        Log.d(LOG_TAG, "onItemSelected : "+villeUri+"----"+DaneContract.EtablissementEntry.getNomEtablissementFromUri(villeUri));
             Intent intent = new Intent(this, EtablissementActivity.class)
                     .setData(villeUri);
+            intent.putExtra("avecville",false);
             startActivity(intent);
     }
 

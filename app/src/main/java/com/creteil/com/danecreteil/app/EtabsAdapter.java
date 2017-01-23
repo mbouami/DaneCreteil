@@ -27,10 +27,12 @@ public class EtabsAdapter extends CursorAdapter implements Filterable {
     private boolean mEtabLayout;
     private ContentResolver mContent;
     private static final String LOG_TAG = EtabsAdapter.class.getSimpleName();
+    private boolean mAvecVille = false;
 
-    public EtabsAdapter(Context context, Cursor c, int flags) {
+    public EtabsAdapter(Context context, Cursor c, int flags, boolean avecville) {
         super(context, c, flags);
         mContent = context.getContentResolver();
+        mAvecVille = avecville;
     }
 
     public void setUseEtabLayout(boolean EtabLayout) {
@@ -48,15 +50,20 @@ public class EtabsAdapter extends CursorAdapter implements Filterable {
     private String convertCursorRowToUXFormat(Cursor cursor) {
 //        return cursor.getString(cursor.getColumnIndex("type"))
 //                +" "+cursor.getString(cursor.getColumnIndex("nom"));
-        String nomville = null;
-        Cursor curs = getVilleById(cursor.getString(cursor.getColumnIndex("ville_id")));
-        if (curs.moveToFirst()){
-            nomville = curs.getString(curs.getColumnIndex("nom"));
+        if (mAvecVille) {
+            String nomville = null;
+            Cursor curs = getVilleById(cursor.getString(cursor.getColumnIndex("ville_id")));
+            if (curs.moveToFirst()){
+                nomville = curs.getString(curs.getColumnIndex("nom"));
+            }
+            return cursor.getString(cursor.getColumnIndex("type"))+" "+
+                    cursor.getString(cursor.getColumnIndex("nom"))
+                    +" ("+nomville+")"
+                    ;
+        } else {
+            return cursor.getString(cursor.getColumnIndex("type"))+" "+
+                    cursor.getString(cursor.getColumnIndex("nom"));
         }
-        return cursor.getString(cursor.getColumnIndex("type"))+" "+
-                cursor.getString(cursor.getColumnIndex("nom"))
-                +" ("+nomville+")"
-                ;
     }
 
     @Override

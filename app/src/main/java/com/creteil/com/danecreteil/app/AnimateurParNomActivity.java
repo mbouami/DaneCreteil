@@ -33,6 +33,7 @@ public class AnimateurParNomActivity extends AppCompatActivity implements ListeA
     public void onItemSelected(Uri animUri) {
         Intent intent = new Intent(this, EtablissementActivity.class)
                 .setData(animUri);
+        intent.putExtra("avecville",true);
         startActivity(intent);
     }
 }
