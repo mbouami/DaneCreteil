@@ -92,9 +92,9 @@ public class AccueilActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Toast.makeText(view.getContext(), "liste des Animateurs", Toast.LENGTH_SHORT).show();
-//                Intent intent = new Intent(view.getContext(), AnimateurParNomActivity.class)
+                Intent intent = new Intent(view.getContext(), AnimateursActivity.class);
 //                        .setData(DaneContract.AnimateurEntry.buildAnimateurs());
-//                startActivity(intent);
+                startActivity(intent);
             }
         });
 

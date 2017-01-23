@@ -4,5 +4,5 @@
     android:id="@+id/etab_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.creteil.com.danecreteil.app.DetailActivity"
+    tools:context=".DetailActivity"
     tools:ignore="MergeRootFrame" />

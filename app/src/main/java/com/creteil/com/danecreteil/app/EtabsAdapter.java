@@ -48,8 +48,6 @@ public class EtabsAdapter extends CursorAdapter implements Filterable {
     }
 
     private String convertCursorRowToUXFormat(Cursor cursor) {
-//        return cursor.getString(cursor.getColumnIndex("type"))
-//                +" "+cursor.getString(cursor.getColumnIndex("nom"));
         if (mAvecVille) {
             String nomville = null;
             Cursor curs = getVilleById(cursor.getString(cursor.getColumnIndex("ville_id")));

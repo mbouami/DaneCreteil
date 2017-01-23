@@ -26,7 +26,8 @@ import com.creteil.com.danecreteil.app.data.DaneContract;
 public class ListeEtabParNomFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String LOG_TAG = ListeEtabParNomFragment.class.getSimpleName();
-    EtabsAvecVilleAdapter mEtabsAdapter;
+//    EtabsAvecVilleAdapter mEtabsAdapter;
+    EtabsAdapter mEtabsAdapter;
     static final String ETAB_URI = "URI";
     private Uri mUri;
     AutoCompleteTextView listeetabs;
@@ -71,7 +72,8 @@ public class ListeEtabParNomFragment extends Fragment implements LoaderManager.L
         if (arguments != null) {
             mUri = arguments.getParcelable(ListeEtabParNomFragment.ETAB_URI);
         }
-        mEtabsAdapter = new EtabsAvecVilleAdapter(getActivity(),null,0);
+//        mEtabsAdapter = new EtabsAvecVilleAdapter(getActivity(),null,0);
+        mEtabsAdapter = new EtabsAdapter(getActivity(),null,0,true);
         View rootView = inflater.inflate(R.layout.liste_etab_par_nom, container, false);
         listeetabs = (AutoCompleteTextView) rootView.findViewById(R.id.rechercher_etabs_par_nom);
         listeetabs.setAdapter(mEtabsAdapter);
