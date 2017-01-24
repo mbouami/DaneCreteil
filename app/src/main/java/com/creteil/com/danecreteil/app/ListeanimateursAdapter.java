@@ -1,11 +1,15 @@
 package com.creteil.com.danecreteil.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 /**
@@ -13,6 +17,7 @@ import android.widget.TextView;
  */
 
 public class ListeanimateursAdapter extends CursorAdapter {
+    private final String LOG_TAG = ListeanimateursAdapter.class.getSimpleName();
 
     public ListeanimateursAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
@@ -22,11 +27,15 @@ public class ListeanimateursAdapter extends CursorAdapter {
         public final TextView nomView;
         public final TextView telView;
         public final TextView mailView;
+        public final ImageButton boutoncallView;
+        public final ImageButton boutonmailView;
 
         public ViewHolder(View view) {
             nomView = (TextView) view.findViewById(R.id.nom);
             telView = (TextView) view.findViewById(R.id.tel);
             mailView = (TextView) view.findViewById(R.id.mail);
+            boutoncallView = (ImageButton) view.findViewById(R.id.bouton_call);
+            boutonmailView = (ImageButton) view.findViewById(R.id.bouton_mail);
         }
     }
 
@@ -39,12 +48,49 @@ public class ListeanimateursAdapter extends CursorAdapter {
         view.setTag(viewHolder);
         return view;
     }
+    private Intent createPhoneIntent(String tel) {
+        Intent shareIntent = new Intent(Intent.ACTION_DIAL);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setData(Uri.parse("tel:"+tel));
+//        if (ActivityCompat.checkSelfPermission(getActivity(),
+//                Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+//            return null;
+//        }
+        return shareIntent;
+    }
+
+    private Intent createMailIntent(String mail) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "");
+        shareIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { mail });
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Demande d'information");
+        return shareIntent;
+    }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        final String Tel = cursor.getString(cursor.getColumnIndex("tel"));
+        final String mail = cursor.getString(cursor.getColumnIndex("email"));
+        final Context lecontext = context;
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         viewHolder.nomView.setText(cursor.getString(cursor.getColumnIndex("nom")));
         viewHolder.telView.setText(cursor.getString(cursor.getColumnIndex("tel")));
         viewHolder.mailView.setText(cursor.getString(cursor.getColumnIndex("email")));
+        viewHolder.boutoncallView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                lecontext.startActivity(createPhoneIntent(Tel));
+            }
+        });
+
+        viewHolder.boutonmailView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                lecontext.startActivity(createMailIntent(mail));
+            }
+        });
     }
 }
