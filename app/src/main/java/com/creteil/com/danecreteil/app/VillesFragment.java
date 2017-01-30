@@ -42,8 +42,14 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     private static final String[] VILLES_COLUMNS = {
             DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry._ID,
             DaneContract.VilleEntry.COLUMN_VILLE_NOM,
-            DaneContract.VilleEntry.COLUMN_VILLE_DEPARTEMENT,
+            DaneContract.VilleEntry.COLUMN_DEPARTEMENT_ID,
             DaneContract.VilleEntry.COLUMN_VILLE_ID
+    };
+
+    private static final String[] DEPARTEMENT_COLUMNS = {
+            DaneContract.DepartementEntry.TABLE_NAME + "." + DaneContract.DepartementEntry._ID,
+            DaneContract.DepartementEntry.COLUMN_DEPARTEMENT_NOM,
+            DaneContract.DepartementEntry.COLUMN_DEPARTEMENT_INTITULE
     };
 
     static final int COL_VILLE_ID = 0;
@@ -195,10 +201,23 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
 //        getActivity().startService(mServiceIntent);
     }
 
+    private String getDepartementId(String nom) {
+        Uri DepartementUri = DaneContract.DepartementEntry.buildDepartementParNom(choix_depart);
+        Cursor departcursor = getContext().getContentResolver().query(DepartementUri,
+                DEPARTEMENT_COLUMNS,
+                null,
+                null,
+                null);
+        if (departcursor.moveToFirst()){
+            return departcursor.getString(departcursor.getColumnIndex(DaneContract.DepartementEntry._ID));
+        }
+        return null;
+    };
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String sortOrder = DaneContract.VilleEntry.COLUMN_VILLE_NOM + " ASC";
-        Uri villeParDepartementUri = DaneContract.VilleEntry.buildVilleParDepartement(choix_depart);
+        Uri villeParDepartementUri = DaneContract.VilleEntry.buildVilleParDepartement(getDepartementId(choix_depart));
         return new CursorLoader(getActivity(),
                 villeParDepartementUri,
                 VILLES_COLUMNS,

@@ -91,7 +91,7 @@ public class AccueilActivity extends AppCompatActivity {
         liste_animateurs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(), "liste des Animateurs", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(view.getContext(), "liste des Animateurs", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(view.getContext(), AnimateursActivity.class);
 //                        .setData(DaneContract.AnimateurEntry.buildAnimateurs());
                 startActivity(intent);

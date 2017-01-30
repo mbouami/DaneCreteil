@@ -28,9 +28,42 @@ public class DaneContract {
     // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
     // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
     public static final String PATH_ANIMATEURS = "animateurs";
+    public static final String PATH_DEPARTEMENTS = "departements";
     public static final String PATH_VILLES = "villes";
     public static final String PATH_ETABLISSEMENTS = "etablissements";
     public static final String PATH_PERSONNEL = "personnel";
+
+    public static final class DepartementEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_DEPARTEMENTS).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_DEPARTEMENTS;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_DEPARTEMENTS;
+
+        // Table name
+        public static final String TABLE_NAME = "departements";
+
+        public static final String COLUMN_DEPARTEMENT_ID = "departement_id";
+        public static final String COLUMN_DEPARTEMENT_NOM = "departement";
+        public static final String COLUMN_DEPARTEMENT_INTITULE = "nom";
+
+        public static Uri buildDepartement() {
+            return CONTENT_URI.buildUpon().build();
+        }
+
+        public static Uri buildDepartementParNom(String nomfepart) {
+            return CONTENT_URI.buildUpon().appendPath(nomfepart).appendPath("nom").build();
+        }
+        public static Uri buildDepartementUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+        public static String getDepartementFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+    }
 
     public static final class AnimateurEntry implements BaseColumns {
 
@@ -49,7 +82,9 @@ public class DaneContract {
         public static final String COLUMN_NOM = "nom";
         public static final String COLUMN_TEL = "tel";
         public static final String COLUMN_EMAIL = "email";
+        public static final String COLUMN_PHOTO = "photo";
         public static final String COLUMN_ANIMATEUR_ID = "animateur_id";
+        public static final String COLUMN_DEPARTEMENT_ID = "departement_id";
 
 
         public static Uri buildAnimateurUri(long id) {
@@ -88,7 +123,7 @@ public class DaneContract {
 
         public static final String COLUMN_VILLE_ID = "ville_id";
         public static final String COLUMN_VILLE_NOM = "nom";
-        public static final String COLUMN_VILLE_DEPARTEMENT = "departement";
+        public static final String COLUMN_DEPARTEMENT_ID = "departement_id";
 
         public static Uri buildVille() {
             return CONTENT_URI.buildUpon().build();

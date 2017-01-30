@@ -209,11 +209,18 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
             Iterator<String> depart = villeJson.keys();
             while( depart.hasNext() ) {
                 String ledepart= (String)depart.next();
+                String intitule = "";
+                switch (ledepart){
+                    case "77" : intitule = "seine et Marne";break;
+                    case "93" : intitule = "Seine Saint Denis";break;
+                    case "94" : intitule = "Val de Marne";break;
+                }
+                long insertedDepartement = addDepartement(ledepart,intitule);
                 JSONArray villeArray = villeJson.getJSONArray(ledepart);
                 Vector<ContentValues> cVVector = new Vector<ContentValues>(villeArray.length());
                 for(int i = 0; i < villeArray.length(); i++) {
                     JSONObject laville = villeArray.getJSONObject(i);
-                    long insertedVille = addVille(laville.getString(OWM_NOM),ledepart,laville.getString(OWM_VILLE_ID));
+                    long insertedVille = addVille(laville.getString(OWM_NOM),insertedDepartement,laville.getString(OWM_VILLE_ID));
                     Log.d(LOG_TAG, "Lors de cette opération. " + laville.getString(OWM_NOM) + " = id de la ville insérée");
                     JSONArray etabsArray = laville.getJSONArray(OWM_ETABS);
                     Vector<ContentValues> etabVector = new Vector<ContentValues>(etabsArray.length());
@@ -224,7 +231,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
                         if (animateurArray.length()>0) {
                             JSONObject animateur = animateurArray.getJSONObject(0);
                             insertedanimateur = addAnimateur(animateur.getString(OWM_NOM),animateur.getString(OWM_TEL),animateur.getString(OWM_EMAIL),
-                                    animateur.getString(OWM_ANIMATEUR_ID));
+                                    animateur.getString(OWM_ANIMATEUR_ID),insertedDepartement);
                         }
                         long insertedEtab = addEtablissement(insertedVille,insertedanimateur,etab.getString(OWM_ETABLISSEMENT_ID),etab.getString(OWM_NOM),etab.getString(OWM_RNE),
                                 etab.getString(OWM_TEL),etab.getString(OWM_FAX),etab.getString(OWM_EMAIL),
@@ -247,6 +254,31 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
+    long addDepartement(String nom,String intitule) {
+
+        long departementId;
+        Cursor departementCursor = getContext().getContentResolver().query(
+                DaneContract.DepartementEntry.CONTENT_URI,
+                new String[]{DaneContract.DepartementEntry._ID},
+                DaneContract.DepartementEntry.COLUMN_DEPARTEMENT_NOM + " = ?",
+                new String[]{nom},
+                null);
+        if (departementCursor.moveToFirst()) {
+            int departementIdIndex = departementCursor.getColumnIndex(DaneContract.DepartementEntry._ID);
+            departementId = departementCursor.getLong(departementIdIndex);
+        } else {
+            ContentValues departementValues = new ContentValues();
+            departementValues.put(DaneContract.DepartementEntry.COLUMN_DEPARTEMENT_NOM, nom);
+            departementValues.put(DaneContract.DepartementEntry.COLUMN_DEPARTEMENT_INTITULE, intitule);
+            Uri insertedUri = getContext().getContentResolver().insert(
+                    DaneContract.DepartementEntry.CONTENT_URI,
+                    departementValues
+            );
+            departementId = ContentUris.parseId(insertedUri);
+        }
+        departementCursor.close();
+        return departementId;
+    }
 
     long addEtablissement(long VilleId,long AnimateurId,String etab_id,String nom,String rne,String tel,
                           String fax, String email,String adresse, String cp, String type) {
@@ -318,7 +350,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
         return personnelId;
     }
 
-    long addVille(String nom,String departement,String Ville_base_Id) {
+    long addVille(String nom,Long departement_id,String Ville_base_Id) {
 
         long villeId;
         Cursor villeCursor = getContext().getContentResolver().query(
@@ -333,7 +365,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
         } else {
             ContentValues villeValues = new ContentValues();
             villeValues.put(DaneContract.VilleEntry.COLUMN_VILLE_NOM, nom);
-            villeValues.put(DaneContract.VilleEntry.COLUMN_VILLE_DEPARTEMENT, departement);
+            villeValues.put(DaneContract.VilleEntry.COLUMN_DEPARTEMENT_ID, departement_id);
             villeValues.put(DaneContract.VilleEntry.COLUMN_VILLE_ID, Ville_base_Id);
             Uri insertedUri = getContext().getContentResolver().insert(
                     DaneContract.VilleEntry.CONTENT_URI,
@@ -345,7 +377,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
         return villeId;
     }
 
-    long addAnimateur(String nom,String tel,String email,String Animateur_base_Id) {
+    long addAnimateur(String nom,String tel,String email,String Animateur_base_Id,Long Departement_id) {
 
         long animateurId;
         Cursor animateurCursor = getContext().getContentResolver().query(
@@ -363,6 +395,7 @@ public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
             animateurValues.put(DaneContract.AnimateurEntry.COLUMN_TEL, tel);
             animateurValues.put(DaneContract.AnimateurEntry.COLUMN_EMAIL, email);
             animateurValues.put(DaneContract.AnimateurEntry.COLUMN_ANIMATEUR_ID, Animateur_base_Id);
+            animateurValues.put(DaneContract.AnimateurEntry.COLUMN_DEPARTEMENT_ID, Departement_id);
             Uri insertedUri = getContext().getContentResolver().insert(
                     DaneContract.AnimateurEntry.CONTENT_URI,
                     animateurValues

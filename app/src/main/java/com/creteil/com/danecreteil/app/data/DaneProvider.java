@@ -37,6 +37,10 @@ public class DaneProvider extends ContentProvider {
     static final int PERSONNEL_PAR_ID = 402;
     static final int PERSONNEL_CONTENANT_NOM = 403;
 
+    static final int DEPARTEMENTS = 500;
+    static final int DEPARTEMENT_ID = 501;
+    static final int DEPARTEMENT_PAR_NOM = 502;
+
     private static final SQLiteQueryBuilder sEtablissementsParVilleQueryBuilder;
     static{
         sEtablissementsParVilleQueryBuilder = new SQLiteQueryBuilder();
@@ -141,6 +145,12 @@ public class DaneProvider extends ContentProvider {
                 );
     };
 
+    private  static final SQLiteQueryBuilder sDepartementQueryBuilder;
+    static {
+        sDepartementQueryBuilder = new SQLiteQueryBuilder();
+        sDepartementQueryBuilder.setTables(DaneContract.DepartementEntry.TABLE_NAME);
+    }
+
     static UriMatcher buildUriMatcher() {
         // I know what you're thinking.  Why create a UriMatcher when you can use regular
         // expressions instead?  Because you're not crazy, that's why.
@@ -154,6 +164,11 @@ public class DaneProvider extends ContentProvider {
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, DaneContract.PATH_VILLES, VILLES);
         matcher.addURI(authority, DaneContract.PATH_VILLES+ "/*", VILLES_PAR_DEPARTEMENT);
+
+        matcher.addURI(authority, DaneContract.PATH_DEPARTEMENTS, DEPARTEMENTS);
+        matcher.addURI(authority, DaneContract.PATH_DEPARTEMENTS+ "/*", DEPARTEMENT_ID);
+        matcher.addURI(authority, DaneContract.PATH_DEPARTEMENTS+ "/*/nom", DEPARTEMENT_PAR_NOM);
+
         matcher.addURI(authority, DaneContract.PATH_ANIMATEURS, ANIMATEURS);
         matcher.addURI(authority, DaneContract.PATH_ANIMATEURS+ "/*", ANIMATEURS_ID);
         matcher.addURI(authority, DaneContract.PATH_ANIMATEURS+ "/*/rechercher", ANIMATEURS_CONTENANT_NOM);
@@ -174,11 +189,19 @@ public class DaneProvider extends ContentProvider {
     //location.location_setting = ?
     private static final String sVillesParDepartementSelection =
             DaneContract.VilleEntry.TABLE_NAME+
-                    "." + DaneContract.VilleEntry.COLUMN_VILLE_DEPARTEMENT + " = ? ";
+                    "." + DaneContract.VilleEntry.COLUMN_DEPARTEMENT_ID + " = ? ";
 
     private static final String sEtablissementParIdSelection =
             DaneContract.EtablissementEntry.TABLE_NAME+
                     "." + DaneContract.EtablissementEntry._ID + " = ? ";
+
+    private static final String sDepartementParIdSelection =
+            DaneContract.DepartementEntry.TABLE_NAME+
+                    "." + DaneContract.DepartementEntry._ID + " = ? ";
+
+    private static final String sDepartementParNomSelection =
+            DaneContract.DepartementEntry.TABLE_NAME+
+                    "." + DaneContract.DepartementEntry.COLUMN_DEPARTEMENT_NOM + " = ? ";
 
     private static final String sEtablissementParIdAnimateurSelection =
             DaneContract.EtablissementEntry.TABLE_NAME+
@@ -201,10 +224,10 @@ public class DaneProvider extends ContentProvider {
                     "." + DaneContract.PersonnelEntry.COLUMN_ETABLISSEMENT_ID + " = ? ";
 
     private Cursor getVillesParDepartement(Uri uri, String[] projection, String sortOrder) {
-        String departement = DaneContract.VilleEntry.getDepartementFromUri(uri);
+        String iddepartement = DaneContract.VilleEntry.getDepartementFromUri(uri);
         String[] selectionArgs;
         String selection;
-        selectionArgs = new String[]{departement};
+        selectionArgs = new String[]{iddepartement};
         selection = sVillesParDepartementSelection;
         return sVillesParDepartementQueryBuilder.query(mDaneHelper.getReadableDatabase(),
                 projection,
@@ -244,6 +267,38 @@ public class DaneProvider extends ContentProvider {
         selectionArgs = new String[]{idetab};
         selection = sEtablissementParIdSelection;
         return sEtablissementsParVilleQueryBuilder.query(mDaneHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getDepartenetParId(Uri uri, String[] projection, String sortOrder) {
+        String iddepart = DaneContract.DepartementEntry.getDepartementFromUri(uri);
+        String[] selectionArgs;
+        String selection;
+        selectionArgs = new String[]{iddepart};
+        selection = sDepartementParIdSelection;
+        return sDepartementQueryBuilder.query(mDaneHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getDepartenetParNom(Uri uri, String[] projection, String sortOrder) {
+        String nomdepart = DaneContract.DepartementEntry.getDepartementFromUri(uri);
+        String[] selectionArgs;
+        String selection;
+        selectionArgs = new String[]{nomdepart};
+        selection = sDepartementParNomSelection;
+        return sDepartementQueryBuilder.query(mDaneHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -354,6 +409,12 @@ public class DaneProvider extends ContentProvider {
                 return DaneContract.AnimateurEntry.CONTENT_TYPE;
             case ANIMATEURS_ID:
                 return DaneContract.AnimateurEntry.CONTENT_ITEM_TYPE;
+            case DEPARTEMENTS:
+                return DaneContract.DepartementEntry.CONTENT_TYPE;
+            case DEPARTEMENT_ID:
+                return DaneContract.DepartementEntry.CONTENT_ITEM_TYPE;
+            case DEPARTEMENT_PAR_NOM:
+                return DaneContract.DepartementEntry.CONTENT_ITEM_TYPE;
             case ANIMATEURS_CONTENANT_NOM:
                 return DaneContract.AnimateurEntry.CONTENT_ITEM_TYPE;
             case ETABLISSEMENTS_PAR_ANIMATEUR:
@@ -398,6 +459,16 @@ public class DaneProvider extends ContentProvider {
                 retCursor = getEtablissementsParId(uri, projection, sortOrder);
                 break;
             }
+
+            case DEPARTEMENT_ID: {
+                retCursor = getDepartenetParId(uri, projection, sortOrder);
+                break;
+            }
+            case DEPARTEMENT_PAR_NOM: {
+                retCursor = getDepartenetParNom(uri, projection, sortOrder);
+                break;
+            }
+
             case ETABLISSEMENTS_CONTENANT_NOM: {
                 retCursor = getEtablissementsContenantleNom(uri, projection, sortOrder);
                 break;
@@ -417,6 +488,19 @@ public class DaneProvider extends ContentProvider {
             }
             case ETABLISSEMENTS_PAR_ANIMATEUR: {
                 retCursor = getEtablissementsParAnimateur(uri, projection, sortOrder);
+                break;
+            }
+
+            case DEPARTEMENTS: {
+                retCursor = mDaneHelper.getReadableDatabase().query(
+                        DaneContract.DepartementEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             }
             case VILLES: {
@@ -509,6 +593,14 @@ public class DaneProvider extends ContentProvider {
                     throw new android.database.SQLException("Erreur lors de l'ajout de l'établissement " + uri);
                 break;
             }
+            case DEPARTEMENTS: {
+                long _id = db.insert(DaneContract.DepartementEntry.TABLE_NAME, null, contentValues);
+                if ( _id > 0 )
+                    returnUri = DaneContract.DepartementEntry.buildDepartementUri(_id);
+                else
+                    throw new android.database.SQLException("Erreur lors de l'ajout du département " + uri);
+                break;
+            }
             case ANIMATEURS: {
                 long _id = db.insert(DaneContract.AnimateurEntry.TABLE_NAME, null, contentValues);
                 if ( _id > 0 )
@@ -547,6 +639,10 @@ public class DaneProvider extends ContentProvider {
             case ANIMATEURS:
                 rowsDeleted = db.delete(
                         DaneContract.AnimateurEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case DEPARTEMENTS:
+                rowsDeleted = db.delete(
+                        DaneContract.DepartementEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("uri inconnue: " + uri);

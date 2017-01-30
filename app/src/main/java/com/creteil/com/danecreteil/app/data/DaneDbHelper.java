@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.creteil.com.danecreteil.app.data.DaneContract.AnimateurEntry;
+import com.creteil.com.danecreteil.app.data.DaneContract.DepartementEntry;
 import com.creteil.com.danecreteil.app.data.DaneContract.VilleEntry;
 import com.creteil.com.danecreteil.app.data.DaneContract.EtablissementEntry;
 import com.creteil.com.danecreteil.app.data.DaneContract.PersonnelEntry;
@@ -15,7 +16,8 @@ import com.creteil.com.danecreteil.app.data.DaneContract.PersonnelEntry;
 
 public class DaneDbHelper extends SQLiteOpenHelper {
     private final String LOG_TAG = DaneDbHelper.class.getSimpleName();
-    private static final int DATABASE_VERSION = 15;
+    private static final int DATABASE_VERSION = 16;
+    private static final String SQL_DELETE_DEPARTEMENTS_TABLE = "DROP TABLE IF EXISTS " + DepartementEntry.TABLE_NAME;
     private static final String SQL_DELETE_ANIMATEUR_TABLE = "DROP TABLE IF EXISTS " + AnimateurEntry.TABLE_NAME;
     private static final String SQL_DELETE_VILLE_TABLE = "DROP TABLE IF EXISTS " + VilleEntry.TABLE_NAME;
     private static final String SQL_DELETE_PERSONNEL_TABLE = "DROP TABLE IF EXISTS " + PersonnelEntry.TABLE_NAME;
@@ -29,18 +31,26 @@ public class DaneDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+
+        final String SQL_CREATE_DEPARTEMENTS_TABLE = "CREATE TABLE " + DepartementEntry.TABLE_NAME + " (" +
+                DepartementEntry._ID + " INTEGER PRIMARY KEY," +
+                DepartementEntry.COLUMN_DEPARTEMENT_NOM + " TEXT NOT NULL, " +
+                DepartementEntry.COLUMN_DEPARTEMENT_INTITULE + " TEXT NOT NULL " +
+                " );";
         final String SQL_CREATE_ANIMATEUR_TABLE = "CREATE TABLE " + AnimateurEntry.TABLE_NAME + " (" +
                 AnimateurEntry._ID + " INTEGER PRIMARY KEY," +
                 AnimateurEntry.COLUMN_NOM + " TEXT NOT NULL, " +
                 AnimateurEntry.COLUMN_TEL + " TEXT NOT NULL, " +
                 AnimateurEntry.COLUMN_EMAIL + " TEXT NOT NULL, " +
+                AnimateurEntry.COLUMN_PHOTO + " BLOB, " +
+                AnimateurEntry.COLUMN_DEPARTEMENT_ID + " INTEGER NOT NULL, " +
                 AnimateurEntry.COLUMN_ANIMATEUR_ID + " INTEGER NOT NULL " +
                 " );";
 
         final String SQL_CREATE_VILLES_TABLE = "CREATE TABLE " + VilleEntry.TABLE_NAME + " (" +
                 VilleEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 VilleEntry.COLUMN_VILLE_NOM + " TEXT NOT NULL, " +
-                VilleEntry.COLUMN_VILLE_DEPARTEMENT + " TEXT NOT NULL, " +
+                VilleEntry.COLUMN_DEPARTEMENT_ID + " INTEGER NOT NULL, " +
                 VilleEntry.COLUMN_VILLE_ID + " INTEGER NOT NULL " +
                 " );";
 
@@ -72,6 +82,7 @@ public class DaneDbHelper extends SQLiteOpenHelper {
                 " FOREIGN KEY (" + PersonnelEntry.COLUMN_ETABLISSEMENT_ID + ") REFERENCES " +
                 EtablissementEntry.TABLE_NAME + " (" + EtablissementEntry._ID + ") " +
                 " );";
+        sqLiteDatabase.execSQL(SQL_CREATE_DEPARTEMENTS_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_ANIMATEUR_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_VILLES_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_ETABLISSEMENTS_TABLE);
@@ -82,6 +93,7 @@ public class DaneDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         sqLiteDatabase.execSQL(SQL_DELETE_ANIMATEUR_TABLE);
         sqLiteDatabase.execSQL(SQL_DELETE_VILLE_TABLE);
+        sqLiteDatabase.execSQL(SQL_DELETE_DEPARTEMENTS_TABLE);
         sqLiteDatabase.execSQL(SQL_DELETE_PERSONNEL_TABLE);
         sqLiteDatabase.execSQL(SQL_DELETE_ETABLISSEMENT_TABLE);
         onCreate(sqLiteDatabase);
