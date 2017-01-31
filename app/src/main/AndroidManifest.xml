@@ -97,6 +97,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".AccueilActivity" />
         </activity>
+        <activity
+            android:name="com.creteil.com.danecreteil.app.DepartementsActivity"
+            android:label="@string/accueil"
+            android:parentActivityName="com.creteil.com.danecreteil.app.AccueilActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".AccueilActivity" />
+        </activity>
         <provider
             android:authorities="com.creteil.com.danecreteil.app"
             android:name=".data.DaneProvider"
