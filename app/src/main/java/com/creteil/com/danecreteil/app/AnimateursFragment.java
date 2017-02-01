@@ -8,19 +8,25 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
 import com.creteil.com.danecreteil.app.data.DaneContract.AnimateurEntry;
+
+import java.util.HashMap;
+
 
 /**
  * Created by mbouami on 23/01/2017.
  */
 
 public class AnimateursFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private final String LOG_TAG = getClass().getSimpleName().toString();
     ListView listView = null;
     ListeanimateursAdapter mAnimateurAdapter;
     private static final int ANIMATEURS_LOADER = 0;

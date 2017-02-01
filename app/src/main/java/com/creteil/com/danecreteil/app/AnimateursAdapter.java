@@ -41,7 +41,7 @@ public class AnimateursAdapter extends CursorAdapter implements Filterable {
     }
 
     private String convertCursorRowToUXFormat(Cursor cursor) {
-        return cursor.getString(ListeAnimParNomFragment.COL_ANIM_NOM);
+        return cursor.getString(cursor.getColumnIndex("nom"));
     }
 
     @Override
@@ -75,7 +75,7 @@ public class AnimateursAdapter extends CursorAdapter implements Filterable {
     @Override
     public String convertToString(Cursor cursor) {
         //returns string inserted into textview after item from drop-down list is selected.
-        return cursor.getString(ListeAnimParNomFragment.COL_ANIM_NOM);
+        return cursor.getString(cursor.getColumnIndex("nom"));
     }
 
     @Override

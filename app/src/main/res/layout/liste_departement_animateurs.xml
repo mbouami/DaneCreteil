@@ -8,6 +8,12 @@ android:layout_height="match_parent">
     android:id="@+id/liste_departements_animateurs"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+
+    android:cacheColorHint="#00000000"
+    android:divider="@android:color/transparent"
+    android:drawSelectorOnTop="false"
+    android:groupIndicator="@null"
+
     android:layout_alignParentLeft="true"
     android:layout_alignParentTop="true" >
 </ExpandableListView>

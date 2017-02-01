@@ -96,10 +96,10 @@ public class DaneProvider extends ContentProvider {
                         "." + DaneContract.EtablissementEntry.COLUMN_ANIMATEUR_ID +
                         " = " + DaneContract.AnimateurEntry.TABLE_NAME +
                         "." + DaneContract.AnimateurEntry._ID
-                );
+        );
     }
-   private static final SQLiteQueryBuilder sVillesParDepartementQueryBuilder;
-   static{
+    private static final SQLiteQueryBuilder sVillesParDepartementQueryBuilder;
+    static{
         sVillesParDepartementQueryBuilder = new SQLiteQueryBuilder();
         sVillesParDepartementQueryBuilder.setTables(DaneContract.VilleEntry.TABLE_NAME);
     }
@@ -142,7 +142,7 @@ public class DaneProvider extends ContentProvider {
                         "." + DaneContract.EtablissementEntry.COLUMN_ANIMATEUR_ID +
                         " = " + DaneContract.AnimateurEntry.TABLE_NAME +
                         "." + DaneContract.AnimateurEntry._ID
-                );
+        );
     };
 
     private  static final SQLiteQueryBuilder sDepartementQueryBuilder;

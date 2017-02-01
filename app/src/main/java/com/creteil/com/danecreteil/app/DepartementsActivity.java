@@ -55,7 +55,7 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-        Log.d(LOG_TAG, "onCreateLoader for loader_id " + id);
+//        Log.d(LOG_TAG, "onCreateLoader for loader_id " + id);
         CursorLoader cl;
         if (id != -1) {
             // child cursor
@@ -84,20 +84,18 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         int id = loader.getId();
-        Log.d(LOG_TAG, "onLoadFinished() for loader_id " + id);
+//        Log.d(LOG_TAG, "onLoadFinished() for loader_id " + id);
         if (id != -1) {
             // child cursor
             if (!cursor.isClosed()) {
-                Log.d(LOG_TAG, "data.getCount() " + cursor.getCount());
-
+//                Log.d(LOG_TAG, "data.getCount() " + cursor.getCount());
                 HashMap<Integer, Integer> groupMap = mAdapter.getGroupMap();
                 try {
                     int groupPos = groupMap.get(id);
-                    Log.d(LOG_TAG, "onLoadFinished() for groupPos " + groupPos);
+//                    Log.d(LOG_TAG, "onLoadFinished() for groupPos " + groupPos);
                     mAdapter.setChildrenCursor(groupPos, cursor);
                 } catch (NullPointerException e) {
-                    Log.w(LOG_TAG,
-                            "Adapter expired, try again on the next query: "
+                    Log.w(LOG_TAG,"Adapter expired, try again on the next query: "
                                     + e.getMessage());
                 }
             }
@@ -109,7 +107,7 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
             int id = loader.getId();
-            Log.d(LOG_TAG, "onLoaderReset() for loader_id " + id);
+//            Log.d(LOG_TAG, "onLoaderReset() for loader_id " + id);
             if (id != -1) {
                 // child cursor
                 try {

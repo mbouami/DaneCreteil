@@ -17,7 +17,7 @@ import android.widget.TextView;
  */
 
 public class ListeanimateursAdapter extends CursorAdapter {
-    private final String LOG_TAG = ListeanimateursAdapter.class.getSimpleName();
+    private final String LOG_TAG = getClass().getSimpleName().toString();
 
     public ListeanimateursAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
