@@ -673,6 +673,10 @@ public class DaneProvider extends ContentProvider {
                 rowsUpdated = db.update(DaneContract.PersonnelEntry.TABLE_NAME, contentValues, selection,
                         selectionArgs);
                 break;
+            case ANIMATEURS:
+                rowsUpdated = db.update(DaneContract.AnimateurEntry.TABLE_NAME, contentValues, selection,
+                        selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("uri inconnue: " + uri);
         }

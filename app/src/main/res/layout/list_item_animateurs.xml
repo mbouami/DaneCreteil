@@ -9,7 +9,7 @@
     android:layout_height="80dp">
 
     <ImageView
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         app:srcCompat="@mipmap/ic_launcher"
         android:id="@+id/photo"
         android:layout_width="100dp" />
@@ -48,13 +48,13 @@
         <ImageButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@android:drawable/stat_sys_vp_phone_call"
+            app:srcCompat="@drawable/ic_phone"
             android:id="@+id/bouton_call" />
 
         <ImageButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@android:drawable/sym_action_email"
+            app:srcCompat="@drawable/ic_mail"
             android:id="@+id/bouton_mail" />
     </LinearLayout>
 </LinearLayout>

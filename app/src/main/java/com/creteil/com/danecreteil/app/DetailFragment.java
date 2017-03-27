@@ -1,17 +1,13 @@
 package com.creteil.com.danecreteil.app;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -36,7 +33,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final String DETAIL_URI = "URI";
     private Uri mUri;
     PersonnelAdapter mPersonnelAdapter;
-    private ListView mListView;
+    private ListView mListPersonnelView;
 
     private ShareActionProvider mShareActionProvider;
     private static final String ETABCAST_SHARE_HASHTAG = " #EtabsDaneCreteil";
@@ -45,6 +42,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private String mTelEtabcast;
     private String mMailEtabcast;
     private String mAdresseEtabcast;
+    private String mIdEtabcast;
 
     private static final String[] PERSONNEL_COLUMNS = {
             DaneContract.PersonnelEntry.TABLE_NAME + "." + DaneContract.PersonnelEntry._ID,
@@ -60,7 +58,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ADRESSE,
             DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_CP,
             DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry.COLUMN_VILLE_NOM,
-            DaneContract.AnimateurEntry.TABLE_NAME + "." + DaneContract.AnimateurEntry.COLUMN_NOM
+            DaneContract.AnimateurEntry.TABLE_NAME + "." + DaneContract.AnimateurEntry.COLUMN_NOM,
+            DaneContract.EtablissementEntry.TABLE_NAME + "." + DaneContract.EtablissementEntry.COLUMN_ETABLISSEMENT_ID
     };
     static final int COL_PERSONNEL_ID = 0;
     static final int COL_PERSONNEL_NOM = 1;
@@ -76,6 +75,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_ETAB_CP = 11;
     static final int COL_VILLE = 12;
     static final int COL_ANIMATEUR = 13;
+    static final int COL_ETABLISSEMENT_ID = 14;
 
     private TextView mNomView;
     private TextView mRneView;
@@ -107,8 +107,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mEmailView = (TextView) rootView.findViewById(R.id.detail_email_textview);
         mAdresseView = (TextView) rootView.findViewById(R.id.detail_adresse_textview);
         mAnimateurView = (TextView) rootView.findViewById(R.id.detail_animateur_textview);
-        mListView = (ListView) rootView.findViewById(R.id.liste_personnel);
-        mListView.setAdapter(mPersonnelAdapter);
+        mListPersonnelView = (ListView) rootView.findViewById(R.id.liste_personnel);
+        mListPersonnelView.setAdapter(mPersonnelAdapter);
+        mListPersonnelView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                String IdPersonnel = cursor.getString(COL_PERSONNEL_ID) + "---"+cursor.getString(COL_PERSONNEL_NOM)+ "---"+cursor.getString(COL_PERSONNEL_STATUT);
+                if (cursor != null) {
+                    Log.d(LOG_TAG, "IDPersonnel : "+IdPersonnel);
+                }
+                return false;
+            }
+        });
         return rootView;
     }
 
@@ -145,6 +156,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 return true;
             case R.id.action_map:
                 startActivity(createMapIntent());
+                return true;
+            case R.id.action_maj:
+                Log.d(LOG_TAG, "MAJ : "+mIdEtabcast);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -214,7 +228,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if ( null != mUri ) {
 //            Log.v(LOG_TAG, "In onCreateLoader "+mUri.toString());
-            String sortOrder = DaneContract.PersonnelEntry.COLUMN_STATUT + " DESC";
+            String sortOrder = DaneContract.PersonnelEntry.COLUMN_PERSONNEL_ID + " ASC";
             return new CursorLoader(
                     getActivity(),
                     mUri,
@@ -230,6 +244,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
+        mIdEtabcast = data.getString(COL_ETABLISSEMENT_ID);
 //           Log.v(LOG_TAG, "In onLoadFinished "+mUri.toString()+"----"+data.getString(COL_PERSONNEL_STATUT)+"---"+data.getString(COL_PERSONNEL_NOM));
         String nom = data.getString(COL_ETAB_TYPE) +" "+data.getString(COL_ETAB_NOM);
         mNomView.setText(nom);

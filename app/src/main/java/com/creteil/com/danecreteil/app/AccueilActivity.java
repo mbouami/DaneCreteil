@@ -5,21 +5,16 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
-import com.creteil.com.danecreteil.app.data.JSONParser;
-import com.creteil.com.danecreteil.app.service.DaneService;
-import com.creteil.com.danecreteil.app.service.DaneServiceAdapter;
+import com.creteil.com.danecreteil.app.data.FetchTask;
 
 public class AccueilActivity extends AppCompatActivity {
     private final String LOG_TAG =AccueilActivity.class.getSimpleName();
-    private String BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
+//    private String BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
+//    private String BASE_URL = DaneContract.BASE_URL + "/listedetailvilles";
     public final static String ETAT_BASE = "etat.base.de.donnees";
 
     @Override
@@ -33,7 +28,9 @@ public class AccueilActivity extends AppCompatActivity {
                 null,
                 null);
         if (!(NombreetablissementCursor.getCount() > 0)) {
-            FetchVillesTask villesTask = new FetchVillesTask(AccueilActivity.this);
+//            FetchVillesTask villesTask = new FetchVillesTask(AccueilActivity.this);
+//            villesTask.execute("update");
+            FetchTask villesTask = new FetchTask(AccueilActivity.this,DaneContract.BASE_URL_LISTE_DETAIL_VILLES);
             villesTask.execute("update");
         }
     }

@@ -9,16 +9,19 @@
     <string name="recherche_etablissement_par_animateur">Etablissements par animateur </string>
     <string name="liste_animateurs">Liste des animateurs </string>
     <string name="titre_villes_activity">Villes Par Département</string>
+    <string name="titre_detail_activity">Information sur  l\'établissement</string>
+    <string name="titre_etabs_activity">Etablissement par Ville</string>
+
     <string name="dep77">Seine et Marne</string>
     <string name="dep93">Seine Saint Denis</string>
     <string name="dep94">Val de Marne</string>
-    <string name="titre_etabs_activity">Etablissement par Ville</string>
+
     <string name="action_share">partager</string>
     <string name="action_call">Appeler</string>
     <string name="action_map">Y aller</string>
     <string name="action_mail">envoyer un mail</string>
-    <string name="titre_detail_activity">Information sur  l\'établissement</string>
     <string name="action_rafraichir">Synchroniser</string>
+    <string name="action_maj">mise à jour</string>
 
     <string name="pref_depart_label">Département</string>
     <string name="pref_depart_key" translatable="false">depart</string>

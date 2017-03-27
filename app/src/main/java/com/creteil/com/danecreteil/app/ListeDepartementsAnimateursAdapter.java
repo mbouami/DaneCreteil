@@ -3,11 +3,14 @@ package com.creteil.com.danecreteil.app;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.util.Log;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +21,11 @@ import android.widget.TextView;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
-
-import static com.creteil.com.danecreteil.app.R.id.imageView;
 
 /**
  * Created by BOUAMI on 31/01/2017.
@@ -31,10 +36,17 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
     private DepartementsActivity mActivity;
     private  Context mContext;
     protected HashMap<Integer, Integer> mGroupMap;
-    private int nbreanimateurs = 0;
+    protected String midanimateur;
+    private int nbreanimateurs;
+    static PackageManager mpackageManager;
+    protected String mCurrentPhotoPath;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_IMAGE_LOAD = 2;
+
 
     public ListeDepartementsAnimateursAdapter(Context context, Cursor cursor, int collapsedGroupLayout, int expandedGroupLayout, String[] groupFrom, int[] groupTo, int childLayout, int lastChildLayout, String[] childFrom, int[] childTo) {
         super(context, cursor, collapsedGroupLayout, expandedGroupLayout, groupFrom, groupTo, childLayout, lastChildLayout, childFrom, childTo);
+
     }
 
     public ListeDepartementsAnimateursAdapter(Context context, Cursor cursor, int groupLayout, String[] groupFrom, int[] groupTo, int childLayout, String[] childFrom, int[] childTo) {
@@ -42,6 +54,8 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         mActivity = (DepartementsActivity) context;
         mGroupMap = new HashMap<Integer, Integer>();
         mContext = context;
+        nbreanimateurs = 0;
+        mpackageManager = context.getPackageManager();
     }
 
     public static class ViewHolder {
@@ -51,6 +65,7 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         public final ImageButton boutoncallView;
         public final ImageButton boutonmailView;
         public final TextView departementView;
+        public final ImageView photoView;
         public final ImageView flecheView;
 
         public ViewHolder(View view) {
@@ -59,6 +74,7 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
             mailView = (TextView) view.findViewById(R.id.mail);
             boutoncallView = (ImageButton) view.findViewById(R.id.bouton_call);
             boutonmailView = (ImageButton) view.findViewById(R.id.bouton_mail);
+            photoView = (ImageView) view.findViewById(R.id.photo);
             departementView = (TextView) view.findViewById(R.id.departement);
             flecheView = (ImageView) view.findViewById(R.id.imagefleche);
 //            departementView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_arrow_forward_black_24dp,0,0,0);
@@ -68,6 +84,14 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
 
     public HashMap<Integer, Integer> getGroupMap() {
         return mGroupMap;
+    }
+
+    public String getIdAnimateur() {
+        return midanimateur;
+    }
+
+    protected void setIdAnimateur(String idanim) {
+        midanimateur = idanim;
     }
 
     @Override
@@ -92,6 +116,94 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
 //    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 //        return super.getGroupView(groupPosition, isExpanded, convertView, parent);
 //    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = mActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        mContext.sendBroadcast(mediaScanIntent);
+    }
+
+    private void capturerPhotoIntent(String idanim) {
+        setIdAnimateur(idanim);
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(mpackageManager) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(mContext,
+                        "com.creteil.com.danecreteil.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                mActivity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+    }
+
+//    private void setPic() {
+//        // Get the dimensions of the View
+//        int targetW = mImageView.getWidth();
+//        int targetH = mImageView.getHeight();
+//
+//        // Get the dimensions of the bitmap
+//        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+//        bmOptions.inJustDecodeBounds = true;
+//        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+//        int photoW = bmOptions.outWidth;
+//        int photoH = bmOptions.outHeight;
+//
+//        // Determine how much to scale down the image
+//        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+//
+//        // Decode the image file into a Bitmap sized to fill the View
+//        bmOptions.inJustDecodeBounds = false;
+//        bmOptions.inSampleSize = scaleFactor;
+//        bmOptions.inPurgeable = true;
+//
+//        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+//        mImageView.setImageBitmap(bitmap);
+//    }
+
+    private void dispatchTakePictureIntent(String idanim) {
+        setIdAnimateur(idanim);
+//        Log.d(LOG_TAG, "dispatchTakePictureIntent " + idanim);
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(mpackageManager) != null) {
+            mActivity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    private void photofromgallery(String idanim) {
+        setIdAnimateur(idanim);
+        Intent gallery = new Intent(Intent.ACTION_GET_CONTENT);
+        gallery.setType("image/*");
+        mActivity.startActivityForResult(gallery, REQUEST_IMAGE_LOAD);
+    }
+
     private Intent createPhoneIntent(String tel) {
         Intent shareIntent = new Intent(Intent.ACTION_DIAL);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
@@ -112,16 +224,27 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Demande d'information");
         return shareIntent;
     }
+
     @Override
-    protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
+    protected void bindChildView(View view, Context context, final Cursor cursor, boolean isLastChild) {
 //        super.bindChildView(view, context, cursor, isLastChild);
-        final String Tel = cursor.getString(cursor.getColumnIndex("tel"));
-        final String mail = cursor.getString(cursor.getColumnIndex("email"));
+        final String idanimateur = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry._ID));
+        final String nom = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_NOM));
+        final String Tel = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_TEL));
+        final String mail = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_EMAIL));
+        final byte[] imageanim = cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO));
         final Context lecontext = context;
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        viewHolder.nomView.setText(cursor.getString(cursor.getColumnIndex("nom")));
-        viewHolder.telView.setText(cursor.getString(cursor.getColumnIndex("tel")));
-        viewHolder.mailView.setText(cursor.getString(cursor.getColumnIndex("email")));
+        viewHolder.nomView.setText(nom);
+        viewHolder.telView.setText(Tel);
+        viewHolder.mailView.setText(mail);
+
+        if (imageanim != null){
+            Bitmap photoanim = BitmapFactory.decodeByteArray(imageanim, 0, imageanim.length);
+            viewHolder.photoView.setImageBitmap(photoanim);
+//            viewHolder.photoView.setImageBitmap(
+//                    decodeSampledBitmapFromResource(getResources(), R.id.photo, 100, 100));
+        }
 //        Bitmap bImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_arrow_downward_black_24dp);
 //        viewHolder.flecheView.setImageBitmap(bImage);
 //        viewHolder.flecheView.setImageResource(R.drawable.ic_arrow_downward_black_24dp);
@@ -138,6 +261,15 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
                 lecontext.startActivity(createMailIntent(mail));
             }
         });
+        viewHolder.photoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Log.d(LOG_TAG, "photoView onClick " + nom+"----"+idanimateur+"----"+getIdAnimateur());
+               dispatchTakePictureIntent(idanimateur);
+//                photofromgallery(idanimateur);
+//                capturerPhotoIntent(idanimateur);
+            }
+        });
     }
 
     @Override
@@ -145,39 +277,10 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
 //        super.bindGroupView(view, context, cursor, isExpanded);
         final String depart = cursor.getString(cursor.getColumnIndex(DaneContract.DepartementEntry.COLUMN_DEPARTEMENT_NOM));
         ViewHolder viewHolder = new ViewHolder(view);
-        viewHolder.departementView.setText("Les animateurs du "+depart);
+        viewHolder.departementView.setText("Les animateurs du " + depart);
 
     }
 
-//    @Override
-//    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-////        return super.getChildView(groupPosition, childPosition, isLastChild, convertView, parent);
-//        View v = convertView;
-//
-//        if (v == null) {
-//            LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//            int layoutId = -1;
-//            layoutId = R.layout.list_item_animateurs;
-//            v = inflater.inflate(layoutId, parent, false);
-//            ViewHolder viewHolder = new ViewHolder(v);
-//            v.setTag(viewHolder);
-//        }
-////        ViewHolder viewHolder = (ViewHolder) v.getTag();
-////        viewHolder.nomView.setText(cursor.getString(cursor.getColumnIndex("nom")));
-////        viewHolder.telView.setText(cursor.getString(cursor.getColumnIndex("tel")));
-////        viewHolder.mailView.setText(cursor.getString(cursor.getColumnIndex("email")));
-//
-////        TextView itemName = (TextView) v.findViewById(R.id.itemName);
-////        TextView itemDescr = (TextView) v.findViewById(R.id.itemDescr);
-////
-////        ItemDetail det = catList.get(groupPosition).getItemList().get(childPosition);
-////
-////        itemName.setText(det.getName());
-////        itemDescr.setText(det.getDescr());
-//
-//        return v;
-//
-//    }
     @Override
     public View newChildView(Context context, Cursor cursor, boolean isLastChild, ViewGroup parent) {
 //        return super.newChildView(context, cursor, isLastChild, parent);

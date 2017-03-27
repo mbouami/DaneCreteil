@@ -20,6 +20,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
+import com.creteil.com.danecreteil.app.data.FetchTask;
 import com.creteil.com.danecreteil.app.service.DaneService;
 import com.creteil.com.danecreteil.app.service.DaneServiceAdapter;
 
@@ -37,7 +38,8 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     RadioGroup liste_depart;
 
     static String Villeencours = null;
-    private String BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
+//    private String BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
+    private String BASE_URL = DaneContract.BASE_URL + "/listedetailvilles";
 
     private static final String[] VILLES_COLUMNS = {
             DaneContract.VilleEntry.TABLE_NAME + "." + DaneContract.VilleEntry._ID,
@@ -188,12 +190,12 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     private void updateVille() {
-        FetchVillesTask villesTask = new FetchVillesTask(getActivity());
+        FetchTask villesTask = new FetchTask(getActivity(),DaneContract.BASE_URL_LISTE_DETAIL_VILLES);
         villesTask.execute();
     }
 
     private void updateDatabase() {
-        FetchVillesTask villesTask = new FetchVillesTask(getActivity());
+        FetchTask villesTask = new FetchTask(getActivity(),DaneContract.BASE_URL_LISTE_DETAIL_VILLES);
         villesTask.execute("update");
 //        DaneServiceAdapter.syncImmediately(getActivity());
 //        Intent mServiceIntent = new Intent(getActivity(), DaneService.class);

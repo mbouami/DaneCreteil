@@ -6,9 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.creteil.com.danecreteil.app.FetchVillesTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,10 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -311,11 +305,12 @@ public class JSONParser {
                     JSONObject laville = villeArray.getJSONObject(i);
                     long insertedVille = addVille(laville.getString(OWM_NOM),insertedDepartement,laville.getString(OWM_VILLE_ID));
 //                    JSONObject etabsJson = laville.getJSONObject(OWM_ETABS);
-                    Log.d(LOG_TAG, "Lors de cette opération. " + laville.getString(OWM_NOM) + " = id de la ville insérée");
+//                    Log.d(LOG_TAG, "Lors de cette opération. " + laville.getString(OWM_NOM) + " = id de la ville insérée");
                     JSONArray etabsArray = laville.getJSONArray(OWM_ETABS);
                     Vector<ContentValues> etabVector = new Vector<ContentValues>(etabsArray.length());
                     for(int j = 0; j < etabsArray.length(); j++) {
                         JSONObject etab = etabsArray.getJSONObject(j);
+//                        Log.d(LOG_TAG, "etab : " +j+"-"+ etab.toString());
                         JSONArray animateurArray = etab.getJSONArray(OWM_ANIMATEUR);
                         long insertedanimateur = 0;
                         if (animateurArray.length()>0) {
@@ -323,10 +318,11 @@ public class JSONParser {
                             insertedanimateur = addAnimateur(animateur.getString(OWM_NOM),animateur.getString(OWM_TEL),animateur.getString(OWM_EMAIL),
                                     animateur.getString(OWM_ANIMATEUR_ID),insertedDepartement);
                         }
+//Log.d(LOG_TAG, "ID : " + etab.getString(OWM_ETABLISSEMENT_ID) + " = ETAB : "+etab.getString(OWM_NOM));
                         long insertedEtab = addEtablissement(insertedVille,insertedanimateur,etab.getString(OWM_ETABLISSEMENT_ID),etab.getString(OWM_NOM),etab.getString(OWM_RNE),
                                 etab.getString(OWM_TEL),etab.getString(OWM_FAX),etab.getString(OWM_EMAIL),
                                 etab.getString(OWM_ADRESSE),etab.getString(OWM_CP),etab.getString(OWM_TYPE));
-                        Log.d(LOG_TAG, "Lors de cette opération, l'établissement " + etab.getString(OWM_NOM) + "--du--"+ledepart + " a été inséré ");
+//                        Log.d(LOG_TAG, "Lors de cette opération, l'établissement " + etab.getString(OWM_NOM) + "--du--"+ledepart + " a été inséré ");
                         JSONArray personnelArray = etab.getJSONArray(OWM_PERSONNEL);
                         for(int k = 0; k < personnelArray.length(); k++) {
                             JSONObject personnel = personnelArray.getJSONObject(k);

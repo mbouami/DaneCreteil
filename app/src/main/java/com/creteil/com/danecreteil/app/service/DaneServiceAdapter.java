@@ -38,7 +38,7 @@ import java.util.Vector;
 
 public class DaneServiceAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = DaneServiceAdapter.class.getSimpleName();
-    private String BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
+    private String BASE_URL =DaneContract.BASE_URL_LISTE_DETAIL_VILLES;
     public static final int SYNC_INTERVAL = 60 * 180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 

@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:layout_marginLeft="10dp">
 
     <ImageView
         android:layout_height="match_parent"
@@ -19,8 +21,9 @@
     android:gravity="center_vertical"
     android:id="@+id/departement"
     android:textStyle="bold|italic"
-    android:textAlignment="center"
-    android:textSize="35sp"
-    android:fontFamily="cursive"/>
+    android:textAlignment="viewStart"
+    android:textSize="32sp"
+    android:fontFamily="cursive"
+        android:paddingRight="20dp" />
 
 </LinearLayout>
