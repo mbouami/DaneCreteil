@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,7 @@ import android.widget.SimpleCursorTreeAdapter;
 import android.widget.TextView;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
+import com.creteil.com.danecreteil.app.data.FetchTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -188,13 +191,14 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
 //        mImageView.setImageBitmap(bitmap);
 //    }
 
-    private void dispatchTakePictureIntent(String idanim) {
-        setIdAnimateur(idanim);
-//        Log.d(LOG_TAG, "dispatchTakePictureIntent " + idanim);
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(mpackageManager) != null) {
-            mActivity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }
+    private void dispatchTakePictureIntent(String idanim,String anim_id) {
+//        setIdAnimateur(idanim);
+//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        if (takePictureIntent.resolveActivity(mpackageManager) != null) {
+//            mActivity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+//        }
+        FetchTask majanimTask = new FetchTask(mContext,DaneContract.BASE_URL_UPDATE_ANIM+"/"+anim_id);
+        majanimTask.execute("maj_anim",idanim,anim_id);
     }
 
     private void photofromgallery(String idanim) {
@@ -229,16 +233,17 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
     protected void bindChildView(View view, Context context, final Cursor cursor, boolean isLastChild) {
 //        super.bindChildView(view, context, cursor, isLastChild);
         final String idanimateur = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry._ID));
+        final String animateur_id = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_ANIMATEUR_ID));
         final String nom = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_NOM));
         final String Tel = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_TEL));
         final String mail = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_EMAIL));
-        final byte[] imageanim = cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO));
+        final byte[] imageanim = Base64.decode(cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO)),Base64.DEFAULT);
         final Context lecontext = context;
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         viewHolder.nomView.setText(nom);
         viewHolder.telView.setText(Tel);
         viewHolder.mailView.setText(mail);
-
+//        Log.d(LOG_TAG,"Taile Image : "+nom+"--"+imageanim.length);
         if (imageanim != null){
             Bitmap photoanim = BitmapFactory.decodeByteArray(imageanim, 0, imageanim.length);
             viewHolder.photoView.setImageBitmap(photoanim);
@@ -265,7 +270,7 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
             @Override
             public void onClick(View v) {
 //                Log.d(LOG_TAG, "photoView onClick " + nom+"----"+idanimateur+"----"+getIdAnimateur());
-               dispatchTakePictureIntent(idanimateur);
+               dispatchTakePictureIntent(idanimateur,animateur_id);
 //                photofromgallery(idanimateur);
 //                capturerPhotoIntent(idanimateur);
             }

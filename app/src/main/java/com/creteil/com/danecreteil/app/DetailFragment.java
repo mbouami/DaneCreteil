@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
+import com.creteil.com.danecreteil.app.data.FetchTask;
 
 /**
  * Created by Mohammed on 03/12/2016.
@@ -42,6 +43,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private String mTelEtabcast;
     private String mMailEtabcast;
     private String mAdresseEtabcast;
+    private String mIdEtab;
     private String mIdEtabcast;
 
     private static final String[] PERSONNEL_COLUMNS = {
@@ -158,7 +160,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 startActivity(createMapIntent());
                 return true;
             case R.id.action_maj:
-                Log.d(LOG_TAG, "MAJ : "+mIdEtabcast);
+//                Log.d(LOG_TAG, "MAJ : "+DaneContract.BASE_URL_DETAIL_ETAB+"/"+mIdEtabcast);
+                FetchTask detailetabTask = new FetchTask(getContext(),DaneContract.BASE_URL_DETAIL_ETAB+"/"+mIdEtabcast);
+                detailetabTask.execute("maj_etab",mIdEtab);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -245,6 +249,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
         mIdEtabcast = data.getString(COL_ETABLISSEMENT_ID);
+        mIdEtab = data.getString(COL_ETAB_ID);
 //           Log.v(LOG_TAG, "In onLoadFinished "+mUri.toString()+"----"+data.getString(COL_PERSONNEL_STATUT)+"---"+data.getString(COL_PERSONNEL_NOM));
         String nom = data.getString(COL_ETAB_TYPE) +" "+data.getString(COL_ETAB_NOM);
         mNomView.setText(nom);

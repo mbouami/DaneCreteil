@@ -15,12 +15,15 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
+import com.creteil.com.danecreteil.app.data.FetchTask;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -49,6 +52,7 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
             DaneContract.AnimateurEntry.COLUMN_TEL,
             DaneContract.AnimateurEntry.COLUMN_EMAIL,
             DaneContract.AnimateurEntry.COLUMN_DEPARTEMENT_ID,
+            DaneContract.AnimateurEntry.COLUMN_ANIMATEUR_ID,
             DaneContract.AnimateurEntry.COLUMN_PHOTO
     };
 
@@ -211,8 +215,25 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
         } else {
             getLoaderManager().initLoader(-1, null, this);
         }
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the main; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.animactivity, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_maj:
+                FetchTask majanimTask = new FetchTask(this,DaneContract.BASE_URL_UPDATE_ANIM+"/");
+                majanimTask.execute("maj_anim","","");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
 
+        }
     }
 
     @Override

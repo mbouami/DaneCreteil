@@ -3,6 +3,8 @@ package com.creteil.com.danecreteil.app;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
@@ -10,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -29,6 +32,7 @@ public class ListeanimateursAdapter extends CursorAdapter {
         public final TextView mailView;
         public final ImageButton boutoncallView;
         public final ImageButton boutonmailView;
+        public final ImageView photoView;
 
         public ViewHolder(View view) {
             nomView = (TextView) view.findViewById(R.id.nom);
@@ -36,6 +40,7 @@ public class ListeanimateursAdapter extends CursorAdapter {
             mailView = (TextView) view.findViewById(R.id.mail);
             boutoncallView = (ImageButton) view.findViewById(R.id.bouton_call);
             boutonmailView = (ImageButton) view.findViewById(R.id.bouton_mail);
+            photoView = (ImageView) view.findViewById(R.id.photo);
         }
     }
 
@@ -78,6 +83,10 @@ public class ListeanimateursAdapter extends CursorAdapter {
         viewHolder.nomView.setText(cursor.getString(cursor.getColumnIndex("nom")));
         viewHolder.telView.setText(cursor.getString(cursor.getColumnIndex("tel")));
         viewHolder.mailView.setText(cursor.getString(cursor.getColumnIndex("email")));
+        byte[] byteArrayPhoto = cursor.getBlob(cursor.getColumnIndexOrThrow("photo"));
+        Log.d(LOG_TAG,"Taile Image : "+byteArrayPhoto.length);
+        Bitmap bm = BitmapFactory.decodeByteArray(byteArrayPhoto, 0 ,byteArrayPhoto.length);
+        viewHolder.photoView.setImageBitmap(bm);
         viewHolder.boutoncallView.setOnClickListener(new View.OnClickListener() {
 
             @Override

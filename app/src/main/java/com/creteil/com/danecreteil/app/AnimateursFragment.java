@@ -35,7 +35,8 @@ public class AnimateursFragment extends Fragment implements LoaderManager.Loader
             AnimateurEntry.TABLE_NAME + "." + AnimateurEntry._ID,
             AnimateurEntry.COLUMN_NOM,
             AnimateurEntry.COLUMN_TEL,
-            AnimateurEntry.COLUMN_EMAIL
+            AnimateurEntry.COLUMN_EMAIL,
+            AnimateurEntry.COLUMN_PHOTO
     };
 
     public AnimateursFragment() {

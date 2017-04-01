@@ -16,6 +16,7 @@ public class FetchTask extends AsyncTask<String, Void, Void> {
     private final String mUrl;
     private boolean DEBUG = true;
     ProgressDialog pDialog;
+
     public FetchTask(Context context, String url) {
         mContext = context;
         mUrl = url;
@@ -51,6 +52,20 @@ public class FetchTask extends AsyncTask<String, Void, Void> {
                 break;
             case "Initialiser":
                 parser.verifierDatabase();
+                break;
+            case "maj_anim":
+                try {
+                    parser.majAnim(params[1]);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "maj_etab":
+                try {
+                    parser.majEtab(params[1]);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
 //            default:
 //                return super.onOptionsItemSelected(item);
