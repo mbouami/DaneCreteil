@@ -242,13 +242,13 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
             }
         });
 
-//        viewHolder.photoView.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                dispatchTakePictureIntent(idanimateur,animateur_id);
-//                return false;
-//            }
-//        });
+        viewHolder.photoView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                dispatchTakePictureIntent(idanimateur,animateur_id);
+                return false;
+            }
+        });
     }
 
     private void UpdatePictureIntent(String idanimateur, String animateur_id) {
