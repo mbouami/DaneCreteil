@@ -11,9 +11,9 @@ import android.provider.BaseColumns;
 
 public class DaneContract {
 
-//    public static final String BASE_URL ="http://www.bouami.fr/danecreteil/web";
+    public static final String BASE_URL ="http://www.bouami.fr/danecreteil/web";
 //    public static final String BASE_URL ="http://192.168.1.19:8080/danecreteil/web";
-    public static final String BASE_URL ="http://192.168.1.12/danecreteil/web";
+//    public static final String BASE_URL ="http://192.168.1.12/danecreteil/web";
     public static final String BASE_URL_LISTE_DETAIL_VILLES = BASE_URL+"/listedetailvilles";
     public static final String BASE_URL_DETAIL_ETAB = BASE_URL+"/detailetab";
     public static final String BASE_URL_UPDATE_ANIM = BASE_URL+"/majanimateurs";
