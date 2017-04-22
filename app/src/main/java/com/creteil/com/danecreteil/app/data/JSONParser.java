@@ -33,7 +33,7 @@ public class JSONParser {
         mContext = context;
         try {
             Uri builtUri = Uri.parse(url).buildUpon().build();
-            this.parse(new URL(builtUri.toString()), method);
+            parse(new URL(builtUri.toString()), method);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -45,8 +45,10 @@ public class JSONParser {
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod(method);
+            urlConnection.setDoInput(true);
             urlConnection.connect();
             InputStream inputStream = urlConnection.getInputStream();
+//            resultat = readStream(inputStream,100000);
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
                 resultat = null;
@@ -79,6 +81,34 @@ public class JSONParser {
                 }
             }
         }
+    }
+
+    /**
+     * Converts the contents of an InputStream to a String.
+     */
+    private String readStream(InputStream stream, int maxLength) throws IOException {
+        String result = null;
+        // Read InputStream using the UTF-8 charset.
+        InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
+        // Create temporary buffer to hold Stream data with specified max length.
+        char[] buffer = new char[maxLength];
+        // Populate temporary buffer with Stream data.
+        int numChars = 0;
+        int readSize = 0;
+        while (numChars < maxLength && readSize != -1) {
+            numChars += readSize;
+            int pct = (100 * numChars) / maxLength;
+//            publishProgress(DownloadCallback.Progress.PROCESS_INPUT_STREAM_IN_PROGRESS, pct);
+            readSize = reader.read(buffer, numChars, buffer.length - numChars);
+        }
+        if (numChars != -1) {
+            // The stream was not empty.
+            // Create String that is actual length of response body if actual length was less than
+            // max length.
+            numChars = Math.min(numChars, maxLength);
+            result = new String(buffer, 0, numChars);
+        }
+        return result;
     }
 
     long addDepartement(String nom,String intitule) {
@@ -234,8 +264,12 @@ public class JSONParser {
         }
     }
 
+    public void majPhoto(String id, String photo) {
+            Log.e(LOG_TAG, "id : "+id+"- photo"+photo);
+    }
+
     public void majAnim(String idAnim) throws JSONException {
-        long animateurId = 0;
+
         final String OWM_NOM= "nom";
         final String OWM_TEL = "tel";
         final String OWM_EMAIL = "email";
@@ -254,7 +288,6 @@ public class JSONParser {
                         animateurValues,whereClause,whereArgs);
             } else {
                 JSONArray animsArray = detailanimJson.getJSONArray("animateurs");
-//                Log.e(LOG_TAG, "detailanimJson : "+detailanimJson.toString());
                 for(int k = 0; k < animsArray.length(); k++) {
                     JSONObject animateur = animsArray.getJSONObject(k);
                     Cursor animateursCursor = mContext.getContentResolver().query(

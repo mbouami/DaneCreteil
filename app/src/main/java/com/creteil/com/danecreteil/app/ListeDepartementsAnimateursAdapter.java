@@ -23,6 +23,8 @@ import android.widget.TextView;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
 import com.creteil.com.danecreteil.app.data.FetchTask;
+import com.creteil.com.danecreteil.app.photos.PhotoIntentActivity;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,10 +42,11 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
     private  Context mContext;
     protected HashMap<Integer, Integer> mGroupMap;
     protected String midanimateur;
+    protected String manimateur_id;
     private int nbreanimateurs;
     static PackageManager mpackageManager;
     protected String mCurrentPhotoPath;
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_IMAGE_LOAD = 2;
 
 
@@ -97,6 +100,14 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         midanimateur = idanim;
     }
 
+    protected void setAnimateurId(String idanim) {
+        manimateur_id = idanim;
+    }
+
+    public String getAnimateurId() {
+        return manimateur_id;
+    }
+
     @Override
     protected Cursor getChildrenCursor(Cursor groupCursor) {
         int groupPos = groupCursor.getPosition();
@@ -123,7 +134,7 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "DANECRETEIL_" + timeStamp + "_";
         File storageDir = mActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
@@ -136,69 +147,30 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         return image;
     }
 
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(mCurrentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        mContext.sendBroadcast(mediaScanIntent);
-    }
-
-    private void capturerPhotoIntent(String idanim) {
+    private void dispatchTakePictureIntent(String idanim,String anim_id) {
         setIdAnimateur(idanim);
+        setAnimateurId(anim_id);
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(mpackageManager) != null) {
+//            mActivity.startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             // Create the File where the photo should go
             File photoFile = null;
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
+                Log.d(LOG_TAG,"Erreur de création de fichier : "+ex.toString());
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(mContext,
-                        "com.creteil.com.danecreteil.fileprovider",
-                        photoFile);
+                Uri photoURI = FileProvider.getUriForFile(mActivity,"com.creteil.com.danecreteil.fileprovider",photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                mActivity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                mActivity.setphotoFile(photoFile);
+                mActivity.startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO );
             }
         }
-    }
-
-//    private void setPic() {
-//        // Get the dimensions of the View
-//        int targetW = mImageView.getWidth();
-//        int targetH = mImageView.getHeight();
-//
-//        // Get the dimensions of the bitmap
-//        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-//        bmOptions.inJustDecodeBounds = true;
-//        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-//        int photoW = bmOptions.outWidth;
-//        int photoH = bmOptions.outHeight;
-//
-//        // Determine how much to scale down the image
-//        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-//
-//        // Decode the image file into a Bitmap sized to fill the View
-//        bmOptions.inJustDecodeBounds = false;
-//        bmOptions.inSampleSize = scaleFactor;
-//        bmOptions.inPurgeable = true;
-//
-//        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-//        mImageView.setImageBitmap(bitmap);
-//    }
-
-    private void dispatchTakePictureIntent(String idanim,String anim_id) {
-//        setIdAnimateur(idanim);
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        if (takePictureIntent.resolveActivity(mpackageManager) != null) {
-//            mActivity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-//        }
-        FetchTask majanimTask = new FetchTask(mContext,DaneContract.BASE_URL_UPDATE_ANIM+"/"+anim_id);
-        majanimTask.execute("maj_anim",idanim,anim_id);
+//        FetchTask majanimTask = new FetchTask(mContext,DaneContract.BASE_URL_UPDATE_ANIM+"/"+anim_id);
+//        majanimTask.execute("maj_anim",idanim,anim_id);
     }
 
     private void photofromgallery(String idanim) {
@@ -238,6 +210,7 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         final String Tel = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_TEL));
         final String mail = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_EMAIL));
         final byte[] imageanim = Base64.decode(cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO)),Base64.DEFAULT);
+//        final byte[] imageanim = cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO));
         final Context lecontext = context;
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         viewHolder.nomView.setText(nom);
@@ -269,12 +242,24 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         viewHolder.photoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Log.d(LOG_TAG, "photoView onClick " + nom+"----"+idanimateur+"----"+getIdAnimateur());
-               dispatchTakePictureIntent(idanimateur,animateur_id);
-//                photofromgallery(idanimateur);
-//                capturerPhotoIntent(idanimateur);
+                UpdatePictureIntent(idanimateur,animateur_id);
             }
         });
+
+        viewHolder.photoView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                dispatchTakePictureIntent(idanimateur,animateur_id);
+                return false;
+            }
+        });
+    }
+
+    private void UpdatePictureIntent(String idanimateur, String animateur_id) {
+        FetchTask majanimTask = new FetchTask(mContext,DaneContract.BASE_URL_UPDATE_ANIM+"/"+animateur_id);
+        majanimTask.execute("maj_anim",idanimateur);
+//                FetchTask majanimTask = new FetchTask(mContext,DaneContract.BASE_URL_UPDATE_ANIM+"/"+animateur_id);
+//                majanimTask.execute("maj_anim",idanimateur,animateur_id);
     }
 
     @Override
