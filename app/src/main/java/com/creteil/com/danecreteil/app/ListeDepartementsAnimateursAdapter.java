@@ -209,7 +209,7 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         final String nom = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_NOM));
         final String Tel = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_TEL));
         final String mail = cursor.getString(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_EMAIL));
-        final byte[] imageanim = Base64.decode(cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO)),Base64.DEFAULT);
+//        final byte[] imageanim = Base64.decode(cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO)),Base64.DEFAULT);
 //        final byte[] imageanim = cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO));
         final Context lecontext = context;
         ViewHolder viewHolder = (ViewHolder) view.getTag();
@@ -217,15 +217,11 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         viewHolder.telView.setText(Tel);
         viewHolder.mailView.setText(mail);
 //        Log.d(LOG_TAG,"Taile Image : "+nom+"--"+imageanim.length);
-        if (imageanim != null){
+        if (cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO)) != null){
+            final byte[] imageanim = Base64.decode(cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO)),Base64.DEFAULT);
             Bitmap photoanim = BitmapFactory.decodeByteArray(imageanim, 0, imageanim.length);
             viewHolder.photoView.setImageBitmap(photoanim);
-//            viewHolder.photoView.setImageBitmap(
-//                    decodeSampledBitmapFromResource(getResources(), R.id.photo, 100, 100));
         }
-//        Bitmap bImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_arrow_downward_black_24dp);
-//        viewHolder.flecheView.setImageBitmap(bImage);
-//        viewHolder.flecheView.setImageResource(R.drawable.ic_arrow_downward_black_24dp);
         viewHolder.boutoncallView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -246,20 +242,18 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
             }
         });
 
-        viewHolder.photoView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                dispatchTakePictureIntent(idanimateur,animateur_id);
-                return false;
-            }
-        });
+//        viewHolder.photoView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                dispatchTakePictureIntent(idanimateur,animateur_id);
+//                return false;
+//            }
+//        });
     }
 
     private void UpdatePictureIntent(String idanimateur, String animateur_id) {
         FetchTask majanimTask = new FetchTask(mContext,DaneContract.BASE_URL_UPDATE_ANIM+"/"+animateur_id);
         majanimTask.execute("maj_anim",idanimateur);
-//                FetchTask majanimTask = new FetchTask(mContext,DaneContract.BASE_URL_UPDATE_ANIM+"/"+animateur_id);
-//                majanimTask.execute("maj_anim",idanimateur,animateur_id);
     }
 
     @Override

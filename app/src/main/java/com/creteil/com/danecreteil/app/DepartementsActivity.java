@@ -472,9 +472,9 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_maj:
-//                FetchTask majanimTask = new FetchTask(this,DaneContract.BASE_URL_UPDATE_ANIM+"/");
-//                majanimTask.execute("maj_anim","","");
-                UpdateAnimateurs();
+                FetchTask majanimTask = new FetchTask(this,DaneContract.BASE_URL_UPDATE_ANIM+"/");
+                majanimTask.execute("maj_anim","","");
+//                UpdateAnimateurs();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

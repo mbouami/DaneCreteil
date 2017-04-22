@@ -56,5 +56,11 @@
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_mail"
             android:id="@+id/bouton_mail" />
+
+        <ImageButton
+            android:id="@+id/bouton_update"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_action_update" />
     </LinearLayout>
 </LinearLayout>
