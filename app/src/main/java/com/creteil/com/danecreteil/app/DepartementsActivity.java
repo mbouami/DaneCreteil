@@ -133,19 +133,28 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;
-        mImageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        mImageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        mimageBytes = baos.toByteArray();
-//        mbase64photo = Base64.encodeToString(mimageBytes, Base64.DEFAULT);
-        mbase64photo = Base64.encodeToString(mimageBytes, Base64.NO_WRAP);
-        ContentValues photoanimateur = new ContentValues();
-        photoanimateur.put(DaneContract.AnimateurEntry.COLUMN_PHOTO,mimageBytes);
-        Log.w(LOG_TAG,"stream.toByteArray(): "+ mimageBytes.length);
-        Uri animateurURI = DaneContract.AnimateurEntry.buildAnimateurs();
-        String selection = "("+ DaneContract.AnimateurEntry._ID+ " = ? )";
-        String[] selectionArgs = new String[] { mAdapter.getIdAnimateur() };
-        getBaseContext().getContentResolver().update(animateurURI,photoanimateur,selection,selectionArgs);
+//        mImageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        mImageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath);
+        mimageBytes = getBytesFromBitmap(mImageBitmap);
+        if (mimageBytes != null) {
+//            mbase64photo = Base64.encodeToString(mimageBytes, Base64.DEFAULT);
+//        mbase64photo = Base64.encodeToString(mimageBytes, Base64.NO_WRAP);
+            ContentValues photoanimateur = new ContentValues();
+            photoanimateur.put(DaneContract.AnimateurEntry.COLUMN_PHOTO,mimageBytes);
+            Log.w(LOG_TAG,"stream.toByteArray(): "+ mimageBytes.length);
+            Uri animateurURI = DaneContract.AnimateurEntry.buildAnimateurs();
+            String selection = "("+ DaneContract.AnimateurEntry._ID+ " = ? )";
+            String[] selectionArgs = new String[] { mAdapter.getIdAnimateur() };
+             getBaseContext().getContentResolver().update(animateurURI,photoanimateur,selection,selectionArgs);
+        }
+    }
+    public static byte[] getBytesFromBitmap(Bitmap bitmap) {
+        if (bitmap!=null) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            return stream.toByteArray();
+        }
+        return null;
     }
 
     private void handleCameraPhoto() {
@@ -397,7 +406,7 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
                     mCurrentPhotoPath = getphotoFile().getAbsolutePath();
 //                    if (uploadFile(mAdapter.getAnimateurId())!=0) handleCameraPhoto();
                     handleCameraPhoto();
-                    sendPhoto();
+//                    sendPhoto();
                 } else {
                     Log.w(LOG_TAG,"Erreur de capture Photo");
                 }

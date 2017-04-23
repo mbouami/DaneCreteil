@@ -70,6 +70,7 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         public final TextView mailView;
         public final ImageButton boutoncallView;
         public final ImageButton boutonmailView;
+        public final ImageButton boutonupdateView;
         public final TextView departementView;
         public final ImageView photoView;
         public final ImageView flecheView;
@@ -80,6 +81,7 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
             mailView = (TextView) view.findViewById(R.id.mail);
             boutoncallView = (ImageButton) view.findViewById(R.id.bouton_call);
             boutonmailView = (ImageButton) view.findViewById(R.id.bouton_mail);
+            boutonupdateView = (ImageButton) view.findViewById(R.id.bouton_update);
             photoView = (ImageView) view.findViewById(R.id.photo);
             departementView = (TextView) view.findViewById(R.id.departement);
             flecheView = (ImageView) view.findViewById(R.id.imagefleche);
@@ -218,7 +220,8 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         viewHolder.mailView.setText(mail);
 //        Log.d(LOG_TAG,"Taile Image : "+nom+"--"+imageanim.length);
         if (cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO)) != null){
-            final byte[] imageanim = Base64.decode(cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO)),Base64.DEFAULT);
+//            final byte[] imageanim = Base64.decode(cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO)),Base64.DEFAULT);
+            final byte[] imageanim = cursor.getBlob(cursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_PHOTO));
             Bitmap photoanim = BitmapFactory.decodeByteArray(imageanim, 0, imageanim.length);
             viewHolder.photoView.setImageBitmap(photoanim);
         }
@@ -235,12 +238,20 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
                 lecontext.startActivity(createMailIntent(mail));
             }
         });
-        viewHolder.photoView.setOnClickListener(new View.OnClickListener() {
+
+        viewHolder.boutonupdateView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 UpdatePictureIntent(idanimateur,animateur_id);
             }
         });
+
+//        viewHolder.photoView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                UpdatePictureIntent(idanimateur,animateur_id);
+//            }
+//        });
 
         viewHolder.photoView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
