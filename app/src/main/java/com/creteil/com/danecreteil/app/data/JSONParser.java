@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -281,7 +282,8 @@ public class JSONParser {
                 animateurValues.put(DaneContract.AnimateurEntry.COLUMN_NOM, detailanimJson.getString(OWM_NOM));
                 animateurValues.put(DaneContract.AnimateurEntry.COLUMN_TEL, detailanimJson.getString(OWM_TEL));
                 animateurValues.put(DaneContract.AnimateurEntry.COLUMN_EMAIL, detailanimJson.getString(OWM_EMAIL));
-                animateurValues.put(DaneContract.AnimateurEntry.COLUMN_PHOTO, detailanimJson.getString(OWN_PHOTO));
+//                animateurValues.put(DaneContract.AnimateurEntry.COLUMN_PHOTO, detailanimJson.getString(OWN_PHOTO));
+                animateurValues.put(DaneContract.AnimateurEntry.COLUMN_PHOTO, Base64.decode(detailanimJson.getString(OWN_PHOTO),Base64.DEFAULT));
                 String whereClause = "_id=?";
                 String[] whereArgs = new String[] { String.valueOf(idAnim) };
                 int insertedUri = mContext.getContentResolver().update(DaneContract.AnimateurEntry.CONTENT_URI,
@@ -301,7 +303,8 @@ public class JSONParser {
                         animateurValues.put(DaneContract.AnimateurEntry.COLUMN_NOM, animateur.getString(OWM_NOM));
                         animateurValues.put(DaneContract.AnimateurEntry.COLUMN_TEL, animateur.getString(OWM_TEL));
                         animateurValues.put(DaneContract.AnimateurEntry.COLUMN_EMAIL, animateur.getString(OWM_EMAIL));
-                        animateurValues.put(DaneContract.AnimateurEntry.COLUMN_PHOTO, animateur.getString(OWN_PHOTO));
+//                        animateurValues.put(DaneContract.AnimateurEntry.COLUMN_PHOTO, animateur.getString(OWN_PHOTO));
+                        animateurValues.put(DaneContract.AnimateurEntry.COLUMN_PHOTO, Base64.decode(animateur.getString(OWN_PHOTO),Base64.DEFAULT));
                         String whereClause = "_id=?";
 //                        Log.e(LOG_TAG, "animateurValues : "+animateurValues.toString());
                         String[] whereArgs = new String[] { animateursCursor.getString(animateursCursor.getColumnIndex(DaneContract.AnimateurEntry._ID)) };
