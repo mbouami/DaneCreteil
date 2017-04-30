@@ -286,8 +286,12 @@ public class JSONParser {
                 animateurValues.put(DaneContract.AnimateurEntry.COLUMN_PHOTO, Base64.decode(detailanimJson.getString(OWN_PHOTO),Base64.DEFAULT));
                 String whereClause = "_id=?";
                 String[] whereArgs = new String[] { String.valueOf(idAnim) };
-                int insertedUri = mContext.getContentResolver().update(DaneContract.AnimateurEntry.CONTENT_URI,
-                        animateurValues,whereClause,whereArgs);
+                try {
+                    mContext.getContentResolver().update(DaneContract.AnimateurEntry.CONTENT_URI,
+                            animateurValues,whereClause,whereArgs);
+                } catch (NullPointerException e) {
+                    Log.w(LOG_TAG,e.getMessage());
+                }
             } else {
                 JSONArray animsArray = detailanimJson.getJSONArray("animateurs");
                 for(int k = 0; k < animsArray.length(); k++) {
@@ -306,10 +310,13 @@ public class JSONParser {
 //                        animateurValues.put(DaneContract.AnimateurEntry.COLUMN_PHOTO, animateur.getString(OWN_PHOTO));
                         animateurValues.put(DaneContract.AnimateurEntry.COLUMN_PHOTO, Base64.decode(animateur.getString(OWN_PHOTO),Base64.DEFAULT));
                         String whereClause = "_id=?";
-//                        Log.e(LOG_TAG, "animateurValues : "+animateurValues.toString());
                         String[] whereArgs = new String[] { animateursCursor.getString(animateursCursor.getColumnIndex(DaneContract.AnimateurEntry._ID)) };
-                        int insertedUri = mContext.getContentResolver().update(DaneContract.AnimateurEntry.CONTENT_URI,
-                                animateurValues,whereClause,whereArgs);
+                        try {
+                            mContext.getContentResolver().update(DaneContract.AnimateurEntry.CONTENT_URI,
+                                    animateurValues,whereClause,whereArgs);
+                        } catch (NullPointerException e) {
+                            Log.w(LOG_TAG,e.getMessage());
+                        }
                     }
                 }
             }

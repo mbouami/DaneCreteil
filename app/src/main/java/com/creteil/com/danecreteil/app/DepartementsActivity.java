@@ -1,7 +1,9 @@
 package com.creteil.com.danecreteil.app;
 
 import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -9,6 +11,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.content.FileProvider;
@@ -18,26 +21,19 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
 import com.creteil.com.danecreteil.app.data.FetchTask;
-import com.creteil.com.danecreteil.app.data.UrlLoadTask;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
+import com.loopj.android.http.*;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by BOUAMI on 31/01/2017.
@@ -53,6 +49,10 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
     static Bitmap mImageBitmap;
     static String mbase64photo;
     static byte[] mimageBytes;
+    RequestParams parametres = new RequestParams();
+    String  nomFichier;
+    Context mContext;
+    ProgressDialog pDialog;
 
     public void setphotoFile(File mphotoFile) {
         this.mphotoFile = mphotoFile;
@@ -77,20 +77,6 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
             DaneContract.DepartementEntry.COLUMN_DEPARTEMENT_NOM,
             DaneContract.DepartementEntry.COLUMN_DEPARTEMENT_INTITULE
     };
-
-//    private void dispatchTakePictureIntent() {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        if (takePictureIntent.resolveActivity(mpackageManager) != null) {
-//            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-//        }
-//    }
-
-    // convert from bitmap to byte array
-    public static byte[] getBytes(Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
-        return stream.toByteArray();
-    }
 
     // convert from byte array to bitmap
     public static Bitmap getImage(byte[] image) {
@@ -141,13 +127,15 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
 //        mbase64photo = Base64.encodeToString(mimageBytes, Base64.NO_WRAP);
             ContentValues photoanimateur = new ContentValues();
             photoanimateur.put(DaneContract.AnimateurEntry.COLUMN_PHOTO,mimageBytes);
-            Log.w(LOG_TAG,"stream.toByteArray(): "+ mimageBytes.length);
+//            Log.w(LOG_TAG,"stream.toByteArray(): "+ mimageBytes.length);
             Uri animateurURI = DaneContract.AnimateurEntry.buildAnimateurs();
             String selection = "("+ DaneContract.AnimateurEntry._ID+ " = ? )";
             String[] selectionArgs = new String[] { mAdapter.getIdAnimateur() };
              getBaseContext().getContentResolver().update(animateurURI,photoanimateur,selection,selectionArgs);
         }
     }
+
+    // convert from bitmap to byte array
     public static byte[] getBytesFromBitmap(Bitmap bitmap) {
         if (bitmap!=null) {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -156,6 +144,7 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
         }
         return null;
     }
+
 
     private void handleCameraPhoto() {
 
@@ -167,210 +156,240 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
 //            mCurrentPhotoPath = null;
         }
     }
-
-    public int uploadFile(String id) {
-
-
-        String fileName = mCurrentPhotoPath;
-
-        HttpURLConnection conn = null;
-        DataOutputStream dos = null;
-        String lineEnd = "\r\n";
-        String twoHyphens = "--";
-        String boundary = "*****";
-        int bytesRead, bytesAvailable, bufferSize;
-        byte[] buffer;
-        int maxBufferSize = 1 * 1024 * 1024;
-        int serverResponseCode = 0;
-        File sourceFile = new File(mCurrentPhotoPath);
-
-        if (!sourceFile.isFile()) {
-
-//            dialog.dismiss();
 //
-//            Log.e("uploadFile", "Source File not exist :"
-//                    +uploadFilePath + "" + uploadFileName);
+//    public int uploadFile(String id) {
 //
-//            runOnUiThread(new Runnable() {
-//                public void run() {
-//                    messageText.setText("Source File not exist :"
-//                            +uploadFilePath + "" + uploadFileName);
+//
+//        String fileName = mCurrentPhotoPath;
+//
+//        HttpURLConnection conn = null;
+//        DataOutputStream dos = null;
+//        String lineEnd = "\r\n";
+//        String twoHyphens = "--";
+//        String boundary = "*****";
+//        int bytesRead, bytesAvailable, bufferSize;
+//        byte[] buffer;
+//        int maxBufferSize = 1 * 1024 * 1024;
+//        int serverResponseCode = 0;
+//        File sourceFile = new File(mCurrentPhotoPath);
+//
+//        if (!sourceFile.isFile()) {
+//
+////            dialog.dismiss();
+////
+////            Log.e("uploadFile", "Source File not exist :"
+////                    +uploadFilePath + "" + uploadFileName);
+////
+////            runOnUiThread(new Runnable() {
+////                public void run() {
+////                    messageText.setText("Source File not exist :"
+////                            +uploadFilePath + "" + uploadFileName);
+////                }
+////            });
+//            Log.d(LOG_TAG, "Source File not exist :"+mCurrentPhotoPath );
+//            return 0;
+//
+//        }
+//        else
+//        {
+//            try {
+//
+//                // open a URL connection to the Servlet
+//                FileInputStream fileInputStream = new FileInputStream(sourceFile);
+//                URL url = new URL(DaneContract.BASE_URL_UPDATE_PHOTO);
+//
+//                // Open a HTTP  connection to  the URL
+//                conn = (HttpURLConnection) url.openConnection();
+//                conn.setDoInput(true); // Allow Inputs
+//                conn.setDoOutput(true); // Allow Outputs
+//                conn.setUseCaches(false); // Don't use a Cached Copy
+//                conn.setRequestMethod("POST");
+//                conn.setRequestProperty("Connection", "Keep-Alive");
+//                conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+//                conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+////                conn.setRequestProperty("uploaded_file", fileName);
+//                OutputStream sortie = conn.getOutputStream();
+//                dos = new DataOutputStream(sortie);
+//
+//                dos.writeBytes(twoHyphens + boundary + lineEnd);
+//                dos.writeBytes("Content-Disposition: form-data; name=\"photo\";filename=\""
+//                                + fileName + "\"");
+////                dos.writeBytes(lineEnd);
+//
+//                // create a buffer of  maximum size
+//                bytesAvailable = fileInputStream.available();
+//
+//                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+//                buffer = new byte[bufferSize];
+//
+//                // read file and write it into form...
+//                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+//
+//                while (bytesRead > 0) {
+//
+//                    dos.write(buffer, 0, bufferSize);
+//                    bytesAvailable = fileInputStream.available();
+//                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+//                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+//
 //                }
-//            });
-            Log.d(LOG_TAG, "Source File not exist :"+mCurrentPhotoPath );
-            return 0;
-
-        }
-        else
-        {
-            try {
-
-                // open a URL connection to the Servlet
-                FileInputStream fileInputStream = new FileInputStream(sourceFile);
-                URL url = new URL(DaneContract.BASE_URL_UPDATE_PHOTO);
-
-                // Open a HTTP  connection to  the URL
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setDoInput(true); // Allow Inputs
-                conn.setDoOutput(true); // Allow Outputs
-                conn.setUseCaches(false); // Don't use a Cached Copy
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Connection", "Keep-Alive");
-                conn.setRequestProperty("ENCTYPE", "multipart/form-data");
-                conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-//                conn.setRequestProperty("uploaded_file", fileName);
-                OutputStream sortie = conn.getOutputStream();
-                dos = new DataOutputStream(sortie);
-
-                dos.writeBytes(twoHyphens + boundary + lineEnd);
-                dos.writeBytes("Content-Disposition: form-data; name=\"photo\";filename=\""
-                                + fileName + "\"");
+//
+//                // send multipart form data necesssary after file data...
 //                dos.writeBytes(lineEnd);
+//                dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+//
+//                // Responses from the server (code and message)
+//                serverResponseCode = conn.getResponseCode();
+//                String serverResponseMessage = conn.getResponseMessage();
+//
+//                Log.d(LOG_TAG, "HTTP Response is : "
+//                        + serverResponseMessage + ": " + serverResponseCode);
+//
+//                if(serverResponseCode == 200){
+//
+//                    runOnUiThread(new Runnable() {
+//                        public void run() {
+//
+//                            String msg = "File Upload Completed.\n\n See uploaded file here : \n\n"
+//                                    +" http://www.androidexample.com/media/uploads/";
+////                            Toast.makeText(this, "File Upload Complete.",
+////                                    Toast.LENGTH_SHORT).show();
+//                            Log.d(LOG_TAG, msg );
+//                        }
+//                    });
+//                }
+//
+//                //close the streams //
+//                fileInputStream.close();
+//                dos.flush();
+//                dos.close();
+//
+//            } catch (MalformedURLException ex) {
+//
+////                dialog.dismiss();
+//                ex.printStackTrace();
+//
+//                runOnUiThread(new Runnable() {
+//                    public void run() {
+////                        messageText.setText("MalformedURLException Exception : check script url.");
+////                        Toast.makeText(UploadToServer.this, "MalformedURLException",
+////                                Toast.LENGTH_SHORT).show();
+//                        Log.d(LOG_TAG, "MalformedURLException Exception : check script url." );
+//                    }
+//                });
+//
+//                Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
+//            } catch (Exception e) {
+//
+////                dialog.dismiss();
+//                e.printStackTrace();
+//
+//                runOnUiThread(new Runnable() {
+//                    public void run() {
+////                        messageText.setText("Got Exception : see logcat ");
+////                        Toast.makeText(UploadToServer.this, "Got Exception : see logcat ",
+////                                Toast.LENGTH_SHORT).show();
+//                        Log.d(LOG_TAG, "Got Exception : see logcat ");
+//
+//                    }
+//                });
+////                Log.e("Upload file to server Exception", "Exception : "
+////                        + e.getMessage(), e);
+//            }
+////            dialog.dismiss();
+//            return serverResponseCode;
+//
+//        } // End else block
+//    }
+//
 
-                // create a buffer of  maximum size
-                bytesAvailable = fileInputStream.available();
-
-                bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                buffer = new byte[bufferSize];
-
-                // read file and write it into form...
-                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-                while (bytesRead > 0) {
-
-                    dos.write(buffer, 0, bufferSize);
-                    bytesAvailable = fileInputStream.available();
-                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-                }
-
-                // send multipart form data necesssary after file data...
-                dos.writeBytes(lineEnd);
-                dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-
-                // Responses from the server (code and message)
-                serverResponseCode = conn.getResponseCode();
-                String serverResponseMessage = conn.getResponseMessage();
-
-                Log.d(LOG_TAG, "HTTP Response is : "
-                        + serverResponseMessage + ": " + serverResponseCode);
-
-                if(serverResponseCode == 200){
-
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-
-                            String msg = "File Upload Completed.\n\n See uploaded file here : \n\n"
-                                    +" http://www.androidexample.com/media/uploads/";
-//                            Toast.makeText(this, "File Upload Complete.",
-//                                    Toast.LENGTH_SHORT).show();
-                            Log.d(LOG_TAG, msg );
-                        }
-                    });
-                }
-
-                //close the streams //
-                fileInputStream.close();
-                dos.flush();
-                dos.close();
-
-            } catch (MalformedURLException ex) {
-
-//                dialog.dismiss();
-                ex.printStackTrace();
-
-                runOnUiThread(new Runnable() {
-                    public void run() {
-//                        messageText.setText("MalformedURLException Exception : check script url.");
-//                        Toast.makeText(UploadToServer.this, "MalformedURLException",
-//                                Toast.LENGTH_SHORT).show();
-                        Log.d(LOG_TAG, "MalformedURLException Exception : check script url." );
-                    }
-                });
-
-                Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
-            } catch (Exception e) {
-
-//                dialog.dismiss();
-                e.printStackTrace();
-
-                runOnUiThread(new Runnable() {
-                    public void run() {
-//                        messageText.setText("Got Exception : see logcat ");
-//                        Toast.makeText(UploadToServer.this, "Got Exception : see logcat ",
-//                                Toast.LENGTH_SHORT).show();
-                        Log.d(LOG_TAG, "Got Exception : see logcat ");
-
-                    }
-                });
-//                Log.e("Upload file to server Exception", "Exception : "
-//                        + e.getMessage(), e);
-            }
-//            dialog.dismiss();
-            return serverResponseCode;
-
-        } // End else block
+    public String getStringImage(Bitmap bmp){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
     }
 
+    // AsyncTask - To convert Image to String
+    public void encodeImagetoString() {
+        new AsyncTask<Void, Void, String>() {
+            Bitmap bitmap;
+            String encodedString;
 
-    private void sendPhoto() {
-//        String url = "http://192.168.1.12/danecreteil/web/listevilles/93";
-        String url = "http://192.168.1.12/danecreteil/web/pnanimateurs/updatephoto";
-        try {
-            UrlLoadTask urlLoadTask = new UrlLoadTask(this,url);
-            urlLoadTask.execute(mimageBytes);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-//        try {
-//            Uri photoURI = FileProvider.getUriForFile(this,"com.creteil.com.danecreteil.fileprovider",getphotoFile());
-//            Bitmap mmBitmap = getBitmapFromUri(photoURI);
-//                    String UPDATE_PHOTO_URL = DaneContract.BASE_URL_UPDATE_PHOTO + "?id="+mAdapter.getAnimateurId()+ "&photo=\""+mbase64photo+"\"";
-////                        String UPDATE_PHOTO_URL = DaneContract.BASE_URL_UPDATE_PHOTO + "?id="+mAdapter.getAnimateurId()+"&photo="+mbase64photo;
-////                        String UPDATE_PHOTO_URL = DaneContract.BASE_URL_UPDATE_PHOTO;
-//                    Log.w(LOG_TAG,"UPDATE_PHOTO_URL: "+ UPDATE_PHOTO_URL);
-////                    FetchTask majphotoTask = new FetchTask(this,UPDATE_PHOTO_URL);
-////                    majphotoTask.execute("maj_photo",mAdapter.getAnimateurId(),mbase64photo);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-//                    bmOptions.inJustDecodeBounds = true;
-//                    Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-//                    Cursor  mcursor = mAdapter.getCursor();
-//                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-////                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos) ;
-//                    ContentValues photoanimateur = new ContentValues();
-//                    photoanimateur.put(DaneContract.AnimateurEntry.COLUMN_PHOTO,mCurrentPhotoPath.getBytes());
-//                    String base64photo = Base64.encodeToString(mCurrentPhotoPath.getBytes(), Base64.NO_WRAP);
-//                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                    bm.compress(Bitmap.CompressFormat.JPEG, 100 , baos);
-//                    byte[] imageBytes = baos.toByteArray();
-//                    String base64photo = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-//                    Bundle extras = data.getExtras();
-////                    Cursor  mcursor = mAdapter.getCursor();
-//                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-////                    String base64photo = getStringImage(imageBitmap);
-////                    imageBitmap.recycle();
-//                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-//                    byte[] imageBytes = baos.toByteArray();
-//                    String base64photo = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
-//                    imageBitmap.recycle();
-//                    ContentValues photoanimateur = new ContentValues();
-//                    photoanimateur.put(DaneContract.AnimateurEntry.COLUMN_PHOTO,imageBytes);
-//                    Log.w(LOG_TAG,"stream.toByteArray(): "+ imageBytes.length);
-//                    Uri animateurURI = DaneContract.AnimateurEntry.buildAnimateurs();
-//                    String selection = "("+ DaneContract.AnimateurEntry._ID+ " = ? )";
-//                    String[] selectionArgs = new String[] { mAdapter.getIdAnimateur() };
-//                    getBaseContext().getContentResolver().update(animateurURI,photoanimateur,selection,selectionArgs);
-//                    String UPDATE_PHOTO_URL = DaneContract.BASE_URL_UPDATE_PHOTO + "?id="+mAdapter.getAnimateurId()+ "&photo=\""+base64photo+"\"";
-//                        String UPDATE_PHOTO_URL = DaneContract.BASE_URL_UPDATE_PHOTO + "?id="+mAdapter.getAnimateurId()+"&photo="+base64photo;
-//                        String UPDATE_PHOTO_URL = DaneContract.BASE_URL_UPDATE_PHOTO;
-//                    Log.w(LOG_TAG,"UPDATE_PHOTO_URL: "+ UPDATE_PHOTO_URL);
-//                    FetchTask majphotoTask = new FetchTask(this,DaneContract.BASE_URL_UPDATE_PHOTO);
-//                    majphotoTask.execute("maj_photo",mAdapter.getAnimateurId(),base64photo);
+            protected void onPreExecute() {
+                pDialog.setMessage("Converting Image to Binary Data");
+                pDialog.show();
+            };
+
+            @Override
+            protected String doInBackground(Void... params) {
+                BitmapFactory.Options options = null;
+                options = new BitmapFactory.Options();
+                options.inSampleSize = 3;
+                bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath,options);
+                encodedString = getStringImage(bitmap);
+                return "";
+            }
+
+            @Override
+            protected void onPostExecute(String msg) {
+                pDialog.setMessage("Calling Upload");
+                // Put converted Image string into Async Http Post param
+                parametres.put("photo", encodedString);
+                nomFichier = getphotoFile().getName();
+                parametres.put("filename", nomFichier);
+                parametres.put("id", mAdapter.getAnimateurId());
+                // Trigger Image upload
+                triggerImageUpload();
+            }
+        }.execute(null, null, null);
+    }
+
+    public void triggerImageUpload() {
+        makeHTTPCall();
+    }
+
+    public void makeHTTPCall() {
+        pDialog.setMessage("Transfert des données en cours. Merci de patienter...");
+//        String url = "http://192.168.1.12/imgupload/upload_image.php";
+        String url = DaneContract.BASE_URL_UPDATE_PHOTO;
+        AsyncHttpClient client = new AsyncHttpClient();
+        // Don't forget to change the IP address to your LAN address. Port no as well.
+        client.post(url,
+                parametres, new AsyncHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                        pDialog.hide();
+                        Toast.makeText(getApplicationContext(), "response",Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                        // Hide Progress Dialog
+                        pDialog.hide();
+                        // When Http response code is '404'
+                        if (statusCode == 404) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Requested resource not found",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                        // When Http response code is '500'
+                        else if (statusCode == 500) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Something went wrong at server end",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                        // When Http response code other than 404, 500
+                        else {
+                            Toast.makeText(
+                                    getApplicationContext(),
+                                    "Error Occured \n Most Common Error: \n1. Device not connected to Internet\n2. Web App is not deployed in App server\n3. App server is not running\n HTTP Status code : "
+                                            + statusCode, Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -404,6 +423,20 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
             case REQUEST_IMAGE_CAPTURE:
                 if (resultCode == RESULT_OK) {
                     mCurrentPhotoPath = getphotoFile().getAbsolutePath();
+//                    String fileNameSegments[] = mCurrentPhotoPath.split("/");
+//                    nomFichier = fileNameSegments[fileNameSegments.length - 1];
+//                    nomFichier = getphotoFile().getName();
+//                    try {
+//                        params.put("filename", nomFichier);
+//                        params.put("photo", getphotoFile());
+//                        params.put("id", mAdapter.getAnimateurId());
+//                    } catch (FileNotFoundException e) {
+//                        e.printStackTrace();
+//                    } finally {
+//                        sendPhoto();
+//                    }
+                    encodeImagetoString();
+//                    sendPhoto();
 //                    if (uploadFile(mAdapter.getAnimateurId())!=0) handleCameraPhoto();
                     handleCameraPhoto();
 //                    sendPhoto();
@@ -414,13 +447,6 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
         }
     }
 
-    public String getStringImage(Bitmap bmp){
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] imageBytes = baos.toByteArray();
-        String encodedImage = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
-        return encodedImage;
-    }
 
     private void writeStream(OutputStream out){
         String output = "Hello world";
@@ -437,23 +463,6 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
         }
     }
 
-    private void readStream(InputStream in) {
-        String resultat = null;
-        BufferedReader reader;
-        StringBuffer buffer;
-        buffer = new StringBuffer();
-        String line;
-        reader = new BufferedReader(new InputStreamReader(in));
-        try {
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line + "\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        resultat = buffer.toString();
-//        Log.w(LOG_TAG,"resultat : " + resultat);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -461,6 +470,8 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
         setContentView(R.layout.liste_departement_animateurs);
         ExpandableListView expandableContactListView = (ExpandableListView) findViewById(R.id.liste_departements_animateurs);
         mAdapter = new ListeDepartementsAnimateursAdapter(this,null,0,null,null,0,null,null);
+        pDialog = new ProgressDialog(this);
+        pDialog.setCancelable(false);
         expandableContactListView.setIndicatorBounds(0,20);
         expandableContactListView.setAdapter(mAdapter);
         Loader<Cursor> loader = getLoaderManager().getLoader(-1);

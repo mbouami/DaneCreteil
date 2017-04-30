@@ -23,8 +23,6 @@ import android.widget.TextView;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
 import com.creteil.com.danecreteil.app.data.FetchTask;
-import com.creteil.com.danecreteil.app.photos.PhotoIntentActivity;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,7 +1,7 @@
 <resources xmlns:xliff="http://schemas.android.com/tools">
     <string name="app_name">DaneCreteil</string>
     <string name="accueil">Accueil</string>
-    <string name="message_version">Version 1.0.5-2017</string>
+    <string name="message_version">Version admin-2017</string>
     <string name="message_accueil">Bienvenue sur l\'application de gestion des animateurs de la DANE de Créteil</string>
     <string name="annuaire_etabs">Etablissements par Département</string>
     <string name="recherche_personnel">Rechercher un personnel administratif</string>
