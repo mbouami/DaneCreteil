@@ -26,11 +26,15 @@ import android.widget.Toast;
 import com.creteil.com.danecreteil.app.data.DaneContract;
 import com.creteil.com.danecreteil.app.data.FetchTask;
 import com.loopj.android.http.*;
+
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
@@ -305,10 +309,58 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
 
     public String getStringImage(Bitmap bmp){
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        bmp.compress(Bitmap.CompressFormat.JPEG, 50, baos);
         byte[] imageBytes = baos.toByteArray();
         String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
         return encodedImage;
+    }
+
+
+    //Reducing Image Size of a selected Image
+    private Bitmap decodeUri(Uri selectedImage) throws FileNotFoundException {
+
+        // Decode image size
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o);
+
+        // The new size we want to scale to
+        final int REQUIRED_SIZE = 500;
+
+        // Find the correct scale value. It should be the power of 2.
+        int width_tmp = o.outWidth, height_tmp = o.outHeight;
+        int scale = 1;
+        while (true) {
+            if (width_tmp / 2 < REQUIRED_SIZE
+                    || height_tmp / 2 < REQUIRED_SIZE) {
+                break;
+            }
+            width_tmp /= 2;
+            height_tmp /= 2;
+            scale *= 2;
+        }
+
+        // Decode with inSampleSize
+        BitmapFactory.Options o2 = new BitmapFactory.Options();
+        o2.inSampleSize = scale;
+        return BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o2);
+
+    }
+
+    //Converting Selected Image to Base64Encode String
+    private String getImageBase64(Uri selectedImage) {
+        Bitmap myImg = null;
+        try {
+            myImg = decodeUri(selectedImage);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        // Must compress the Image to reduce image size to make upload easy
+        myImg.compress(Bitmap.CompressFormat.PNG, 50, stream);
+        byte[] byte_arr = stream.toByteArray();
+        // Encode Image to String
+        return  android.util.Base64.encodeToString(byte_arr, 0);
     }
 
     // AsyncTask - To convert Image to String
@@ -337,6 +389,13 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
                 pDialog.setMessage("Calling Upload");
                 // Put converted Image string into Async Http Post param
                 parametres.put("photo", encodedString);
+//                parametres.put("photo", new ByteArrayInputStream(imageformatBytes));
+//                File myFile = new File(getphotoFile().getAbsolutePath());
+//                try {
+//                    parametres.put("photo", myFile,"image/jpeg");
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                }
                 nomFichier = getphotoFile().getName();
                 parametres.put("filename", nomFichier);
                 parametres.put("id", mAdapter.getAnimateurId());
@@ -354,6 +413,8 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
         pDialog.setMessage("Transfert des données en cours. Merci de patienter...");
 //        String url = "http://192.168.1.12/imgupload/upload_image.php";
         String url = DaneContract.BASE_URL_UPDATE_PHOTO;
+//        String url="http://192.168.1.12/danecreteil/web/pnanimateurs/test";
+//        String url="http://192.168.1.19:8080/danecreteil/web/pnanimateurs/test";
         AsyncHttpClient client = new AsyncHttpClient();
         // Don't forget to change the IP address to your LAN address. Port no as well.
         client.post(url,
@@ -423,7 +484,7 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
             case REQUEST_IMAGE_CAPTURE:
                 if (resultCode == RESULT_OK) {
                     mCurrentPhotoPath = getphotoFile().getAbsolutePath();
-//                    String fileNameSegments[] = mCurrentPhotoPath.split("/");
+                    //                    String fileNameSegments[] = mCurrentPhotoPath.split("/");
 //                    nomFichier = fileNameSegments[fileNameSegments.length - 1];
 //                    nomFichier = getphotoFile().getName();
 //                    try {
