@@ -309,7 +309,7 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
 
     public String getStringImage(Bitmap bmp){
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] imageBytes = baos.toByteArray();
         String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
         return encodedImage;
@@ -388,16 +388,16 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
             protected void onPostExecute(String msg) {
                 pDialog.setMessage("Calling Upload");
                 // Put converted Image string into Async Http Post param
-                parametres.put("photo", encodedString);
+//                parametres.put("photo", encodedString);
 //                parametres.put("photo", new ByteArrayInputStream(imageformatBytes));
-//                File myFile = new File(getphotoFile().getAbsolutePath());
-//                try {
-//                    parametres.put("photo", myFile,"image/jpeg");
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-                nomFichier = getphotoFile().getName();
-                parametres.put("filename", nomFichier);
+                File myFile = new File(mCurrentPhotoPath);
+                try {
+                    parametres.put("photo", myFile);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+//                nomFichier = getphotoFile().getName();
+//                parametres.put("filename", nomFichier);
                 parametres.put("id", mAdapter.getAnimateurId());
                 // Trigger Image upload
                 triggerImageUpload();
@@ -422,7 +422,8 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         pDialog.hide();
-                        Toast.makeText(getApplicationContext(), "response",Toast.LENGTH_LONG).show();
+                        handleCameraPhoto();
+                        Toast.makeText(getApplicationContext(), "Transfert réussi",Toast.LENGTH_LONG).show();
                     }
 
                     @Override
@@ -499,7 +500,7 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
                     encodeImagetoString();
 //                    sendPhoto();
 //                    if (uploadFile(mAdapter.getAnimateurId())!=0) handleCameraPhoto();
-                    handleCameraPhoto();
+//                    handleCameraPhoto();
 //                    sendPhoto();
                 } else {
                     Log.w(LOG_TAG,"Erreur de capture Photo");
