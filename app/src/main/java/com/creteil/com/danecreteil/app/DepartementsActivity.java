@@ -25,7 +25,11 @@ import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
 import com.creteil.com.danecreteil.app.data.FetchTask;
+import com.creteil.com.danecreteil.app.data.JSONParser;
 import com.loopj.android.http.*;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -272,18 +276,43 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
 //        String url="http://192.168.1.19:8080/danecreteil/web/pnanimateurs/test";
         AsyncHttpClient client = new AsyncHttpClient();
         // Don't forget to change the IP address to your LAN address. Port no as well.
-        client.post(url,
-                parametres, new AsyncHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        pDialog.hide();
-                        handleCameraPhoto();
-                        Toast.makeText(getApplicationContext(), "Transfert réussi",Toast.LENGTH_LONG).show();
-                    }
+        client.post(url, parametres, new BaseJsonHttpResponseHandler<JSONObject>() {
 
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                        // Hide Progress Dialog
+//            @Override
+//            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, String response) {
+//                        pDialog.hide();
+//                        handleCameraPhoto();
+//                        Toast.makeText(getApplicationContext(), "Transfert réussi : "+rawJsonResponse,Toast.LENGTH_LONG).show();
+//
+//            }
+//
+//            @Override
+//            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, String errorResponse) {
+//
+//            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                pDialog.hide();
+                JSONObject mrawJsonResponse = null;
+                try {
+                    mrawJsonResponse = new JSONObject(rawJsonResponse);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (!mrawJsonResponse.getBoolean("erreur")){
+                        handleCameraPhoto();
+                        Toast.makeText(getApplicationContext(),mrawJsonResponse.getString("message"),
+                                        Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
                         pDialog.hide();
                         // When Http response code is '404'
                         if (statusCode == 404) {
@@ -305,8 +334,48 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
                                             + statusCode, Toast.LENGTH_LONG)
                                     .show();
                         }
-                    }
-                });
+            }
+
+            @Override
+            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                return null;
+            }
+        });
+//        client.post(url,
+//                parametres, new  AsyncHttpResponseHandler() {
+//                    @Override
+//                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+//                        pDialog.hide();
+//                        handleCameraPhoto();
+//                        Toast.makeText(getApplicationContext(), "Transfert réussi",Toast.LENGTH_LONG).show();
+//                    }
+//
+//                    @Override
+//                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+//                        // Hide Progress Dialog
+//                        pDialog.hide();
+//                        // When Http response code is '404'
+//                        if (statusCode == 404) {
+//                            Toast.makeText(getApplicationContext(),
+//                                    "Ressorces de la requête non trouvées",
+//                                    Toast.LENGTH_LONG).show();
+//                        }
+//                        // When Http response code is '500'
+//                        else if (statusCode == 500) {
+//                            Toast.makeText(getApplicationContext(),
+//                                    "Lz serveur ne répond pas",
+//                                    Toast.LENGTH_LONG).show();
+//                        }
+//                        // When Http response code other than 404, 500
+//                        else {
+//                            Toast.makeText(
+//                                    getApplicationContext(),
+//                                    "Erreurs \n Sources d'erreurs: \n1. Pas de connection à internet\n2. Application non déployée sur le serveur\n3. Le serveur Web est à l'arrêt\n HTTP Status code : "
+//                                            + statusCode, Toast.LENGTH_LONG)
+//                                    .show();
+//                        }
+//                    }
+//                });
     }
 
     @Override
