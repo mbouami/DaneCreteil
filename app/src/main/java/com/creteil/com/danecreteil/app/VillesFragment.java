@@ -1,5 +1,6 @@
 package com.creteil.com.danecreteil.app;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -18,11 +19,16 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
-import com.creteil.com.danecreteil.app.data.FetchTask;
-import com.creteil.com.danecreteil.app.service.DaneService;
-import com.creteil.com.danecreteil.app.service.DaneServiceAdapter;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.BaseJsonHttpResponseHandler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Mohammed on 27/11/2016.
@@ -189,18 +195,63 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
         getLoaderManager().restartLoader(VILLES_LOADER, null, this);
     }
 
-    private void updateVille() {
-        FetchTask villesTask = new FetchTask(getActivity(),DaneContract.BASE_URL_LISTE_DETAIL_VILLES);
-        villesTask.execute();
-    }
-
     private void updateDatabase() {
-        FetchTask villesTask = new FetchTask(getActivity(),DaneContract.BASE_URL_LISTE_DETAIL_VILLES);
-        villesTask.execute("update");
-//        DaneServiceAdapter.syncImmediately(getActivity());
-//        Intent mServiceIntent = new Intent(getActivity(), DaneService.class);
-////        mServiceIntent.putExtra("EXTRA_COMPTEUR", "test");
-//        getActivity().startService(mServiceIntent);
+        final ProgressDialog pDialog = new ProgressDialog(getActivity());
+        pDialog.setIndeterminate(false);
+        pDialog.setCancelable(false);
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.post(DaneContract.BASE_URL_LISTE_DETAIL_VILLES, new BaseJsonHttpResponseHandler<JSONObject>() {
+            @Override
+            public void onStart() {
+                pDialog.setMessage("Synchronisation des données en cours. Merci de patienter...");
+                pDialog.show();
+            }
+
+            @Override
+            public void onFinish() {
+                pDialog.hide();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                DaneContract.initialiserBase(getActivity());
+                try {
+                    DaneContract.getVillesDataFromJson(getActivity(),rawJsonResponse);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                pDialog.hide();
+                // When Http response code is '404'
+                if (statusCode == 404) {
+                    Toast.makeText(getActivity(),
+                            "Ressorces de la requête non trouvées",
+                            Toast.LENGTH_LONG).show();
+                }
+                // When Http response code is '500'
+                else if (statusCode == 500) {
+                    Toast.makeText(getActivity(),
+                            "Lz serveur ne répond pas",
+                            Toast.LENGTH_LONG).show();
+                }
+                // When Http response code other than 404, 500
+                else {
+                    Toast.makeText(getActivity(),
+                            "Erreurs \n Sources d'erreurs: \n1. Pas de connection à internet\n2. Application non déployée sur le serveur\n3. Le serveur Web est à l'arrêt\n HTTP Status code : "
+                                    + statusCode, Toast.LENGTH_LONG)
+                            .show();
+                }
+            }
+
+            @Override
+            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                return null;
+            }
+        });
+
     }
 
     private String getDepartementId(String nom) {

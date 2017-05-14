@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
@@ -24,21 +23,18 @@ import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
-import com.creteil.com.danecreteil.app.data.FetchTask;
-import com.creteil.com.danecreteil.app.data.JSONParser;
 import com.loopj.android.http.*;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
@@ -478,39 +474,111 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_maj:
-                FetchTask majanimTask = new FetchTask(this,DaneContract.BASE_URL_UPDATE_ANIM+"/");
-                majanimTask.execute("maj_anim","","");
-//                UpdateAnimateurs();
+                mContext = this;
+                AsyncHttpClient client = new AsyncHttpClient();
+                client.post(DaneContract.BASE_URL_UPDATE_ANIM+"/", new BaseJsonHttpResponseHandler<JSONObject>() {
+                    @Override
+                    public void onStart() {
+//                        super.onStart();
+                        pDialog.setMessage("Mise à jour de la liste des animateurs en cours. Merci de patienter...");
+                        pDialog.show();
+                    }
+
+                    @Override
+                    public void onFinish() {
+//                        super.onFinish();
+                        pDialog.hide();
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                        JSONObject detailanimJson = null;
+                        JSONArray animsArray = null;
+                        final String OWM_NOM= "nom";
+                        final String OWM_TEL = "tel";
+                        final String OWM_EMAIL = "email";
+                        final String OWN_PHOTO = "photo";
+                        try {
+                            detailanimJson = new JSONObject(rawJsonResponse);
+                            animsArray = detailanimJson.getJSONArray("animateurs");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        for(int k = 0; k < animsArray.length(); k++) {
+                            JSONObject animateur = null;
+                            try {
+                                animateur = animsArray.getJSONObject(k);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            Cursor animateursCursor = null;
+                            try {
+                                animateursCursor = mContext.getContentResolver().query(
+                                        DaneContract.AnimateurEntry.CONTENT_URI,
+                                        new String[]{DaneContract.AnimateurEntry._ID},
+                                        DaneContract.AnimateurEntry.COLUMN_ANIMATEUR_ID + " = ?",
+                                        new String[]{animateur.getString("id")},
+                                        null);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            if (animateursCursor.moveToFirst()) {
+                                ContentValues animateurValues = new ContentValues();
+                                try {
+                                    animateurValues.put(DaneContract.AnimateurEntry.COLUMN_NOM, animateur.getString(OWM_NOM));
+                                    animateurValues.put(DaneContract.AnimateurEntry.COLUMN_TEL, animateur.getString(OWM_TEL));
+                                    animateurValues.put(DaneContract.AnimateurEntry.COLUMN_EMAIL, animateur.getString(OWM_EMAIL));
+                                    animateurValues.put(DaneContract.AnimateurEntry.COLUMN_PHOTO, Base64.decode(animateur.getString(OWN_PHOTO),Base64.DEFAULT));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                String whereClause = "_id=?";
+                                String[] whereArgs = new String[] { animateursCursor.getString(animateursCursor.getColumnIndex(DaneContract.AnimateurEntry._ID)) };
+                                try {
+                                    mContext.getContentResolver().update(DaneContract.AnimateurEntry.CONTENT_URI,
+                                            animateurValues,whereClause,whereArgs);
+                                } catch (NullPointerException e) {
+                                    Log.w(LOG_TAG,e.getMessage());
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                        pDialog.hide();
+                        // When Http response code is '404'
+                        if (statusCode == 404) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Ressorces de la requête non trouvées",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                        // When Http response code is '500'
+                        else if (statusCode == 500) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Lz serveur ne répond pas",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                        // When Http response code other than 404, 500
+                        else {
+                            Toast.makeText(
+                                    getApplicationContext(),
+                                    "Erreurs \n Sources d'erreurs: \n1. Pas de connection à internet\n2. Application non déployée sur le serveur\n3. Le serveur Web est à l'arrêt\n HTTP Status code : "
+                                            + statusCode, Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    }
+
+                    @Override
+                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        return null;
+                    }
+                });
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
 
         }
-    }
-
-    private void UpdateAnimateurs() {
-        Cursor animateursCursor = getContentResolver().query(
-                DaneContract.AnimateurEntry.CONTENT_URI,
-                new String[]{DaneContract.AnimateurEntry._ID,DaneContract.AnimateurEntry.COLUMN_ANIMATEUR_ID},
-                null,
-                null,
-                null);
-        FetchTask majanimTask = null;
-        String idanimateur = "";
-        String animateur_id = "";
-        if (animateursCursor != null ) {
-            if  (animateursCursor.moveToFirst()) {
-                do {
-                    int idanimateurIndex = animateursCursor.getColumnIndex(DaneContract.AnimateurEntry._ID);
-                    int animateurIdIndex = animateursCursor.getColumnIndex(DaneContract.AnimateurEntry.COLUMN_ANIMATEUR_ID);
-                    idanimateur = String.valueOf(animateursCursor.getLong(idanimateurIndex));
-                    animateur_id = animateursCursor.getString(animateurIdIndex);
-                    majanimTask = new FetchTask(this,DaneContract.BASE_URL_UPDATE_ANIM+"/"+animateur_id);
-                    majanimTask.execute("maj_anim",idanimateur);
-                }while (animateursCursor.moveToNext());
-            }
-        }
-        animateursCursor.close();
     }
 
     @Override

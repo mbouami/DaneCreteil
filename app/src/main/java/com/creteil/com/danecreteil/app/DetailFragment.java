@@ -1,5 +1,8 @@
 package com.creteil.com.danecreteil.app;
 
+import android.app.ProgressDialog;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -19,9 +22,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
-import com.creteil.com.danecreteil.app.data.FetchTask;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.BaseJsonHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Mohammed on 03/12/2016.
@@ -160,13 +171,87 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 startActivity(createMapIntent());
                 return true;
             case R.id.action_maj:
-//                Log.d(LOG_TAG, "MAJ : "+DaneContract.BASE_URL_DETAIL_ETAB+"/"+mIdEtabcast);
-                FetchTask detailetabTask = new FetchTask(getContext(),DaneContract.BASE_URL_DETAIL_ETAB+"/"+mIdEtabcast);
-                detailetabTask.execute("maj_etab",mIdEtab);
+                majetab();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void majetab() {
+        final ProgressDialog pDialog = new ProgressDialog(getContext());
+        pDialog.setIndeterminate(false);
+        pDialog.setCancelable(false);
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.post(DaneContract.BASE_URL_DETAIL_ETAB+"/"+mIdEtabcast, new BaseJsonHttpResponseHandler<JSONObject>() {
+            @Override
+            public void onStart() {
+                pDialog.setMessage("Mise à jour de l'établissement en cours. Merci de patienter...");
+                pDialog.show();
+            }
+
+            @Override
+            public void onFinish() {
+                pDialog.hide();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                long etablissementId = 0;
+                // First, check if the location with this city name exists in the db
+                Cursor etablissementCursor = getContext().getContentResolver().query(
+                        DaneContract.EtablissementEntry.CONTENT_URI,
+                        new String[]{DaneContract.EtablissementEntry._ID},
+                        DaneContract.EtablissementEntry._ID + " = ?",
+                        new String[]{mIdEtab},
+                        null);
+                if (etablissementCursor.moveToFirst()) {
+                    int etablissementIdIndex = etablissementCursor.getColumnIndex(DaneContract.EtablissementEntry._ID);
+                    etablissementId = etablissementCursor.getLong(etablissementIdIndex);
+                }
+                DaneContract.delPersonnel(getContext(),mIdEtab);
+                try {
+                    JSONObject detailetabJson = new JSONObject(rawJsonResponse);
+                    JSONArray listePersonnel = detailetabJson.getJSONArray("personnel");
+                    for(int j = 0; j < listePersonnel.length(); j++) {
+                        JSONObject lepersonnel = listePersonnel.getJSONObject(j);
+                        long insertedPersonnel = DaneContract.addPersonnelJson(getContext(),lepersonnel,etablissementId);
+                    }
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, e.getMessage(), e);
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                pDialog.hide();
+                // When Http response code is '404'
+                if (statusCode == 404) {
+                    Toast.makeText(getContext(),
+                            "Ressorces de la requête non trouvées",
+                            Toast.LENGTH_LONG).show();
+                }
+                // When Http response code is '500'
+                else if (statusCode == 500) {
+                    Toast.makeText(getContext(),
+                            "Lz serveur ne répond pas",
+                            Toast.LENGTH_LONG).show();
+                }
+                // When Http response code other than 404, 500
+                else {
+                    Toast.makeText(getContext(),
+                            "Erreurs \n Sources d'erreurs: \n1. Pas de connection à internet\n2. Application non déployée sur le serveur\n3. Le serveur Web est à l'arrêt\n HTTP Status code : "
+                                    + statusCode, Toast.LENGTH_LONG)
+                            .show();
+                }
+            }
+
+            @Override
+            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                return null;
+            }
+        });
     }
 
     private Intent createShareIntent() {

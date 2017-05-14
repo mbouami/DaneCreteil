@@ -1,5 +1,7 @@
 package com.creteil.com.danecreteil.app;
 
+import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
@@ -20,15 +22,21 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SimpleCursorTreeAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
-import com.creteil.com.danecreteil.app.data.FetchTask;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.BaseJsonHttpResponseHandler;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by BOUAMI on 31/01/2017.
@@ -38,6 +46,7 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
     private final String LOG_TAG = getClass().getSimpleName().toString();
     private DepartementsActivity mActivity;
     private  Context mContext;
+    ProgressDialog pDialog = null;
     protected HashMap<Integer, Integer> mGroupMap;
     protected String midanimateur;
     protected String manimateur_id;
@@ -60,6 +69,9 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         mContext = context;
         nbreanimateurs = 0;
         mpackageManager = context.getPackageManager();
+        pDialog = new ProgressDialog(context);
+        pDialog.setIndeterminate(false);
+        pDialog.setCancelable(false);
     }
 
     public static class ViewHolder {
@@ -169,8 +181,6 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
                 mActivity.startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO );
             }
         }
-//        FetchTask majanimTask = new FetchTask(mContext,DaneContract.BASE_URL_UPDATE_ANIM+"/"+anim_id);
-//        majanimTask.execute("maj_anim",idanim,anim_id);
     }
 
     private void photofromgallery(String idanim) {
@@ -261,8 +271,77 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
     }
 
     private void UpdatePictureIntent(String idanimateur, String animateur_id) {
-        FetchTask majanimTask = new FetchTask(mContext,DaneContract.BASE_URL_UPDATE_ANIM+"/"+animateur_id);
-        majanimTask.execute("maj_anim",idanimateur);
+        final String idanim = idanimateur;
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.post(DaneContract.BASE_URL_UPDATE_ANIM+"/"+animateur_id, new BaseJsonHttpResponseHandler<JSONObject>() {
+            @Override
+            public void onStart() {
+                pDialog.setMessage("Mise à jour de l'animateur en cours. Merci de patienter...");
+                pDialog.show();
+            }
+
+            @Override
+            public void onFinish() {
+                pDialog.hide();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                JSONObject detailanimJson = null;
+                ContentValues animateurValues = new ContentValues();
+                final String OWM_NOM= "nom";
+                final String OWM_TEL = "tel";
+                final String OWM_EMAIL = "email";
+                final String OWN_PHOTO = "photo";
+                try {
+                    detailanimJson = new JSONObject(rawJsonResponse);
+                    animateurValues.put(DaneContract.AnimateurEntry.COLUMN_NOM, detailanimJson.getString(OWM_NOM));
+                    animateurValues.put(DaneContract.AnimateurEntry.COLUMN_TEL, detailanimJson.getString(OWM_TEL));
+                    animateurValues.put(DaneContract.AnimateurEntry.COLUMN_EMAIL, detailanimJson.getString(OWM_EMAIL));
+                    animateurValues.put(DaneContract.AnimateurEntry.COLUMN_PHOTO, Base64.decode(detailanimJson.getString(OWN_PHOTO),Base64.DEFAULT));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                String whereClause = "_id=?";
+                String[] whereArgs = new String[] { idanim };
+                try {
+                    mContext.getContentResolver().update(DaneContract.AnimateurEntry.CONTENT_URI,
+                            animateurValues,whereClause,whereArgs);
+                } catch (NullPointerException e) {
+                    Log.w(LOG_TAG,e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                pDialog.hide();
+                // When Http response code is '404'
+                if (statusCode == 404) {
+                    Toast.makeText(mContext,
+                            "Ressorces de la requête non trouvées",
+                            Toast.LENGTH_LONG).show();
+                }
+                // When Http response code is '500'
+                else if (statusCode == 500) {
+                    Toast.makeText(mContext,
+                            "Lz serveur ne répond pas",
+                            Toast.LENGTH_LONG).show();
+                }
+                // When Http response code other than 404, 500
+                else {
+                    Toast.makeText(mContext,
+                            "Erreurs \n Sources d'erreurs: \n1. Pas de connection à internet\n2. Application non déployée sur le serveur\n3. Le serveur Web est à l'arrêt\n HTTP Status code : "
+                                    + statusCode, Toast.LENGTH_LONG)
+                            .show();
+                }
+            }
+
+            @Override
+            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                return null;
+            }
+        });
+
     }
 
     @Override

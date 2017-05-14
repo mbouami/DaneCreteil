@@ -1,15 +1,23 @@
 package com.creteil.com.danecreteil.app;
 
-import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.creteil.com.danecreteil.app.data.DaneContract;
-import com.creteil.com.danecreteil.app.data.FetchTask;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.BaseJsonHttpResponseHandler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 public class AccueilActivity extends AppCompatActivity {
     private final String LOG_TAG =AccueilActivity.class.getSimpleName();
@@ -28,10 +36,63 @@ public class AccueilActivity extends AppCompatActivity {
                 null,
                 null);
         if (!(NombreetablissementCursor.getCount() > 0)) {
-//            FetchVillesTask villesTask = new FetchVillesTask(AccueilActivity.this);
-//            villesTask.execute("update");
-            FetchTask villesTask = new FetchTask(AccueilActivity.this,DaneContract.BASE_URL_LISTE_DETAIL_VILLES);
-            villesTask.execute("update");
+            final Context mContext = AccueilActivity.this;
+            final ProgressDialog pDialog = new ProgressDialog(mContext);
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.post(DaneContract.BASE_URL_LISTE_DETAIL_VILLES, new BaseJsonHttpResponseHandler<JSONObject>() {
+                @Override
+                public void onStart() {
+                    pDialog.setMessage("Synchronisation des données en cours. Merci de patienter...");
+                    pDialog.show();
+                }
+
+                @Override
+                public void onFinish() {
+                    pDialog.hide();
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                    DaneContract.initialiserBase(mContext);
+                    try {
+                        DaneContract.getVillesDataFromJson(mContext,rawJsonResponse);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                    pDialog.hide();
+                    // When Http response code is '404'
+                    if (statusCode == 404) {
+                        Toast.makeText(mContext,
+                                "Ressorces de la requête non trouvées",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    // When Http response code is '500'
+                    else if (statusCode == 500) {
+                        Toast.makeText(mContext,
+                                "Lz serveur ne répond pas",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    // When Http response code other than 404, 500
+                    else {
+                        Toast.makeText(mContext,
+                                "Erreurs \n Sources d'erreurs: \n1. Pas de connection à internet\n2. Application non déployée sur le serveur\n3. Le serveur Web est à l'arrêt\n HTTP Status code : "
+                                        + statusCode, Toast.LENGTH_LONG)
+                                .show();
+                    }
+                }
+
+                @Override
+                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                    return null;
+                }
+            });
+
         }
     }
 
@@ -88,14 +149,10 @@ public class AccueilActivity extends AppCompatActivity {
         liste_animateurs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Toast.makeText(view.getContext(), "liste des Animateurs", Toast.LENGTH_SHORT).show();
-//                Intent intent = new Intent(view.getContext(), AnimateursActivity.class);
                 Intent intent = new Intent(view.getContext(), DepartementsActivity.class);
-//                        .setData(DaneContract.AnimateurEntry.buildAnimateurs());
                 startActivity(intent);
             }
         });
-
     }
 
 }
