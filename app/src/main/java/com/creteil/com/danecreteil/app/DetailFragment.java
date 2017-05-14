@@ -140,20 +140,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.detailetab, menu);
-        // Retrieve the share menu item
-        MenuItem menuShareItem = menu.findItem(R.id.action_share);
-        MenuItem menuCallItem = menu.findItem(R.id.action_call);
-
-//        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuShareItem);
-//        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuCallItem);
-
-        // If onLoadFinished happens before this, we can go ahead and set the share intent now.
-//        if (mEtabSharecast != null) {
-//            mShareActionProvider.setShareIntent(createShareIntent());
-//        }
-//        if (mTelEtabcast != null) {
-//            mShareActionProvider.setShareIntent(createPhoneIntent());
-//        }
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -267,10 +253,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Intent shareIntent = new Intent(Intent.ACTION_DIAL);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setData(Uri.parse("tel:"+mTelEtabcast));
-//        if (ActivityCompat.checkSelfPermission(getActivity(),
-//                Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-//            return null;
-//        }
         return shareIntent;
     }
 
@@ -291,11 +273,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(geoLocation);
         return intent;
-//        if (intent.resolveActivity(getPackageManager()) != null) {
-//            startActivity(intent);
-//        } else {
-//            Log.d(LOG_TAG, "Couldn't call " + location + ", no receiving apps installed!");
-//        }
     }
 
     @Override
@@ -304,19 +281,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onActivityCreated(savedInstanceState);
     }
 
-    void onEtablissementChanged( String idEtablissement ) {
-        if (null != mUri) {
-//            Uri updatedUri = DaneContract.EtablissementEntry.buildEtablissementParId(idEtablissement,"etab");
-            Uri updatedUri = DaneContract.PersonnelEntry.buildPersonnelParIdEtab(idEtablissement,"etab");
-            mUri = updatedUri;
-            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
-        }
-    }
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if ( null != mUri ) {
-//            Log.v(LOG_TAG, "In onCreateLoader "+mUri.toString());
             String sortOrder = DaneContract.PersonnelEntry.COLUMN_PERSONNEL_ID + " ASC";
             return new CursorLoader(
                     getActivity(),
@@ -356,10 +323,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mTelEtabcast = String.format("%s", tel);
         mAdresseEtabcast = String.format("%s", adresse);
         mPersonnelAdapter.swapCursor(data);
-//        if (mShareActionProvider != null) {
-//            mShareActionProvider.setShareIntent(createShareIntent());
-////            mShareActionProvider.setShareIntent(createPhoneIntent());
-//        }
     }
 
     }

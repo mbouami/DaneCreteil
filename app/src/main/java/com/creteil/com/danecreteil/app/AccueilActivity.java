@@ -13,11 +13,13 @@ import android.widget.Toast;
 import com.creteil.com.danecreteil.app.data.DaneContract;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
+import com.loopj.android.http.ResponseHandlerInterface;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpResponse;
 
 public class AccueilActivity extends AppCompatActivity {
     private final String LOG_TAG =AccueilActivity.class.getSimpleName();
@@ -44,23 +46,18 @@ public class AccueilActivity extends AppCompatActivity {
             client.post(DaneContract.BASE_URL_LISTE_DETAIL_VILLES, new BaseJsonHttpResponseHandler<JSONObject>() {
                 @Override
                 public void onStart() {
-                    pDialog.setMessage("Synchronisation des données en cours. Merci de patienter...");
+                    pDialog.setMessage("Importation des données en cours. Merci de patienter...");
                     pDialog.show();
                 }
 
                 @Override
                 public void onFinish() {
-                    pDialog.hide();
+//                    pDialog.hide();
                 }
 
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                    DaneContract.initialiserBase(mContext);
-                    try {
-                        DaneContract.getVillesDataFromJson(mContext,rawJsonResponse);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    DaneContract.initialiserBase(mContext,rawJsonResponse,pDialog);
                 }
 
                 @Override

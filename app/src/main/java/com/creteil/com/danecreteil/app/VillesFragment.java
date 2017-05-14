@@ -203,23 +203,18 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
         client.post(DaneContract.BASE_URL_LISTE_DETAIL_VILLES, new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
             public void onStart() {
-                pDialog.setMessage("Synchronisation des données en cours. Merci de patienter...");
+                pDialog.setMessage("Importation des données en cours. Merci de patienter...");
                 pDialog.show();
             }
 
             @Override
             public void onFinish() {
-                pDialog.hide();
+//                pDialog.hide();
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                DaneContract.initialiserBase(getActivity());
-                try {
-                    DaneContract.getVillesDataFromJson(getActivity(),rawJsonResponse);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                DaneContract.initialiserBase(getActivity(),rawJsonResponse,pDialog);
             }
 
             @Override

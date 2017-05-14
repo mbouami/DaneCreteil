@@ -1,11 +1,13 @@
 package com.creteil.com.danecreteil.app.data;
 
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -241,10 +243,7 @@ public class DaneContract {
         public static Uri buildPersonnel() {
             return CONTENT_URI.buildUpon().build();
         }
-//        public static String getVilleFromUri(Uri uri) {
-//            return uri.getPathSegments().get(1);
-//        }
-//
+
         public static String getEtablissementFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
@@ -256,64 +255,125 @@ public class DaneContract {
         }
     }
 
-    public static void initialiserBase(Context mContext){
-        int effacertablePersonnel = mContext.getContentResolver().delete(DaneContract.PersonnelEntry.CONTENT_URI,null,null);
-        int effacertableEtablissement = mContext.getContentResolver().delete(DaneContract.EtablissementEntry.CONTENT_URI,null,null);
-        int effacertableVille = mContext.getContentResolver().delete(DaneContract.VilleEntry.CONTENT_URI,null,null);
-        int effacertableAnimateur = mContext.getContentResolver().delete(DaneContract.AnimateurEntry.CONTENT_URI,null,null);
-        int effacertableDepartements = mContext.getContentResolver().delete(DaneContract.DepartementEntry.CONTENT_URI,null,null);
+    public static void initialiserBase(Context mContext, String resultat, ProgressDialog pDialog){
+        try{
+            mContext.getContentResolver().delete(DaneContract.PersonnelEntry.CONTENT_URI,null,null);
+            mContext.getContentResolver().delete(DaneContract.EtablissementEntry.CONTENT_URI,null,null);
+            mContext.getContentResolver().delete(DaneContract.VilleEntry.CONTENT_URI,null,null);
+            mContext.getContentResolver().delete(DaneContract.AnimateurEntry.CONTENT_URI,null,null);
+            mContext.getContentResolver().delete(DaneContract.DepartementEntry.CONTENT_URI,null,null);
+        } finally {
+            getVillesDataFromJson(mContext,resultat,pDialog);
+        }
     }
 
 
-    public static void getVillesDataFromJson(Context mContext, String resultat)
-            throws JSONException {
+    public static void getVillesDataFromJson(Context mContext, String resultat,ProgressDialog pDialog) {
 
-        final String OWM_ETABS = "etabs";
-        final String OWM_PERSONNEL = "personnel";
-        final String OWM_ANIMATEUR = "animateur";
-        try {
-            JSONObject villeJson = new JSONObject(resultat);
-            Iterator<String> depart = villeJson.keys();
-            while( depart.hasNext() ) {
-                String ledepart= (String)depart.next();
-                String intitule = "";
-                switch (ledepart){
-                    case "77" : intitule = "seine et Marne";break;
-                    case "93" : intitule = "Seine Saint Denis";break;
-                    case "94" : intitule = "Val de Marne";break;
+        final Context mcontext = mContext;
+        final String mresultat = resultat;
+        final ProgressDialog mDialog = pDialog;
+
+        new AsyncTask<Void, Void, String>() {
+            final String OWM_ETABS = "etabs";
+            final String OWM_PERSONNEL = "personnel";
+            final String OWM_ANIMATEUR = "animateur";
+            @Override
+            protected String doInBackground(Void... params) {
+                JSONObject villeJson = null;
+                try {
+                    villeJson = new JSONObject(mresultat);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                long insertedDepartement = addDepartement(mContext,ledepart,intitule);
-                JSONArray villeArray = villeJson.getJSONArray(ledepart);
-                Vector<ContentValues> cVVector = new Vector<ContentValues>(villeArray.length());
-                for(int i = 0; i < villeArray.length(); i++) {
-                    JSONObject laville = villeArray.getJSONObject(i);
-                    long insertedVille = addVilleJson(mContext,laville,insertedDepartement);
-                    JSONArray etabsArray = laville.getJSONArray(OWM_ETABS);
-                    Vector<ContentValues> etabVector = new Vector<ContentValues>(etabsArray.length());
-                    for(int j = 0; j < etabsArray.length(); j++) {
-                        JSONObject etab = etabsArray.getJSONObject(j);
-//                        Log.d(LOG_TAG, "etab : " +j+"-"+ etab.toString());
-                        JSONArray animateurArray = etab.getJSONArray(OWM_ANIMATEUR);
-                        long insertedanimateur = 0;
-                        if (animateurArray.length()>0) {
-                            JSONObject animateur = animateurArray.getJSONObject(0);
-                            insertedanimateur = addAnimateurJson(mContext,animateur,insertedDepartement);
+                Iterator<String> depart = villeJson.keys();
+                while( depart.hasNext() ) {
+                    String ledepart= (String)depart.next();
+                    String intitule = "";
+                    switch (ledepart){
+                        case "77" : intitule = "seine et Marne";break;
+                        case "93" : intitule = "Seine Saint Denis";break;
+                        case "94" : intitule = "Val de Marne";break;
+                    }
+                    long insertedDepartement = addDepartement(mcontext,ledepart,intitule);
+                    JSONArray villeArray = null;
+                    try {
+                        villeArray = villeJson.getJSONArray(ledepart);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    for(int i = 0; i < villeArray.length(); i++) {
+                        JSONObject laville = null;
+                        try {
+                            laville = villeArray.getJSONObject(i);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                        long insertedEtab = addEtablissementJson(mContext,etab,insertedVille,insertedanimateur);
-                        JSONArray personnelArray = etab.getJSONArray(OWM_PERSONNEL);
-                        for(int k = 0; k < personnelArray.length(); k++) {
-                            JSONObject personnel = personnelArray.getJSONObject(k);
-                            long insertedPersonnel = addPersonnelJson(mContext,personnel,insertedEtab);
+                        long insertedVille = addVilleJson(mcontext,laville,insertedDepartement);
+                        JSONArray etabsArray = null;
+                        try {
+                            etabsArray = laville.getJSONArray(OWM_ETABS);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        for(int j = 0; j < etabsArray.length(); j++) {
+                            JSONObject etab = null;
+                            try {
+                                etab = etabsArray.getJSONObject(j);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            JSONArray animateurArray = null;
+                            try {
+                                animateurArray = etab.getJSONArray(OWM_ANIMATEUR);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            long insertedanimateur = 0;
+                            if (animateurArray.length()>0) {
+                                JSONObject animateur = null;
+                                try {
+                                    animateur = animateurArray.getJSONObject(0);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                insertedanimateur = addAnimateurJson(mcontext,animateur,insertedDepartement);
+                            }
+                            long insertedEtab = addEtablissementJson(mcontext,etab,insertedVille,insertedanimateur);
+                            JSONArray personnelArray = null;
+                            try {
+                                personnelArray = etab.getJSONArray(OWM_PERSONNEL);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            for(int k = 0; k < personnelArray.length(); k++) {
+                                JSONObject personnel = null;
+                                try {
+                                    personnel = personnelArray.getJSONObject(k);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                long insertedPersonnel = addPersonnelJson(mcontext,personnel,insertedEtab);
+                            }
+
                         }
 
                     }
-
                 }
+                return null;
             }
-        } catch (JSONException e) {
-//            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
-        }
+
+            @Override
+            protected void onPreExecute() {
+                mDialog.setMessage("Synchronisation des données en cours. Merci de patienter...");
+//                pDialog.show();
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                mDialog.hide();
+            }
+        }.execute(null, null, null);
     }
 
     public static long addEtablissementJson(Context mContext, JSONObject etab, Long insertedVille, Long insertedanimateur) {
@@ -519,7 +579,6 @@ public class DaneContract {
             do {
                 int personnelIdIndex = personnelCursor.getColumnIndex(DaneContract.PersonnelEntry._ID);
                 Long personnelId = personnelCursor.getLong(personnelIdIndex);
-//                Log.d(LOG_TAG, "majEtab personnelId : " + personnelId);
                 String whereClause = "_id=?";
                 String[] whereArgs = new String[] { String.valueOf(personnelId) };
                 int deletedUri = mContext.getContentResolver().delete(
@@ -527,7 +586,6 @@ public class DaneContract {
                         whereClause,
                         whereArgs
                 );
-//                Log.d(LOG_TAG, "majEtab resultatdelete : " + deletedUri);
             } while (personnelCursor.moveToNext());
         }
     }

@@ -52,10 +52,8 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
     static String mCurrentPhotoPath;
     static Bitmap mImageBitmap;
     static String mencodedString;
-    static String mbase64photo;
     static byte[] mimageBytes;
     RequestParams parametres = new RequestParams();
-    String  nomFichier;
     Context mContext;
     ProgressDialog pDialog;
 
@@ -106,34 +104,11 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
     }
 
     private void setPic() {
-        // Get the dimensions of the View
-        int targetW = 50;
-        int targetH = 50;
-
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-//        mImageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         mImageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath);
         mimageBytes = getBytesFromBitmap(mImageBitmap);
         if (mimageBytes != null) {
-//            mbase64photo = Base64.encodeToString(mimageBytes, Base64.DEFAULT);
             ContentValues photoanimateur = new ContentValues();
-//            photoanimateur.put(DaneContract.AnimateurEntry.COLUMN_PHOTO,mimageBytes);
             photoanimateur.put(DaneContract.AnimateurEntry.COLUMN_PHOTO,Base64.decode(mencodedString,Base64.DEFAULT));
-
-//            Log.w(LOG_TAG,"stream.toByteArray(): "+ mimageBytes.length);
             Uri animateurURI = DaneContract.AnimateurEntry.buildAnimateurs();
             String selection = "("+ DaneContract.AnimateurEntry._ID+ " = ? )";
             String[] selectionArgs = new String[] { mAdapter.getIdAnimateur() };
@@ -171,53 +146,6 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
     }
 
 
-    //Reducing Image Size of a selected Image
-    private Bitmap decodeUri(Uri selectedImage) throws FileNotFoundException {
-
-        // Decode image size
-        BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o);
-
-        // The new size we want to scale to
-        final int REQUIRED_SIZE = 500;
-
-        // Find the correct scale value. It should be the power of 2.
-        int width_tmp = o.outWidth, height_tmp = o.outHeight;
-        int scale = 1;
-        while (true) {
-            if (width_tmp / 2 < REQUIRED_SIZE
-                    || height_tmp / 2 < REQUIRED_SIZE) {
-                break;
-            }
-            width_tmp /= 2;
-            height_tmp /= 2;
-            scale *= 2;
-        }
-
-        // Decode with inSampleSize
-        BitmapFactory.Options o2 = new BitmapFactory.Options();
-        o2.inSampleSize = scale;
-        return BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o2);
-
-    }
-
-    //Converting Selected Image to Base64Encode String
-    private String getImageBase64(Uri selectedImage) {
-        Bitmap myImg = null;
-        try {
-            myImg = decodeUri(selectedImage);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        // Must compress the Image to reduce image size to make upload easy
-        myImg.compress(Bitmap.CompressFormat.PNG, 50, stream);
-        byte[] byte_arr = stream.toByteArray();
-        // Encode Image to String
-        return  android.util.Base64.encodeToString(byte_arr, 0);
-    }
-
     // AsyncTask - To convert Image to String
     public void encodeImagetoString() {
         new AsyncTask<Void, Void, String>() {
@@ -225,8 +153,8 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
             String encodedString;
 
             protected void onPreExecute() {
-                pDialog.setMessage("Converting Image to Binary Data");
-                pDialog.show();
+//                pDialog.setMessage("Converting Image to Binary Data");
+//                pDialog.show();
             };
 
             @Override
@@ -243,18 +171,8 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
             @Override
             protected void onPostExecute(String msg) {
                 pDialog.setMessage("Calling Upload");
-                // Put converted Image string into Async Http Post param
                 parametres.put("photo", encodedString);
-//                File myFile = new File(mCurrentPhotoPath);
-//                try {
-//                    parametres.put("photo", myFile);
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//                nomFichier = getphotoFile().getName();
-//                parametres.put("filename", nomFichier);
                 parametres.put("id", mAdapter.getAnimateurId());
-                // Trigger Image upload
                 triggerImageUpload();
             }
         }.execute(null, null, null);
@@ -265,7 +183,6 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
     }
 
     public void makeHTTPCall() {
-        pDialog.setMessage("Transfert des données en cours. Merci de patienter...");
 //        String url = "http://192.168.1.12/imgupload/upload_image.php";
         String url = DaneContract.BASE_URL_UPDATE_PHOTO;
 //        String url="http://192.168.1.12/danecreteil/web/pnanimateurs/test";
@@ -274,18 +191,16 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
         // Don't forget to change the IP address to your LAN address. Port no as well.
         client.post(url, parametres, new BaseJsonHttpResponseHandler<JSONObject>() {
 
-//            @Override
-//            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, String response) {
-//                        pDialog.hide();
-//                        handleCameraPhoto();
-//                        Toast.makeText(getApplicationContext(), "Transfert réussi : "+rawJsonResponse,Toast.LENGTH_LONG).show();
-//
-//            }
-//
-//            @Override
-//            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, String errorResponse) {
-//
-//            }
+            @Override
+            public void onStart() {
+                pDialog.setMessage("Transfert des données en cours. Merci de patienter...");
+                pDialog.show();
+            }
+
+            @Override
+            public void onFinish() {
+                pDialog.hide();
+            }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
@@ -337,41 +252,7 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
                 return null;
             }
         });
-//        client.post(url,
-//                parametres, new  AsyncHttpResponseHandler() {
-//                    @Override
-//                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-//                        pDialog.hide();
-//                        handleCameraPhoto();
-//                        Toast.makeText(getApplicationContext(), "Transfert réussi",Toast.LENGTH_LONG).show();
-//                    }
-//
-//                    @Override
-//                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-//                        // Hide Progress Dialog
-//                        pDialog.hide();
-//                        // When Http response code is '404'
-//                        if (statusCode == 404) {
-//                            Toast.makeText(getApplicationContext(),
-//                                    "Ressorces de la requête non trouvées",
-//                                    Toast.LENGTH_LONG).show();
-//                        }
-//                        // When Http response code is '500'
-//                        else if (statusCode == 500) {
-//                            Toast.makeText(getApplicationContext(),
-//                                    "Lz serveur ne répond pas",
-//                                    Toast.LENGTH_LONG).show();
-//                        }
-//                        // When Http response code other than 404, 500
-//                        else {
-//                            Toast.makeText(
-//                                    getApplicationContext(),
-//                                    "Erreurs \n Sources d'erreurs: \n1. Pas de connection à internet\n2. Application non déployée sur le serveur\n3. Le serveur Web est à l'arrêt\n HTTP Status code : "
-//                                            + statusCode, Toast.LENGTH_LONG)
-//                                    .show();
-//                        }
-//                    }
-//                });
+
     }
 
     @Override
@@ -405,43 +286,11 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
             case REQUEST_IMAGE_CAPTURE:
                 if (resultCode == RESULT_OK) {
                     mCurrentPhotoPath = getphotoFile().getAbsolutePath();
-                    //                    String fileNameSegments[] = mCurrentPhotoPath.split("/");
-//                    nomFichier = fileNameSegments[fileNameSegments.length - 1];
-//                    nomFichier = getphotoFile().getName();
-//                    try {
-//                        params.put("filename", nomFichier);
-//                        params.put("photo", getphotoFile());
-//                        params.put("id", mAdapter.getAnimateurId());
-//                    } catch (FileNotFoundException e) {
-//                        e.printStackTrace();
-//                    } finally {
-//                        sendPhoto();
-//                    }
                     encodeImagetoString();
-//                    sendPhoto();
-//                    if (uploadFile(mAdapter.getAnimateurId())!=0) handleCameraPhoto();
-//                    handleCameraPhoto();
-//                    sendPhoto();
                 } else {
                     Log.w(LOG_TAG,"Erreur de capture Photo");
                 }
                 break;
-        }
-    }
-
-
-    private void writeStream(OutputStream out){
-        String output = "Hello world";
-
-        try {
-            out.write(output.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -583,7 +432,6 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-//        Log.d(LOG_TAG, "onCreateLoader for loader_id " + id);
         CursorLoader cl;
         if (id != -1) {
             // child cursor
@@ -612,16 +460,11 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         int id = loader.getId();
-//        Log.d(LOG_TAG, "onLoadFinished() for loader_id " + id);
         if (id != -1) {
-            // child cursor
             if (!cursor.isClosed()) {
-//                Log.d(LOG_TAG, "data.getCount() " + cursor.getCount());
-
                 HashMap<Integer, Integer> groupMap = mAdapter.getGroupMap();
                 try {
                     int groupPos = groupMap.get(id);
-//                    Log.d(LOG_TAG, "onLoadFinished() for groupPos " + groupPos);
                     mAdapter.setChildrenCursor(groupPos, cursor);
                 } catch (NullPointerException e) {
                     Log.w(LOG_TAG,"Adapter expired, try again on the next query: "
@@ -636,9 +479,7 @@ public class DepartementsActivity extends AppCompatActivity implements LoaderMan
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
             int id = loader.getId();
-//            Log.d(LOG_TAG, "onLoaderReset() for loader_id " + id);
             if (id != -1) {
-                // child cursor
                 try {
                     mAdapter.setChildrenCursor(id, null);
                 } catch (NullPointerException e) {

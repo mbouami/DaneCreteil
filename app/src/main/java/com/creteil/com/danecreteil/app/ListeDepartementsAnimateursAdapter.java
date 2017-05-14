@@ -50,7 +50,6 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
     protected HashMap<Integer, Integer> mGroupMap;
     protected String midanimateur;
     protected String manimateur_id;
-    private int nbreanimateurs;
     static PackageManager mpackageManager;
     protected String mCurrentPhotoPath;
     static final int REQUEST_TAKE_PHOTO = 1;
@@ -67,7 +66,6 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         mActivity = (DepartementsActivity) context;
         mGroupMap = new HashMap<Integer, Integer>();
         mContext = context;
-        nbreanimateurs = 0;
         mpackageManager = context.getPackageManager();
         pDialog = new ProgressDialog(context);
         pDialog.setIndeterminate(false);
@@ -95,7 +93,6 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
             photoView = (ImageView) view.findViewById(R.id.photo);
             departementView = (TextView) view.findViewById(R.id.departement);
             flecheView = (ImageView) view.findViewById(R.id.imagefleche);
-//            departementView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_arrow_forward_black_24dp,0,0,0);
         }
     }
 
