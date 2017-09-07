@@ -191,10 +191,6 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
         Intent shareIntent = new Intent(Intent.ACTION_DIAL);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setData(Uri.parse("tel:"+tel));
-    //        if (ActivityCompat.checkSelfPermission(getActivity(),
-    //                Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-    //            return null;
-    //        }
         return shareIntent;
     }
 
@@ -251,13 +247,6 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
             }
         });
 
-//        viewHolder.photoView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                UpdatePictureIntent(idanimateur,animateur_id);
-//            }
-//        });
-
         viewHolder.photoView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -270,6 +259,7 @@ public class ListeDepartementsAnimateursAdapter extends SimpleCursorTreeAdapter 
     private void UpdatePictureIntent(String idanimateur, String animateur_id) {
         final String idanim = idanimateur;
         AsyncHttpClient client = new AsyncHttpClient();
+        client.setBasicAuth("admin","admin");
         client.post(DaneContract.BASE_URL_UPDATE_ANIM+"/"+animateur_id, new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
             public void onStart() {

@@ -1,7 +1,6 @@
 package com.creteil.com.danecreteil.app;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -44,7 +43,6 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
     RadioGroup liste_depart;
 
     static String Villeencours = null;
-//    private String BASE_URL ="http://www.bouami.fr/gestionetabs/web/listedetailvilles";
     private String BASE_URL = DaneContract.BASE_URL + "/listedetailvilles";
 
     private static final String[] VILLES_COLUMNS = {
@@ -200,6 +198,7 @@ public class VillesFragment extends Fragment implements LoaderManager.LoaderCall
         pDialog.setIndeterminate(false);
         pDialog.setCancelable(false);
         AsyncHttpClient client = new AsyncHttpClient();
+        client.setBasicAuth("admin","admin");
         client.post(DaneContract.BASE_URL_LISTE_DETAIL_VILLES, new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
             public void onStart() {
